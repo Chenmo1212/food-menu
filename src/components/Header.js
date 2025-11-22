@@ -1,0 +1,22 @@
+import React from 'react';
+
+export default function Header() {
+  return (
+    <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
+      <div className="flex flex-col">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-800">Welcome, My Love ❤️</h1>
+        <p className="text-gray-500 text-sm">What would you like to eat today?</p>
+      </div>
+      <div className="relative w-full md:w-auto">
+        <input 
+          type="text" 
+          placeholder="Search category or menu..." 
+          className="pl-10 pr-4 py-3 rounded-xl bg-white w-full md:w-80 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+        />
+        <span className="absolute left-3 top-3.5 text-gray-400">🔍</span>
+      </div>
+    </header>
+  );
+}
+
+// Made with Bob
