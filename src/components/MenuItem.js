@@ -28,7 +28,7 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
         {item.name}
       </h3>
       <p className="text-gray-400 text-xs mb-4">
-        {item.stock} Pan Available
+        {(item.orderCount || 0) > 3 ? '🔥 ' : ''}{item.orderCount || 0} orders
       </p>
       
       <button

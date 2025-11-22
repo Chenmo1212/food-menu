@@ -59,9 +59,15 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
 
       {/* Modal Card */}
       <div
-        className={`fixed inset-4 md:inset-8 lg:inset-16 z-50 bg-white rounded-3xl shadow-2xl transition-opacity duration-300 ${
+        className={`fixed inset-4 md:inset-8 z-50 bg-white rounded-3xl shadow-2xl transition-opacity duration-300 ${
           isAnimating && !isClosing ? 'opacity-100' : 'opacity-0'
         }`}
+        style={{
+          left: window.innerWidth >= 1024 ? '30%' : undefined,
+          right: window.innerWidth >= 1024 ? '30%' : undefined,
+          top: window.innerWidth >= 1024 ? '5%' : undefined,
+          bottom: window.innerWidth >= 1024 ? '5%' : undefined,
+        }}
       >
         <div
           ref={contentRef}
@@ -89,16 +95,29 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
           {/* Modal Content */}
           <div>
             <div className="p-6 md:p-8">
-            {/* Title */}
+            {/* Title and Recommend Button */}
             <div className="flex justify-between items-start mb-4">
-              <div>
+              <div className="flex-1">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
                   {item.name}
                 </h2>
-                <p className="text-gray-500 text-sm">
-                  {item.stock} Pan Available
-                </p>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500 text-sm">
+                    {(item.orderCount || 0) > 3 ? '🔥 ' : ''}{item.orderCount || 0} orders
+                  </span>
+                </div>
               </div>
+              <button className="ml-4 px-4 py-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-xl font-medium text-sm hover:from-orange-500 hover:to-orange-600 transition-all shadow-md hover:shadow-lg flex items-center gap-2 whitespace-nowrap">
+                <span>⭐</span>
+                <span>Recommend</span>
+              </button>
+            </div>
+
+            {/* Price */}
+            <div className="mb-4">
+              <p className="text-3xl font-bold text-orange-500">
+                ${item.price.toFixed(2)}
+              </p>
             </div>
 
             {/* Description */}
