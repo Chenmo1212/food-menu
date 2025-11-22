@@ -4,6 +4,7 @@ import Header from './components/Header';
 import CategoryFilter from './components/CategoryFilter';
 import MenuGrid from './components/MenuGrid';
 import Cart from './components/Cart';
+import MenuItemModal from './components/MenuItemModal';
 import { MENU_ITEMS } from './data/menuData';
 
 export default function App() {
@@ -18,6 +19,25 @@ export default function App() {
     },
   ]);
   const [activeCategory, setActiveCategory] = useState('Pizza');
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [cardRect, setCardRect] = useState(null);
+
+  // Handle item click to open modal
+  const handleItemClick = (item, rect) => {
+    setSelectedItem(item);
+    setCardRect(rect);
+    setModalOpen(true);
+  };
+
+  // Close modal
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setTimeout(() => {
+      setSelectedItem(null);
+      setCardRect(null);
+    }, 300);
+  };
 
   // Add to cart logic
   const addToCart = (item) => {
@@ -76,6 +96,7 @@ export default function App() {
             items={MENU_ITEMS}
             activeCategory={activeCategory}
             onAddToCart={addToCart}
+            onItemClick={handleItemClick}
           />
         </div>
       </main>
@@ -87,6 +108,16 @@ export default function App() {
         onCheckout={handleCheckout}
       />
 
+      {/* Menu Item Detail Modal */}
+      {selectedItem && (
+        <MenuItemModal
+          item={selectedItem}
+          isOpen={modalOpen}
+          onClose={handleCloseModal}
+          onAddToCart={addToCart}
+          cardRect={cardRect}
+        />
+      )}
     </div>
   );
 }
