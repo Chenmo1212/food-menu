@@ -4,7 +4,7 @@ export default function Header() {
   return (
     <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
       <div className="flex flex-col">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800">Welcome, My Love ❤️</h1>
+        <h1 className="text-xl md:text-2xl font-bold text-gray-800">Welcome, Yuan Bao ❤️</h1>
         <p className="text-gray-500 text-sm">What would you like to eat today?</p>
       </div>
       <div className="relative w-full md:w-auto">

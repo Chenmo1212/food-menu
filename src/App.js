@@ -6,6 +6,7 @@ import MenuGrid from './components/MenuGrid';
 import Cart from './components/Cart';
 import MenuItemModal from './components/MenuItemModal';
 import { MENU_ITEMS } from './data/menuData';
+import { sendMarkdownToWeChat } from './services/wechatNotification';
 
 export default function App() {
   const [cart, setCart] = useState([
@@ -62,8 +63,17 @@ export default function App() {
   };
 
   // Handle checkout
-  const handleCheckout = (total, deliveryInfo = '') => {
-    alert(`Order placed for my love! Total: $${total.toFixed(2)}${deliveryInfo}`);
+  const handleCheckout = async (total, deliveryInfo = '', markdown = '') => {
+    console.log('Order Summary (Markdown):\n', markdown);
+    
+    // Send to WeChat via backend
+    const result = await sendMarkdownToWeChat(markdown, deliveryInfo);
+    
+    if (result.success) {
+      alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\n✅ Notification sent successfully!`);
+    } else {
+      alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\n⚠️ Failed to send notification: ${result.message}\n\nPlease check console for details.`);
+    }
   };
 
   return (

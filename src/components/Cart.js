@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import CartItem from './CartItem';
+import OrderSummaryModal from './OrderSummaryModal';
 
 export default function Cart({ cart, onUpdateQty, onCheckout }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showDeliveryPicker, setShowDeliveryPicker] = useState(false);
+  const [showOrderSummary, setShowOrderSummary] = useState(false);
   
   // Get next Monday
   const getNextMonday = () => {
@@ -29,6 +31,13 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
     const displayHours = hours % 12 || 12;
     const displayMinutes = minutes.toString().padStart(2, '0');
     return `${dayName}, ${displayHours}:${displayMinutes} ${period}`;
+  };
+  
+  // Handle order submission
+  const handleSubmitOrder = (markdown) => {
+    const deliveryInfo = `${deliveryDate} at ${deliveryTime}`;
+    onCheckout(0, deliveryInfo, markdown);
+    setIsOpen(false);
   };
   
   // Calculate totals
@@ -257,18 +266,22 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
 
           <button
             className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-200 transition-all mt-4"
-            onClick={() => {
-              const deliveryInfo = deliveryDate && deliveryTime
-                ? `\nDelivery: ${deliveryDate} at ${deliveryTime}`
-                : '';
-              onCheckout(total, deliveryInfo);
-              setIsOpen(false);
-            }}
+            onClick={() => setShowOrderSummary(true)}
           >
             Print Bills
           </button>
         </div>
       </aside>
+
+      {/* Order Summary Modal */}
+      <OrderSummaryModal
+        isOpen={showOrderSummary}
+        onClose={() => setShowOrderSummary(false)}
+        cart={cart}
+        deliveryDate={deliveryDate}
+        deliveryTime={deliveryTime}
+        onSubmit={handleSubmitOrder}
+      />
     </>
   );
 }
