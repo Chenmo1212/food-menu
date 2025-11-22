@@ -14,16 +14,17 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
     <div
       ref={cardRef}
       onClick={handleClick}
-      className="bg-white p-4 rounded-3xl shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col items-center relative group hover:scale-105"
+      className="bg-white p-4 pt-16 md:pt-24 rounded-3xl shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col items-center relative group hover:scale-105 md:min-h-[220px]"
     >
-      <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full overflow-hidden mb-4 shadow-md border-4 border-gray-50">
-        <img 
-          src={item.image} 
-          alt={item.name} 
-          className="w-full h-full object-cover" 
+      {/* Image protruding above the card */}
+      <div className="absolute -top-12 md:-top-14 left-1/2 transform -translate-x-1/2 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl overflow-hidden shadow-lg border-4 border-white">
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-full h-full object-cover"
         />
       </div>
-      <h3 className="font-bold text-base md:text-lg text-center mb-1 line-clamp-2">
+      <h3 className="font-bold text-base md:text-lg text-center mb-1 line-clamp-2 mt-2">
         {item.name}
       </h3>
       <p className="text-gray-400 text-xs mb-4">

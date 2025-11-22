@@ -87,10 +87,12 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
           </button>
 
           {/* Hero Image */}
-          <div className={`relative w-full bg-gradient-to-br from-orange-50 to-orange-100 transition-all duration-300 ${
-            isAnimating ? 'h-64 md:h-96' : 'h-32 sm:h-36 md:h-40'
+          <div className={`relative w-full transition-all duration-300 ${
+            isAnimating
+              ? 'h-64 md:h-96 bg-gradient-to-br from-orange-50 to-orange-100'
+              : 'h-0 bg-transparent'
           }`}>
-            <div className={`w-full h-full ${isAnimating ? '' : 'rounded-full mx-auto'}`} style={!isAnimating ? { maxWidth: '160px' } : {}}>
+            <div className={`w-full h-full ${isAnimating ? '' : 'hidden'}`}>
               <img
                 src={item.image}
                 alt={item.name}
@@ -99,11 +101,22 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
             </div>
           </div>
 
-          {/* Card Content - Visible when closing */}
-          <div className={`transition-opacity duration-200 ${
-            isAnimating ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 p-4'
+          {/* Card Content - Visible when closing with protruding image */}
+          <div className={`transition-opacity duration-200 relative ${
+            isAnimating ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 p-4 pt-20 md:pt-24 pb-6 min-h-[200px] md:min-h-[220px]'
           }`}>
-            <h3 className="font-bold text-base md:text-lg text-center mb-1 line-clamp-2">
+            {/* Protruding Image */}
+            <div className={`absolute -top-12 md:-top-14 left-1/2 transform -translate-x-1/2 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl overflow-hidden shadow-lg border-4 border-white ${
+              isAnimating ? 'opacity-0' : 'opacity-100'
+            }`}>
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            <h3 className="font-bold text-base md:text-lg text-center mb-1 line-clamp-2 mt-2">
               {item.name}
             </h3>
             <p className="text-gray-400 text-xs mb-4 text-center">
