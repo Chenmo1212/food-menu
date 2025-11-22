@@ -20,6 +20,7 @@ export default function App() {
     },
   ]);
   const [activeCategory, setActiveCategory] = useState('Pizza');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [cardRect, setCardRect] = useState(null);
@@ -76,6 +77,20 @@ export default function App() {
     }
   };
 
+  // Filter items based on search query and active category
+  const filteredItems = MENU_ITEMS.filter(item => {
+    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
+    const matchesSearch = searchQuery === '' ||
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (item.ingredients && item.ingredients.some(ingredient =>
+        ingredient.toLowerCase().includes(searchQuery.toLowerCase())
+      ));
+    
+    return matchesCategory && matchesSearch;
+  });
+
   return (
     <div className="flex h-screen bg-gray-100 font-sans text-gray-800 overflow-hidden">
       {/* Left Sidebar Navigation - Hidden on mobile */}
@@ -85,7 +100,10 @@ export default function App() {
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Sticky Header Section - Fixed on mobile, normal on desktop */}
         <div className="lg:relative lg:p-6 lg:pt-8 sticky top-0 z-20 bg-gray-100 p-4">
-          <Header />
+          <Header
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
           
           <CategoryFilter
             activeCategory={activeCategory}
@@ -94,9 +112,11 @@ export default function App() {
 
           {/* Section Title - Also sticky */}
           <div className="flex justify-between items-center mt-4 md:mt-6">
-            <h2 className="text-lg md:text-xl font-bold">Choose {activeCategory}</h2>
+            <h2 className="text-lg md:text-xl font-bold">
+              {searchQuery ? `Search Results` : `Choose ${activeCategory}`}
+            </h2>
             <span className="text-gray-400 text-xs md:text-sm">
-              {MENU_ITEMS.length} items result
+              {filteredItems.length} items result
             </span>
           </div>
         </div>
@@ -104,7 +124,7 @@ export default function App() {
         {/* Scrollable Menu Grid */}
         <div className="flex-1 overflow-y-auto p-4 pt-4 md:p-6 md:pt-6 lg:p-8 lg:pt-6">
           <MenuGrid
-            items={MENU_ITEMS}
+            items={filteredItems}
             activeCategory={activeCategory}
             onAddToCart={addToCart}
             onItemClick={handleItemClick}

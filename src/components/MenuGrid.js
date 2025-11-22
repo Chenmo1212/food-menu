@@ -2,6 +2,18 @@ import React from 'react';
 import MenuItem from './MenuItem';
 
 export default function MenuGrid({ items, activeCategory, onAddToCart, onItemClick }) {
+  if (items.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="text-6xl mb-4">🔍</div>
+        <h3 className="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
+        <p className="text-gray-500 max-w-md">
+          Try adjusting your search terms or browse different categories to find what you're looking for.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Product Grid - Responsive with top margin for protruding images */}
