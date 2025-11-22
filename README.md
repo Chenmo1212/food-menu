@@ -1,70 +1,269 @@
-# Getting Started with Create React App
+# Food Menu App - Project Structure
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## 📁 File Organization
 
-## Available Scripts
+```
+food-menu/
+│
+├── public/                      # Static files
+│   ├── index.html
+│   └── ...
+│
+├── src/
+│   ├── components/              # ✨ NEW: Reusable components
+│   │   ├── Sidebar.js          # Desktop left navigation (hidden on mobile)
+│   │   ├── MobileNav.js        # Mobile bottom navigation (hidden on desktop)
+│   │   ├── Header.js           # Page header with search bar
+│   │   ├── CategoryFilter.js   # Category selection buttons
+│   │   ├── MenuGrid.js         # Grid container for menu items
+│   │   ├── MenuItem.js         # Individual menu item card
+│   │   ├── Cart.js             # Shopping cart (sidebar/overlay)
+│   │   └── CartItem.js         # Individual cart item row
+│   │
+│   ├── data/                    # ✨ NEW: Data files
+│   │   └── menuData.js         # Menu items & categories
+│   │
+│   ├── App.js                   # ✅ REFACTORED: Main app (now clean!)
+│   ├── index.js                 # Entry point
+│   ├── index.css                # ✅ UPDATED: Global styles + utilities
+│   └── ...
+│
+├── package.json
+├── tailwind.config.js
+├── postcss.config.js
+├── REFACTORING_GUIDE.md         # ✨ NEW: Detailed guide
+└── PROJECT_STRUCTURE.md         # ✨ NEW: This file
+```
 
-In the project directory, you can run:
+## 🔄 Component Hierarchy
 
-### `npm start`
+```
+App
+├── Sidebar (Desktop only)
+│   └── NavItem (x6)
+│
+├── Main Content
+│   ├── Header
+│   │   └── Search Input
+│   │
+│   ├── CategoryFilter
+│   │   └── Category Buttons (x5)
+│   │
+│   └── MenuGrid
+│       └── MenuItem (x6)
+│           └── Add to Order Button
+│
+├── Cart (Responsive)
+│   ├── Cart Header
+│   ├── Dine In/Take Away Toggle
+│   ├── Cart Items List
+│   │   └── CartItem (multiple)
+│   │       └── Quantity Controls
+│   ├── Totals Summary
+│   └── Print Bills Button
+│
+└── MobileNav (Mobile/Tablet only)
+    └── NavButton (x5)
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 📱 Responsive Behavior
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Desktop (≥ 1024px)
+```
+┌─────────┬──────────────────────────┬─────────────┐
+│         │                          │             │
+│ Sidebar │    Main Content          │    Cart     │
+│         │    - Header              │  (Sidebar)  │
+│ (Fixed) │    - Categories          │             │
+│         │    - Menu Grid (3 cols)  │  (Fixed)    │
+│         │                          │             │
+└─────────┴──────────────────────────┴─────────────┘
+```
 
-### `npm test`
+### Tablet (768px - 1023px)
+```
+┌──────────────────────────────────────┐
+│         Main Content                 │
+│         - Header                     │
+│         - Categories                 │
+│         - Menu Grid (2 cols)         │
+│                                      │
+│                          [Cart Btn]  │ ← Floating
+└──────────────────────────────────────┘
+┌──────────────────────────────────────┐
+│     Bottom Navigation Bar            │
+└──────────────────────────────────────┘
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Mobile (< 768px)
+```
+┌────────────────────────┐
+│    Main Content        │
+│    - Header (stacked)  │
+│    - Categories        │
+│    - Menu Grid (2 col) │
+│                        │
+│            [Cart Btn]  │ ← Floating
+└────────────────────────┘
+┌────────────────────────┐
+│  Bottom Navigation     │
+└────────────────────────┘
 
-### `npm run build`
+When Cart Opens:
+┌────────────────────────┐
+│ [Overlay]   │  Cart    │
+│             │  Panel   │
+│             │  [X]     │
+│             │          │
+│             │  Items   │
+│             │          │
+│             │  Total   │
+└─────────────┴──────────┘
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🎨 Component Responsibilities
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### **Sidebar.js**
+- Desktop navigation
+- Logo/branding
+- Navigation items with icons
+- User profile avatar
+- Hidden on mobile/tablet
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### **MobileNav.js**
+- Bottom navigation bar
+- 5 main navigation items
+- Active state highlighting
+- Only visible on mobile/tablet
 
-### `npm run eject`
+### **Header.js**
+- Welcome message
+- Search input
+- Responsive layout (stacked on mobile)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### **CategoryFilter.js**
+- Category selection buttons
+- Horizontal scrollable on mobile
+- Active category highlighting
+- Receives: `activeCategory`, `onCategoryChange`
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### **MenuGrid.js**
+- Container for menu items
+- Section title with item count
+- Responsive grid (2-3 columns)
+- Receives: `items`, `activeCategory`, `onAddToCart`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### **MenuItem.js**
+- Individual menu item card
+- Product image (circular)
+- Name, price, stock info
+- "Add to Order" button
+- Receives: `item`, `onAddToCart`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### **Cart.js**
+- Shopping cart display
+- Responsive (sidebar/overlay)
+- Floating button on mobile
+- Order summary and totals
+- Checkout button
+- Receives: `cart`, `onUpdateQty`, `onCheckout`
 
-## Learn More
+### **CartItem.js**
+- Individual cart item row
+- Product image and details
+- Quantity controls (+/-)
+- Price calculation
+- Receives: `item`, `onUpdateQty`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 📊 Data Flow
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+menuData.js
+    ↓
+  App.js (State Management)
+    ├── activeCategory
+    ├── cart
+    ├── addToCart()
+    ├── updateQty()
+    └── handleCheckout()
+    ↓
+Components (Props)
+    ├── CategoryFilter ← activeCategory, onCategoryChange
+    ├── MenuGrid ← items, activeCategory, onAddToCart
+    └── Cart ← cart, onUpdateQty, onCheckout
+```
 
-### Code Splitting
+## 🔧 State Management
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+All state is managed in `App.js`:
 
-### Analyzing the Bundle Size
+```javascript
+const [cart, setCart] = useState([...])
+const [activeCategory, setActiveCategory] = useState('Pizza')
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Functions:
+- `addToCart(item)` - Add item to cart or increment quantity
+- `updateQty(id, delta)` - Update item quantity (+1 or -1)
+- `handleCheckout(total)` - Process checkout
 
-### Making a Progressive Web App
+## 🎯 Key Features
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### ✅ Responsive Design
+- Mobile-first approach
+- Tailwind breakpoints (sm, md, lg, xl)
+- Adaptive layouts for all screen sizes
 
-### Advanced Configuration
+### ✅ Component Separation
+- Single Responsibility Principle
+- Reusable components
+- Clean prop interfaces
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### ✅ User Experience
+- Smooth transitions
+- Intuitive mobile cart
+- Touch-friendly buttons
+- Horizontal scroll for categories
 
-### Deployment
+### ✅ Code Organization
+- Separated data from logic
+- Clear file structure
+- Easy to maintain and extend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## 📈 Lines of Code Comparison
 
-### `npm run build` fails to minify
+**Before Refactoring:**
+- App.js: ~224 lines (everything in one file)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**After Refactoring:**
+- App.js: ~80 lines (clean and focused)
+- Components: ~8 files (~30-40 lines each)
+- Data: 1 file (~56 lines)
+- **Total: Better organized, more maintainable!**
+
+## 🚀 Getting Started
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Start development server:**
+   ```bash
+   npm start
+   ```
+
+3. **Test responsive design:**
+   - Resize browser window
+   - Use browser DevTools device toolbar
+   - Test on actual devices
+
+## 📚 Related Documentation
+
+- [REFACTORING_GUIDE.md](./REFACTORING_GUIDE.md) - Detailed refactoring guide
+- [README.md](./README.md) - Project overview
+- [Tailwind CSS Docs](https://tailwindcss.com/docs) - Styling reference
+
+---
+
+**Last Updated:** 2025-11-22
