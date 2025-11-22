@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
-import MobileNav from './components/MobileNav';
 import Header from './components/Header';
 import CategoryFilter from './components/CategoryFilter';
 import MenuGrid from './components/MenuGrid';
@@ -51,20 +50,34 @@ export default function App() {
       {/* Left Sidebar Navigation - Hidden on mobile */}
       <Sidebar />
 
-      {/* Main Content Area - Responsive with bottom padding for mobile nav */}
-      <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto pb-20 lg:pb-8">
-        <Header />
-        
-        <CategoryFilter
-          activeCategory={activeCategory}
-          onCategoryChange={setActiveCategory}
-        />
+      {/* Main Content Area - Responsive */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Sticky Header Section - Fixed on mobile, normal on desktop */}
+        <div className="lg:relative lg:p-6 lg:pt-8 sticky top-0 z-20 bg-gray-100 p-4">
+          <Header />
+          
+          <CategoryFilter
+            activeCategory={activeCategory}
+            onCategoryChange={setActiveCategory}
+          />
 
-        <MenuGrid
-          items={MENU_ITEMS}
-          activeCategory={activeCategory}
-          onAddToCart={addToCart}
-        />
+          {/* Section Title - Also sticky */}
+          <div className="flex justify-between items-center mt-4 md:mt-6">
+            <h2 className="text-lg md:text-xl font-bold">Choose {activeCategory}</h2>
+            <span className="text-gray-400 text-xs md:text-sm">
+              {MENU_ITEMS.length} items result
+            </span>
+          </div>
+        </div>
+
+        {/* Scrollable Menu Grid */}
+        <div className="flex-1 overflow-y-auto p-4 pt-4 md:p-6 md:pt-6 lg:p-8 lg:pt-6">
+          <MenuGrid
+            items={MENU_ITEMS}
+            activeCategory={activeCategory}
+            onAddToCart={addToCart}
+          />
+        </div>
       </main>
 
       {/* Right Sidebar (Order Summary) - Responsive */}
@@ -74,8 +87,6 @@ export default function App() {
         onCheckout={handleCheckout}
       />
 
-      {/* Mobile Bottom Navigation */}
-      <MobileNav />
     </div>
   );
 }

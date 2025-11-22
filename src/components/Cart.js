@@ -14,7 +14,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
       {/* Mobile Cart Button - Fixed at bottom */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed bottom-24 right-4 bg-orange-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2 z-50"
+        className="lg:hidden fixed bottom-4 right-4 bg-orange-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2 z-50"
       >
         <span>🛒</span>
         <span className="font-bold">({cart.length})</span>

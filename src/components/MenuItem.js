@@ -13,9 +13,6 @@ export default function MenuItem({ item, onAddToCart }) {
       <h3 className="font-bold text-base md:text-lg text-center mb-1 line-clamp-2">
         {item.name}
       </h3>
-      <p className="text-orange-500 font-bold text-lg mb-2">
-        ${item.price}
-      </p>
       <p className="text-gray-400 text-xs mb-4">
         {item.stock} Pan Available
       </p>
