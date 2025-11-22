@@ -24,10 +24,6 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
   const handleClose = () => {
     setIsClosing(true);
     setIsAnimating(false);
-    // Scroll to top before closing animation for smooth transition
-    if (contentRef.current) {
-      contentRef.current.scrollTop = 0;
-    }
     setTimeout(() => {
       setIsClosing(false);
       onClose();
@@ -41,7 +37,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
 
   if (!isOpen && !isClosing) return null;
 
-  // Calculate initial position and size from card
+  // Calculate initial position and size from card for opening animation
   const initialStyle = cardRect ? {
     position: 'fixed',
     top: `${cardRect.top}px`,
@@ -54,27 +50,22 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
   return (
     <>
       {/* Backdrop */}
-      <div 
+      <div
         className={`fixed inset-0 bg-black z-40 transition-opacity duration-300 ${
-          isAnimating ? 'opacity-50' : 'opacity-0'
+          isAnimating && !isClosing ? 'opacity-50' : 'opacity-0'
         }`}
         onClick={handleClose}
       />
 
       {/* Modal Card */}
       <div
-        className={`fixed z-50 bg-white transition-all duration-300 ease-out ${
-          isAnimating
-            ? 'inset-4 md:inset-8 lg:inset-16 rounded-3xl shadow-2xl'
-            : 'rounded-3xl shadow-lg'
+        className={`fixed inset-4 md:inset-8 lg:inset-16 z-50 bg-white rounded-3xl shadow-2xl transition-opacity duration-300 ${
+          isAnimating && !isClosing ? 'opacity-100' : 'opacity-0'
         }`}
-        style={!isAnimating ? initialStyle : {}}
       >
         <div
           ref={contentRef}
-          className={`h-full transition-opacity duration-200 ${
-            isAnimating ? 'overflow-y-auto' : 'overflow-hidden'
-          }`}
+          className="h-full overflow-y-auto"
         >
           {/* Close Button */}
           <button
@@ -87,52 +78,16 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
           </button>
 
           {/* Hero Image */}
-          <div className={`relative w-full transition-all duration-300 ${
-            isAnimating
-              ? 'h-64 md:h-96 bg-gradient-to-br from-orange-50 to-orange-100'
-              : 'h-0 bg-transparent'
-          }`}>
-            <div className={`w-full h-full ${isAnimating ? '' : 'hidden'}`}>
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
+          <div className="relative w-full h-64 md:h-96 bg-gradient-to-br from-orange-50 to-orange-100">
+            <img
+              src={item.image}
+              alt={item.name}
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          {/* Card Content - Visible when closing with protruding image */}
-          <div className={`transition-opacity duration-200 relative ${
-            isAnimating ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100 p-4 pt-20 md:pt-24 pb-6 min-h-[200px] md:min-h-[220px]'
-          }`}>
-            {/* Protruding Image */}
-            <div className={`absolute -top-12 md:-top-14 left-1/2 transform -translate-x-1/2 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl overflow-hidden shadow-lg border-4 border-white ${
-              isAnimating ? 'opacity-0' : 'opacity-100'
-            }`}>
-              <img
-                src={item.image}
-                alt={item.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            
-            <h3 className="font-bold text-base md:text-lg text-center mb-1 line-clamp-2 mt-2">
-              {item.name}
-            </h3>
-            <p className="text-gray-400 text-xs mb-4 text-center">
-              {item.stock} Pan Available
-            </p>
-            <button
-              className="bg-orange-100 text-orange-600 px-4 py-2 rounded-xl font-medium text-sm w-full"
-            >
-              Add to Order
-            </button>
-          </div>
-
-          {/* Modal Content - Only visible when fully expanded */}
-          <div className={`transition-opacity duration-200 ${
-            isAnimating ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden'
-          }`}>
+          {/* Modal Content */}
+          <div>
             <div className="p-6 md:p-8">
             {/* Title and Price */}
             <div className="flex justify-between items-start mb-4">
