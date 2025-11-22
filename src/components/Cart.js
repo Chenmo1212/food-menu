@@ -84,14 +84,14 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         </div>
 
         {/* Toggle */}
-        <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
+        {/* <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
           <button className="flex-1 py-2 rounded-lg bg-orange-500 text-white text-sm font-bold shadow-sm">
             Dine In
           </button>
           <button className="flex-1 py-2 rounded-lg text-gray-500 text-sm font-medium">
             Take Away
           </button>
-        </div>
+        </div> */}
 
         {/* Cart List */}
         <div className="flex-1 overflow-y-auto pr-2 space-y-4 md:space-y-6">
@@ -242,7 +242,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
 
         {/* Footer Totals */}
         <div className="mt-6 border-t pt-6 space-y-3">
-          <div className="flex justify-between text-gray-500 text-sm">
+          {/* <div className="flex justify-between text-gray-500 text-sm">
             <span>Items ({cart.length})</span>
             <span className="font-bold text-gray-800">${subtotal.toFixed(2)}</span>
           </div>
@@ -253,7 +253,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
           <div className="flex justify-between text-xl font-bold border-t border-dashed pt-4 mt-2">
             <span>Total</span>
             <span className="text-orange-500">${total.toFixed(2)}</span>
-          </div>
+          </div> */}
 
           <button
             className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-200 transition-all mt-4"

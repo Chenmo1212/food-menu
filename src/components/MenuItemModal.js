@@ -124,52 +124,56 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
             </div>
 
             {/* Description */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Description</h3>
-              <p className="text-gray-600 leading-relaxed">
-                Indulge in our delicious {item.name}, crafted with the finest ingredients and 
-                prepared fresh to order. Perfect for any occasion, this {item.category.toLowerCase()} 
-                is sure to satisfy your cravings and leave you wanting more.
-              </p>
-            </div>
+            {item.description && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Description</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+            )}
 
             {/* Ingredients */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Ingredients</h3>
-              <div className="flex flex-wrap gap-2">
-                {['Fresh Dough', 'Tomato Sauce', 'Mozzarella', 'Basil', 'Olive Oil'].map((ingredient, idx) => (
-                  <span 
-                    key={idx}
-                    className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-                  >
-                    {ingredient}
-                  </span>
-                ))}
+            {item.ingredients && item.ingredients.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Ingredients</h3>
+                <div className="flex flex-wrap gap-2">
+                  {item.ingredients.map((ingredient, idx) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                    >
+                      {ingredient}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Nutritional Info */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Nutritional Information</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-gray-50 p-3 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-gray-800">320</p>
-                  <p className="text-xs text-gray-500">Calories</p>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-gray-800">15g</p>
-                  <p className="text-xs text-gray-500">Protein</p>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-gray-800">12g</p>
-                  <p className="text-xs text-gray-500">Fat</p>
-                </div>
-                <div className="bg-gray-50 p-3 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-gray-800">35g</p>
-                  <p className="text-xs text-gray-500">Carbs</p>
+            {item.nutrition && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Nutritional Information</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-gray-50 p-3 rounded-xl text-center">
+                    <p className="text-2xl font-bold text-gray-800">{item.nutrition.calories}</p>
+                    <p className="text-xs text-gray-500">Calories</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-xl text-center">
+                    <p className="text-2xl font-bold text-gray-800">{item.nutrition.protein}</p>
+                    <p className="text-xs text-gray-500">Protein</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-xl text-center">
+                    <p className="text-2xl font-bold text-gray-800">{item.nutrition.fat}</p>
+                    <p className="text-xs text-gray-500">Fat</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-xl text-center">
+                    <p className="text-2xl font-bold text-gray-800">{item.nutrition.carbs}</p>
+                    <p className="text-xs text-gray-500">Carbs</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Special Notes */}
             <div className="mb-8">
