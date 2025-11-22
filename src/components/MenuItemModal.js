@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, cardRect }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [specialInstructions, setSpecialInstructions] = useState('');
   const contentRef = useRef(null);
+  const { language, t } = useLanguage();
 
   useEffect(() => {
     if (isOpen) {
@@ -90,7 +92,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
           <div className="relative w-full h-64 md:h-96 bg-gradient-to-br from-orange-50 to-orange-100">
             <img
               src={item.image}
-              alt={item.name}
+              alt={language === 'zh' ? item.name : item.nameEn}
               className="w-full h-full object-cover"
             />
           </div>
@@ -102,36 +104,41 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
-                  {item.name}
+                  {language === 'zh' ? item.name : item.nameEn}
                 </h2>
                 <div className="flex items-center gap-2">
                   <span className="text-gray-500 text-sm">
-                    {(item.orderCount || 0) > 3 ? '🔥 ' : ''}{item.orderCount || 0} orders
+                    {(item.orderCount || 0) > 3 ? '🔥 ' : ''}
+                    {item.orderCount || 0} {t('orders', '单')}
                   </span>
                 </div>
               </div>
               <button className="ml-4 px-4 py-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-xl font-medium text-sm hover:from-orange-500 hover:to-orange-600 transition-all shadow-md hover:shadow-lg flex items-center gap-2 whitespace-nowrap">
                 <span>⭐</span>
-                <span>Recommend</span>
+                <span>{t('Recommend', '推荐')}</span>
               </button>
             </div>
 
             {/* Description */}
-            {item.description && (
+            {(item.description || item.descriptionEn) && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Description</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  {t('Description', '描述')}
+                </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  {item.description}
+                  {language === 'zh' ? item.description : item.descriptionEn}
                 </p>
               </div>
             )}
 
             {/* Ingredients */}
-            {item.ingredients && item.ingredients.length > 0 && (
+            {((language === 'zh' && item.ingredients) || (language === 'en' && item.ingredientsEn)) && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Ingredients</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  {t('Ingredients', '食材')}
+                </h3>
                 <div className="flex flex-wrap gap-2">
-                  {item.ingredients.map((ingredient, idx) => (
+                  {(language === 'zh' ? item.ingredients : item.ingredientsEn)?.map((ingredient, idx) => (
                     <span
                       key={idx}
                       className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
@@ -146,23 +153,25 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
             {/* Nutritional Info */}
             {item.nutrition && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">Nutritional Information</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                  {t('Nutritional Information', '营养信息')}
+                </h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-gray-50 p-3 rounded-xl text-center">
                     <p className="text-2xl font-bold text-gray-800">{item.nutrition.calories}</p>
-                    <p className="text-xs text-gray-500">Calories</p>
+                    <p className="text-xs text-gray-500">{t('Calories', '卡路里')}</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-xl text-center">
                     <p className="text-2xl font-bold text-gray-800">{item.nutrition.protein}</p>
-                    <p className="text-xs text-gray-500">Protein</p>
+                    <p className="text-xs text-gray-500">{t('Protein', '蛋白质')}</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-xl text-center">
                     <p className="text-2xl font-bold text-gray-800">{item.nutrition.fat}</p>
-                    <p className="text-xs text-gray-500">Fat</p>
+                    <p className="text-xs text-gray-500">{t('Fat', '脂肪')}</p>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-xl text-center">
                     <p className="text-2xl font-bold text-gray-800">{item.nutrition.carbs}</p>
-                    <p className="text-xs text-gray-500">Carbs</p>
+                    <p className="text-xs text-gray-500">{t('Carbs', '碳水')}</p>
                   </div>
                 </div>
               </div>
@@ -170,11 +179,13 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
 
             {/* Special Notes */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Special Instructions</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                {t('Special Instructions', '特殊要求')}
+              </h3>
               <textarea
                 value={specialInstructions}
                 onChange={(e) => setSpecialInstructions(e.target.value)}
-                placeholder="Add any special requests or dietary requirements..."
+                placeholder={t('Add any special requests or dietary requirements...', '添加任何特殊要求或饮食需求...')}
                 className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
                 rows="3"
               />
@@ -185,7 +196,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
                 onClick={handleAddToCart}
                 className="w-full bg-orange-500 text-white py-4 rounded-2xl font-semibold text-lg hover:bg-orange-600 transition-colors shadow-lg hover:shadow-xl"
               >
-                Add to Order
+                {t('Add to Order', '加入订单')}
               </button>
             </div>
           </div>

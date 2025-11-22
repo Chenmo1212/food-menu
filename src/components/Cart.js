@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import CartItem from './CartItem';
 import OrderSummaryModal from './OrderSummaryModal';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Cart({ cart, onUpdateQty, onCheckout }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showDeliveryPicker, setShowDeliveryPicker] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
+  const { t } = useLanguage();
   
   // Get next Monday
   const getNextMonday = () => {
@@ -87,7 +89,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h2 className="font-bold text-xl">Current Order</h2>
+            <h2 className="font-bold text-xl">{t('Current Order', '当前订单')}</h2>
             <p className="text-gray-400 text-sm">#907653</p>
           </div>
         </div>
@@ -105,7 +107,9 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         {/* Cart List */}
         <div className="flex-1 overflow-y-auto pr-2 space-y-4 md:space-y-6">
           {cart.length === 0 ? (
-            <div className="text-center text-gray-400 mt-10">Cart is empty 🛒</div>
+            <div className="text-center text-gray-400 mt-10">
+              {t('Cart is empty 🛒', '购物车是空的 🛒')}
+            </div>
           ) : (
             cart.map(item => (
               <CartItem
@@ -128,7 +132,9 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
                 <span className="text-xl">🕐</span>
               </div>
               <div className="text-left">
-                <p className="text-xs text-gray-500 font-medium">Delivery Time</p>
+                <p className="text-xs text-gray-500 font-medium">
+                  {t('Delivery Time', '送达时间')}
+                </p>
                 <p className="text-sm font-bold text-gray-800">{formatDeliveryDisplay()}</p>
               </div>
             </div>
@@ -268,7 +274,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
             className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-200 transition-all mt-4"
             onClick={() => setShowOrderSummary(true)}
           >
-            Get Summary
+            {t('Get Summary', '获取摘要')}
           </button>
         </div>
       </aside>

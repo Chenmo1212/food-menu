@@ -7,19 +7,12 @@ import Cart from './components/Cart';
 import MenuItemModal from './components/MenuItemModal';
 import { MENU_ITEMS } from './data/menuData';
 import { sendMarkdownToWeChat } from './services/wechatNotification';
+import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 
-export default function App() {
-  const [cart, setCart] = useState([
-    {
-      id: 101,
-      name: 'Orange Juice',
-      price: 2.87,
-      qty: 4,
-      note: 'Less Ice',
-      image: 'https://images.unsplash.com/photo-1600271886742-f049cd451bba?ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=60'
-    },
-  ]);
-  const [activeCategory, setActiveCategory] = useState('Pizza');
+function AppContent() {
+  const { t } = useLanguage();
+  const [cart, setCart] = useState([]);
+  const [activeCategory, setActiveCategory] = useState('Rice');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -113,10 +106,10 @@ export default function App() {
           {/* Section Title - Also sticky */}
           <div className="flex justify-between items-center mt-4 md:mt-6">
             <h2 className="text-lg md:text-xl font-bold">
-              {searchQuery ? `Search Results` : `Choose ${activeCategory}`}
+              {searchQuery ? t('Search Results', '搜索结果') : `${t('Choose', '选择')} ${activeCategory}`}
             </h2>
             <span className="text-gray-400 text-xs md:text-sm">
-              {filteredItems.length} items result
+              {filteredItems.length} {t('items result', '个结果')}
             </span>
           </div>
         </div>
@@ -150,6 +143,14 @@ export default function App() {
         />
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 }
 

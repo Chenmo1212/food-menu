@@ -1,7 +1,9 @@
 import React, { useRef } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function MenuItem({ item, onAddToCart, onItemClick }) {
   const cardRef = useRef(null);
+  const { language, t } = useLanguage();
 
   const handleClick = () => {
     if (cardRef.current && onItemClick) {
@@ -20,15 +22,16 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
       <div className="absolute -top-12 md:-top-14 left-1/2 transform -translate-x-1/2 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl overflow-hidden shadow-lg border-4 border-white">
         <img
           src={item.image}
-          alt={item.name}
+          alt={language === 'zh' ? item.name : item.nameEn}
           className="w-full h-full object-cover"
         />
       </div>
       <h3 className="font-bold text-base md:text-lg text-center mb-1 line-clamp-2 mt-2">
-        {item.name}
+        {language === 'zh' ? item.name : item.nameEn}
       </h3>
       <p className="text-gray-400 text-xs mb-4">
-        {(item.orderCount || 0) > 3 ? '🔥 ' : ''}{item.orderCount || 0} orders
+        {(item.orderCount || 0) > 3 ? '🔥 ' : ''}
+        {item.orderCount || 0} {t('orders', '单')}
       </p>
       
       <button
@@ -38,7 +41,7 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
         }}
         className="bg-orange-100 text-orange-600 px-4 py-2 rounded-xl font-medium text-sm hover:bg-orange-500 hover:text-white transition-colors w-full"
       >
-        Add to Order
+        {t('Add to Order', '加入订单')}
       </button>
     </div>
   );
