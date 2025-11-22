@@ -3,6 +3,33 @@ import CartItem from './CartItem';
 
 export default function Cart({ cart, onUpdateQty, onCheckout }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showDeliveryPicker, setShowDeliveryPicker] = useState(false);
+  
+  // Get next Monday
+  const getNextMonday = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const daysUntilMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek) % 7 || 7;
+    const nextMonday = new Date(today);
+    nextMonday.setDate(today.getDate() + daysUntilMonday);
+    return nextMonday.toISOString().split('T')[0];
+  };
+  
+  const [deliveryDate, setDeliveryDate] = useState(getNextMonday());
+  const [deliveryTime, setDeliveryTime] = useState('19:30');
+  
+  // Format display text
+  const formatDeliveryDisplay = () => {
+    const date = new Date(deliveryDate + 'T' + deliveryTime);
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayName = days[date.getDay()];
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    const displayMinutes = minutes.toString().padStart(2, '0');
+    return `${dayName}, ${displayHours}:${displayMinutes} ${period}`;
+  };
   
   // Calculate totals
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
@@ -81,6 +108,120 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
           )}
         </div>
 
+        {/* Delivery Time Section */}
+        <div className="mt-4 mb-4">
+          <button
+            onClick={() => setShowDeliveryPicker(true)}
+            className="w-full p-4 bg-white rounded-xl border-2 border-orange-200 hover:border-orange-300 hover:shadow-md transition-all flex items-center justify-between group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                <span className="text-xl">🕐</span>
+              </div>
+              <div className="text-left">
+                <p className="text-xs text-gray-500 font-medium">Delivery Time</p>
+                <p className="text-sm font-bold text-gray-800">{formatDeliveryDisplay()}</p>
+              </div>
+            </div>
+            <span className="text-gray-400 group-hover:text-orange-500 transition-colors">
+              ✏️
+            </span>
+          </button>
+        </div>
+
+        {/* Delivery Time Modal */}
+        {showDeliveryPicker && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-50"
+              onClick={() => setShowDeliveryPicker(false)}
+            />
+            
+            {/* Modal */}
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-4 border-b">
+                  <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <span>🕐</span>
+                    <span>Select Delivery Time</span>
+                  </h3>
+                  <button
+                    onClick={() => setShowDeliveryPicker(false)}
+                    className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Quick Select Buttons */}
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-3">Quick Select</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: 'Today 7:30 PM', offset: 0, time: '19:30' },
+                      { label: 'Tomorrow 7:30 PM', offset: 1, time: '19:30' },
+                      { label: 'Next Monday 7:30 PM', offset: null, time: '19:30' },
+                      { label: 'Next Week', offset: 7, time: '19:30' }
+                    ].map((option, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          if (option.offset !== null) {
+                            const date = new Date();
+                            date.setDate(date.getDate() + option.offset);
+                            setDeliveryDate(date.toISOString().split('T')[0]);
+                            setDeliveryTime(option.time);
+                          } else if (option.label === 'Next Monday 7:30 PM') {
+                            setDeliveryDate(getNextMonday());
+                            setDeliveryTime(option.time);
+                          }
+                        }}
+                        className="px-4 py-3 bg-orange-50 hover:bg-orange-100 border-2 border-orange-200 hover:border-orange-300 rounded-xl text-sm font-medium text-gray-700 transition-all hover:shadow-md"
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Date/Time Inputs */}
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-gray-600">Custom Time</p>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-2">Date</label>
+                    <input
+                      type="date"
+                      value={deliveryDate}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 bg-white text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-2">Time</label>
+                    <input
+                      type="time"
+                      value={deliveryTime}
+                      onChange={(e) => setDeliveryTime(e.target.value)}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 bg-white text-sm"
+                    />
+                  </div>
+                </div>
+
+                {/* Confirm Button */}
+                <button
+                  onClick={() => setShowDeliveryPicker(false)}
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
         {/* Special Instructions Section */}
         {cart.some(item => item.specialInstructions) && (
           <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
@@ -117,7 +258,10 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
           <button
             className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-200 transition-all mt-4"
             onClick={() => {
-              onCheckout(total);
+              const deliveryInfo = deliveryDate && deliveryTime
+                ? `\nDelivery: ${deliveryDate} at ${deliveryTime}`
+                : '';
+              onCheckout(total, deliveryInfo);
               setIsOpen(false);
             }}
           >

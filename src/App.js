@@ -62,8 +62,8 @@ export default function App() {
   };
 
   // Handle checkout
-  const handleCheckout = (total) => {
-    alert(`Order placed for my love! Total: $${total.toFixed(2)}`);
+  const handleCheckout = (total, deliveryInfo = '') => {
+    alert(`Order placed for my love! Total: $${total.toFixed(2)}${deliveryInfo}`);
   };
 
   return (
