@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function OrderSummaryModal({ 
   isOpen, 
@@ -10,8 +10,23 @@ export default function OrderSummaryModal({
 }) {
   const [secretCode, setSecretCode] = useState('');
   const [codeError, setCodeError] = useState('');
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
   
-  const SECRET_CODE = 'dianxin';
+  const SECRET_CODE = process.env.REACT_APP_SECRET_CODE || 'dianxin';
+
+  // Handle animation states
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      // Small delay to trigger enter animation
+      setTimeout(() => setIsAnimating(true), 10);
+    } else {
+      setIsAnimating(false);
+      // Wait for exit animation to complete before unmounting
+      setTimeout(() => setShouldRender(false), 300);
+    }
+  }, [isOpen]);
 
   // Generate Markdown summary
   const generateMarkdownSummary = () => {
@@ -64,22 +79,30 @@ export default function OrderSummaryModal({
   const handleClose = () => {
     setSecretCode('');
     setCodeError('');
-    onClose();
+    setIsAnimating(false);
+    // Wait for animation to complete before calling onClose
+    setTimeout(() => onClose(), 300);
   };
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-300"
+        className={`fixed inset-0 bg-black z-50 transition-opacity duration-300 ${
+          isAnimating ? 'opacity-50' : 'opacity-0'
+        }`}
         onClick={handleClose}
       />
       
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col animate-scale-in">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+        <div className={`bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col pointer-events-auto transition-all duration-300 ${
+          isAnimating
+            ? 'opacity-100 scale-100 translate-y-0'
+            : 'opacity-0 scale-95 translate-y-4'
+        }`}>
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
             <div className="flex items-center gap-3">
@@ -186,7 +209,7 @@ export default function OrderSummaryModal({
               )}
               <p className="mt-3 text-xs text-purple-600 flex items-center gap-1">
                 <span>💡</span>
-                <span>Only you and your love know this word</span>
+                <span>The full spelling of our safe word.</span>
               </p>
             </div>
           </div>

@@ -268,7 +268,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
             className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-200 transition-all mt-4"
             onClick={() => setShowOrderSummary(true)}
           >
-            Print Bills
+            Get Summary
           </button>
         </div>
       </aside>

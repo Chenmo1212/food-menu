@@ -1,116 +1,171 @@
-# WeChat Work Notification Setup Guide
+# Backend API Integration Setup Guide
+# 后端 API 集成设置指南
 
-## 📱 企业微信通知配置指南
+## 📱 English Version
 
-This guide will help you set up WeChat Work notifications for your food ordering app.
+This guide will help you set up backend API integration for sending order notifications to WeChat Work.
 
 ## Prerequisites
 
-1. A WeChat Work (企业微信) account
-2. Admin access to create applications
+1. Backend API running at `https://api.chenmo1212.cn`
+2. API endpoint `/messages` accepting POST requests
 
 ## Setup Steps
 
-### 1. Create WeChat Work Application
-
-1. Log in to [WeChat Work Admin Console](https://work.weixin.qq.com/)
-2. Go to **Applications & Mini Programs** (应用管理)
-3. Click **Create Application** (创建应用)
-4. Fill in application details:
-   - Name: "Food Order Notifications" (or any name you prefer)
-   - Logo: Upload an icon
-   - Description: "Receive food order notifications"
-5. Click **Create** (创建)
-
-### 2. Get Required Credentials
-
-After creating the application, you'll need three pieces of information:
-
-#### A. Enterprise ID (企业ID / Corp ID)
-- Go to **My Enterprise** (我的企业)
-- Find **Enterprise Information** (企业信息)
-- Copy the **Enterprise ID** (企业ID)
-
-#### B. Application Secret (应用Secret)
-- Go to your application page
-- Find **Application Secret** (应用Secret)
-- Click **View** (查看) and copy the secret
-- ⚠️ Keep this secret safe!
-
-#### C. Application ID (AgentId)
-- On your application page
-- Find **AgentId**
-- Copy the number
-
-### 3. Configure Environment Variables
+### 1. Configure Environment Variables
 
 1. Copy the example environment file:
    ```bash
    cp .env.example .env.local
    ```
 
-2. Edit `.env.local` and fill in your credentials:
+2. Edit `.env.local` and update values if needed:
    ```env
-   REACT_APP_WECHAT_CORPID=your_corp_id_here
-   REACT_APP_WECHAT_CORPSECRET=your_corp_secret_here
-   REACT_APP_WECHAT_AGENTID=your_agent_id_here
+   REACT_APP_API_BASE_URL=https://api.chenmo1212.cn
+   REACT_APP_SECRET_CODE=dianxin
    ```
 
 3. Save the file
 
-### 4. Set Trusted IP (可信IP)
+### 2. Restart Development Server
 
-For the API to work, you need to add your server IP to the trusted list:
+```bash
+npm start
+```
 
-1. Go to your application settings
-2. Find **Enterprise Trusted IP** (企业可信IP)
-3. Add your server's public IP address
-4. For local development, you might need to use a proxy or deploy to a server
+### 3. Test the Integration
 
-### 5. Test the Integration
+1. Add items to cart
+2. Select delivery time
+3. Click "Checkout"
+4. Enter the secret code: `dianxin` (or your custom code from .env.local)
+5. Complete the order
+6. Check WeChat Work for the notification
 
-1. Start your development server:
-   ```bash
-   npm start
-   ```
+## 📝 API Request Format
 
-2. Create an order and submit it
-3. Check your WeChat Work app for the notification
+The application sends POST requests to `${API_BASE_URL}/messages` with the following JSON structure:
+
+```json
+{
+  "name": "Food Order System",
+  "email": "order@foodmenu.app",
+  "content": "🍕 New Order!\n\n📅 Delivery: [delivery time]\n\n[order details in markdown]",
+  "website": "Food Menu App",
+  "agent": "Food Ordering System",
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
 
 ## 🔒 Security Notes
 
 - **Never commit `.env.local` to version control**
 - The `.gitignore` file already excludes it
-- Keep your Corp Secret safe
-- Rotate secrets regularly
+- Keep your secret code secure
+- Change the default secret code in production
 - Only share credentials with trusted team members
-
-## 📝 Notification Format
-
-The app sends notifications in Markdown format with:
-- Order date and time
-- List of items with quantities
-- Special instructions for each item
-- Total item count
 
 ## 🐛 Troubleshooting
 
-### "Failed to get access token"
-- Check if your Corp ID and Corp Secret are correct
-- Verify the application is active
+### "Failed to send notification"
+- Check if the backend API is running
+- Verify the API endpoint URL is correct
+- Check browser console for detailed error messages
+- Ensure network connection is stable
 
-### "Invalid IP"
-- Add your server IP to the trusted IP list
-- For local development, consider using ngrok or similar tools
+### "Invalid secret code"
+- Make sure you're entering the correct code from `.env.local`
+- Default code is `dianxin`
+- Check for typos
 
-### "Permission denied"
-- Ensure the application has permission to send messages
-- Check if the application is visible to users
+### API returns error
+- Verify the backend API is properly configured
+- Check if the API endpoint accepts the request format
+- Review backend logs for error details
 
-## 📚 Additional Resources
+---
 
-- [WeChat Work API Documentation](https://developer.work.weixin.qq.com/document/)
-- [Message Sending API](https://developer.work.weixin.qq.com/document/path/90236)
+## 📱 中文版本
+
+本指南将帮助您设置后端 API 集成，用于向企业微信发送订单通知。
+
+## 前置条件
+
+1. 后端 API 运行在 `https://api.chenmo1212.cn`
+2. API 端点 `/messages` 接受 POST 请求
+
+## 设置步骤
+
+### 1. 配置环境变量
+
+1. 复制示例环境文件：
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. 编辑 `.env.local` 并根据需要更新值：
+   ```env
+   REACT_APP_API_BASE_URL=https://api.chenmo1212.cn
+   REACT_APP_SECRET_CODE=dianxin
+   ```
+
+3. 保存文件
+
+### 2. 重启开发服务器
+
+```bash
+npm start
+```
+
+### 3. 测试集成
+
+1. 添加商品到购物车
+2. 选择配送时间
+3. 点击"结账"
+4. 输入密码：`dianxin`（或你在 .env.local 中自定义的密码）
+5. 完成订单
+6. 在企业微信中查看通知
+
+## 📝 API 请求格式
+
+应用程序向 `${API_BASE_URL}/messages` 发送 POST 请求，JSON 结构如下：
+
+```json
+{
+  "name": "Food Order System",
+  "email": "order@foodmenu.app",
+  "content": "🍕 New Order!\n\n📅 Delivery: [配送时间]\n\n[订单详情（Markdown格式）]",
+  "website": "Food Menu App",
+  "agent": "Food Ordering System",
+  "timestamp": "2024-01-01T12:00:00.000Z"
+}
+```
+
+## 🔒 安全提示
+
+- **永远不要将 `.env.local` 提交到版本控制**
+- `.gitignore` 文件已经排除了它
+- 保护好你的密码
+- 在生产环境中更改默认密码
+- 只与可信任的团队成员共享凭证
+
+## 🐛 故障排除
+
+### "发送通知失败"
+- 检查后端 API 是否正常运行
+- 验证 API 端点 URL 是否正确
+- 查看浏览器控制台的详细错误信息
+- 确认网络连接稳定
+
+### "密码错误"
+- 确保输入的密码与 `.env.local` 中的一致
+- 默认密码是 `dianxin`
+- 检查是否有拼写错误
+
+### API 返回错误
+- 验证后端 API 配置正确
+- 检查 API 端点是否接受该请求格式
+- 查看后端日志了解错误详情
 
 ## 💝 Made with Love
 
