@@ -116,13 +116,6 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
               </button>
             </div>
 
-            {/* Price */}
-            <div className="mb-4">
-              <p className="text-3xl font-bold text-orange-500">
-                ${item.price.toFixed(2)}
-              </p>
-            </div>
-
             {/* Description */}
             {item.description && (
               <div className="mb-6">
@@ -192,7 +185,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
                 onClick={handleAddToCart}
                 className="w-full bg-orange-500 text-white py-4 rounded-2xl font-semibold text-lg hover:bg-orange-600 transition-colors shadow-lg hover:shadow-xl"
               >
-                Add to Order - ${item.price.toFixed(2)}
+                Add to Order
               </button>
             </div>
           </div>

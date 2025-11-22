@@ -12,10 +12,11 @@ export default function CartItem({ item, onUpdateQty }) {
       </div>
       <div className="flex-1 min-w-0">
         <h4 className="font-bold text-sm truncate">{item.name}</h4>
-        {item.note && <p className="text-gray-400 text-xs truncate">{item.note}</p>}
-        <p className="font-bold text-sm mt-1">
-          ${(item.price * item.qty).toFixed(2)}
-        </p>
+        {item.specialInstructions && (
+          <p className="text-gray-400 text-xs truncate italic">
+            {item.specialInstructions}
+          </p>
+        )}
       </div>
       <div className="flex items-center gap-2 md:gap-3 bg-gray-100 rounded-lg px-2 py-1">
         <button
