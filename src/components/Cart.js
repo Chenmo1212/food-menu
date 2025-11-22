@@ -72,9 +72,9 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
             <div className="text-center text-gray-400 mt-10">Cart is empty 🛒</div>
           ) : (
             cart.map(item => (
-              <CartItem 
-                key={item.id} 
-                item={item} 
+              <CartItem
+                key={item.cartItemId || item.id}
+                item={item}
                 onUpdateQty={onUpdateQty}
               />
             ))

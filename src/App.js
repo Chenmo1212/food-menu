@@ -41,19 +41,20 @@ export default function App() {
 
   // Add to cart logic
   const addToCart = (item, specialInstructions = '') => {
-    const existing = cart.find((c) => c.id === item.id && c.specialInstructions === specialInstructions);
+    const cartItemId = `${item.id}-${specialInstructions}`;
+    const existing = cart.find((c) => c.cartItemId === cartItemId);
     if (existing) {
-      setCart(cart.map((c) => (c.id === item.id && c.specialInstructions === specialInstructions ? { ...c, qty: c.qty + 1 } : c)));
+      setCart(cart.map((c) => (c.cartItemId === cartItemId ? { ...c, qty: c.qty + 1 } : c)));
     } else {
-      setCart([...cart, { ...item, qty: 1, specialInstructions }]);
+      setCart([...cart, { ...item, qty: 1, specialInstructions, cartItemId }]);
     }
   };
 
   // Update quantity
-  const updateQty = (id, delta) => {
+  const updateQty = (cartItemId, delta) => {
     setCart(cart.map(item => {
-      if (item.id === id) {
-        const newQty = Math.max(0, item.qty + delta);
+      if (item.cartItemId === cartItemId) {
+        const newQty = item.qty + delta;
         return { ...item, qty: newQty };
       }
       return item;

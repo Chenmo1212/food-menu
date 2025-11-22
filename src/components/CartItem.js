@@ -18,15 +18,15 @@ export default function CartItem({ item, onUpdateQty }) {
         </p>
       </div>
       <div className="flex items-center gap-2 md:gap-3 bg-gray-100 rounded-lg px-2 py-1">
-        <button 
-          onClick={() => onUpdateQty(item.id, -1)} 
+        <button
+          onClick={() => onUpdateQty(item.cartItemId, -1)}
           className="text-gray-500 hover:text-orange-500 w-6 h-6 flex items-center justify-center"
         >
           -
         </button>
         <span className="font-bold text-sm w-4 text-center">{item.qty}</span>
-        <button 
-          onClick={() => onUpdateQty(item.id, 1)} 
+        <button
+          onClick={() => onUpdateQty(item.cartItemId, 1)}
           className="text-gray-500 hover:text-orange-500 w-6 h-6 flex items-center justify-center"
         >
           +
