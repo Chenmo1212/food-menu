@@ -81,6 +81,24 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
           )}
         </div>
 
+        {/* Special Instructions Section */}
+        {cart.some(item => item.specialInstructions) && (
+          <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
+            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <span>📝</span>
+              <span>Special Instructions</span>
+            </h3>
+            <div className="space-y-2">
+              {cart.filter(item => item.specialInstructions).map((item, index) => (
+                <div key={`${item.id}-${index}`} className="text-sm">
+                  <p className="font-medium text-gray-700">{item.name}:</p>
+                  <p className="text-gray-600 italic pl-2">{item.specialInstructions}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Footer Totals */}
         <div className="mt-6 border-t pt-6 space-y-3">
           <div className="flex justify-between text-gray-500 text-sm">

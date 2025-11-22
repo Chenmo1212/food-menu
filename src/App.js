@@ -40,12 +40,12 @@ export default function App() {
   };
 
   // Add to cart logic
-  const addToCart = (item) => {
-    const existing = cart.find((c) => c.id === item.id);
+  const addToCart = (item, specialInstructions = '') => {
+    const existing = cart.find((c) => c.id === item.id && c.specialInstructions === specialInstructions);
     if (existing) {
-      setCart(cart.map((c) => (c.id === item.id ? { ...c, qty: c.qty + 1 } : c)));
+      setCart(cart.map((c) => (c.id === item.id && c.specialInstructions === specialInstructions ? { ...c, qty: c.qty + 1 } : c)));
     } else {
-      setCart([...cart, { ...item, qty: 1 }]);
+      setCart([...cart, { ...item, qty: 1, specialInstructions }]);
     }
   };
 

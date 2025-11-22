@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, cardRect }) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [specialInstructions, setSpecialInstructions] = useState('');
   const contentRef = useRef(null);
 
   useEffect(() => {
@@ -11,6 +12,8 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
       document.body.style.overflow = 'hidden';
       // Trigger animation after a brief delay
       setTimeout(() => setIsAnimating(true), 10);
+      // Reset special instructions when modal opens
+      setSpecialInstructions('');
     } else {
       document.body.style.overflow = 'unset';
       setIsAnimating(false);
@@ -31,7 +34,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
   };
 
   const handleAddToCart = () => {
-    onAddToCart(item);
+    onAddToCart(item, specialInstructions);
     handleClose();
   };
 
@@ -172,6 +175,8 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-800 mb-3">Special Instructions</h3>
               <textarea
+                value={specialInstructions}
+                onChange={(e) => setSpecialInstructions(e.target.value)}
                 placeholder="Add any special requests or dietary requirements..."
                 className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
                 rows="3"
