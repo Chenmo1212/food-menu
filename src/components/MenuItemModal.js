@@ -89,7 +89,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
           {/* Modal Content */}
           <div>
             <div className="p-6 md:p-8">
-            {/* Title and Price */}
+            {/* Title */}
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
@@ -97,11 +97,6 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
                 </h2>
                 <p className="text-gray-500 text-sm">
                   {item.stock} Pan Available
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-3xl font-bold text-orange-500">
-                  ${item.price.toFixed(2)}
                 </p>
               </div>
             </div>
