@@ -53,10 +53,10 @@ export default function Sidebar({ activeView, onViewChange }) {
           onClick={() => onViewChange('order')}
         />
         <NavItem
-          icon="🔔"
-          label="Alert"
-          active={activeView === 'alert'}
-          onClick={() => onViewChange('alert')}
+          icon="🏆"
+          label="Rank"
+          active={activeView === 'rank'}
+          onClick={() => onViewChange('rank')}
         />
         <NavItem
           icon="⚙️"

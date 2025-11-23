@@ -6,6 +6,7 @@ import MenuGrid from './components/MenuGrid';
 import Cart from './components/Cart';
 import MenuItemModal from './components/MenuItemModal';
 import MobileNav from './components/MobileNav';
+import Rank from './components/Rank';
 import { MENU_ITEMS } from './data/menuData';
 import { sendMarkdownToWeChat } from './services/wechatNotification';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
@@ -155,16 +156,8 @@ function AppContent() {
           </div>
         );
       
-      case 'alert':
-        return (
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="text-center">
-              <span className="text-6xl mb-4 block">🔔</span>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('Notifications', '通知')}</h2>
-              <p className="text-gray-500">{t('No new notifications', '暂无新通知')}</p>
-            </div>
-          </div>
-        );
+      case 'rank':
+        return <Rank />;
       
       case 'settings':
         return (
