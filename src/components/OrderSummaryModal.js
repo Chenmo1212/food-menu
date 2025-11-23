@@ -13,7 +13,7 @@ export default function OrderSummaryModal({
   const [isAnimating, setIsAnimating] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
   
-  const SECRET_CODE = process.env.REACT_APP_SECRET_CODE || 'dianxin';
+  const SECRET_CODE = process.env.REACT_APP_SECRET_CODE;
 
   // Handle animation states
   useEffect(() => {
