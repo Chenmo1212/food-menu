@@ -52,8 +52,8 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
         </h3>
       </div>
       <p className="text-gray-400 text-xs mb-4 flex items-center justify-center gap-1">
-        {(item.orderCount || 0) > 3 && <FireIcon className="text-orange-500" />}
-        {item.orderCount || 0} {t('orders', '单')}
+        {(item.orderCount || 0) >= 3 && <FireIcon className="text-orange-500" />}
+        {item.orderCount || 0} {(item.orderCount || 0) === 1 ? t('order', '单') : t('orders', '单')}
       </p>
       
       <button

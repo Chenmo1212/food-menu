@@ -110,7 +110,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
                 <div className="flex items-center gap-2">
                   <span className="text-gray-500 text-sm flex items-center gap-1">
                     {(item.orderCount || 0) > 3 && <FireIcon className="text-orange-500" />}
-                    {item.orderCount || 0} {t('orders', '单')}
+                    {item.orderCount || 0} {(item.orderCount || 0) === 1 ? t('order', '单') : t('orders', '单')}
                   </span>
                 </div>
               </div>
