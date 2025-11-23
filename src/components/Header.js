@@ -6,7 +6,7 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <header className="mb-6 md:mb-8 relative min-h-[80px]">
+    <header className="relative">
       {/* Main Header Content */}
       <div className={`flex justify-between items-center transition-opacity duration-300 ${showSearch ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
@@ -57,7 +57,7 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
 
       {/* Search Overlay - Slides down from top and covers entire header */}
       {showSearch && (
-        <div className="absolute top-0 left-0 right-0 bg-gray-100 rounded-2xl shadow-lg z-50 animate-slideDownOverlay p-4">
+        <div className="absolute top-0 left-0 right-0 bg-gray-100 z-50 animate-slideDownOverlay">
           <div className="flex items-center gap-3">
             {/* Back Button */}
             <button
