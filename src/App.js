@@ -5,12 +5,13 @@ import CategoryFilter from './components/CategoryFilter';
 import MenuGrid from './components/MenuGrid';
 import Cart from './components/Cart';
 import MenuItemModal from './components/MenuItemModal';
+import CustomDishModal from './components/CustomDishModal';
 import MobileNav from './components/MobileNav';
 import Rank from './components/Rank';
 import { MENU_ITEMS } from './data/menuData';
 import { sendMarkdownToWeChat } from './services/wechatNotification';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
-import { HomeIcon, ClockIcon, OrderIcon, SettingsIcon, CheckIcon, WarningIcon } from './utils/iconMapping';
+import { HomeIcon, ClockIcon, OrderIcon, SettingsIcon, CheckIcon, WarningIcon, PlusIcon } from './utils/iconMapping';
 
 function AppContent() {
   const { t } = useLanguage();
@@ -22,6 +23,7 @@ function AppContent() {
   const [cardRect, setCardRect] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('menu');
+  const [showCustomDishModal, setShowCustomDishModal] = useState(false);
 
   // Handle item click to open modal
   const handleItemClick = (item, rect) => {
@@ -106,10 +108,17 @@ function AppContent() {
             <div className="flex justify-between items-center mb-2 px-4 lg:px-4">
               <h2 className="text-lg md:text-xl font-bold">
                 {searchQuery ? t('Search Results', '搜索结果') : `${t('Choose', '选择')} ${activeCategory}`}
+                <span className="text-gray-400 text-sm font-normal ml-2">
+                  ({filteredItems.length})
+                </span>
               </h2>
-              <span className="text-gray-400 text-xs md:text-sm">
-                {filteredItems.length} {t('items result', '个结果')}
-              </span>
+              <button
+                onClick={() => setShowCustomDishModal(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors shadow-sm hover:shadow-md text-sm font-medium"
+              >
+                <PlusIcon className="text-white" />
+                <span>{t('Add', '添加')}</span>
+              </button>
             </div>
 
             {/* Scrollable Menu Grid */}
@@ -217,6 +226,13 @@ function AppContent() {
           cardRect={cardRect}
         />
       )}
+
+      {/* Custom Dish Modal */}
+      <CustomDishModal
+        isOpen={showCustomDishModal}
+        onClose={() => setShowCustomDishModal(false)}
+        onAddToCart={addToCart}
+      />
 
       {/* Mobile Navigation Menu */}
       {/* <MobileNav

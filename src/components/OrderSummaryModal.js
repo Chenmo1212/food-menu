@@ -50,7 +50,11 @@ export default function OrderSummaryModal({
     markdown += `## Items\n\n`;
     
     cart.forEach((item, index) => {
-      markdown += `${index + 1}. **${item.name}** (x${item.qty})\n`;
+      markdown += `${index + 1}. **${item.name}** (x${item.qty})`;
+      if (item.isCustom) {
+        markdown += ` 🌟 *[Custom Request - Not in Menu]*`;
+      }
+      markdown += `\n`;
       if (item.specialInstructions) {
         markdown += `   - *Special Instructions:* ${item.specialInstructions}\n`;
       }
@@ -133,17 +137,43 @@ export default function OrderSummaryModal({
               </h4>
               <div className="space-y-2">
                 {cart.map((item, index) => (
-                  <div key={index} className="bg-white rounded-xl p-3 shadow-sm">
-                    <div className="flex justify-between items-start">
+                  <div key={index} className={`rounded-xl p-3 shadow-sm ${
+                    item.isCustom ? 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200' : 'bg-white'
+                  }`}>
+                    <div className="flex justify-between items-start gap-3">
+                      {/* Show image for custom dishes */}
+                      {item.isCustom && item.image && (
+                        <div className="flex-shrink-0">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-16 h-16 object-cover rounded-lg"
+                          />
+                        </div>
+                      )}
                       <div className="flex-1">
-                        <p className="font-semibold text-gray-800">{item.name}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-800">{item.name}</p>
+                          {item.isCustom && (
+                            <span className="px-2 py-0.5 bg-blue-500 text-white text-xs rounded-full font-medium">
+                              Custom
+                            </span>
+                          )}
+                        </div>
+                        {item.isCustom && (
+                          <p className="text-xs text-blue-600 mt-1">
+                            ⚠️ Not in menu - Custom request
+                          </p>
+                        )}
                         {item.specialInstructions && (
                           <p className="text-xs text-gray-500 italic mt-1">
                             "{item.specialInstructions}"
                           </p>
                         )}
                       </div>
-                      <span className="ml-3 px-2 py-1 bg-orange-100 text-orange-600 rounded-lg text-sm font-bold">
+                      <span className={`ml-3 px-2 py-1 rounded-lg text-sm font-bold ${
+                        item.isCustom ? 'bg-blue-100 text-blue-600' : 'bg-orange-100 text-orange-600'
+                      }`}>
                         x{item.qty}
                       </span>
                     </div>
