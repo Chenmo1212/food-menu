@@ -2,7 +2,7 @@ import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { MENU_ITEMS } from '../data/menuData';
 
-export default function Rank() {
+export default function Rank({ onItemClick }) {
   const { t, language } = useLanguage();
 
   // Sort items by orderCount (sales) in descending order and get top 10
@@ -54,7 +54,13 @@ export default function Rank() {
               return (
                 <div key={item.id} className="flex flex-col items-center" style={{ width: '140px' }}>
                   {/* Dish Image */}
-                  <div className="relative mb-3">
+                  <div
+                    className="relative mb-3 cursor-pointer transform hover:scale-105 transition-transform"
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      onItemClick(item, rect);
+                    }}
+                  >
                     <div className={`w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden border-4 ${
                       rank === 1 ? 'border-yellow-400 shadow-xl shadow-yellow-200' :
                       rank === 2 ? 'border-gray-400 shadow-lg shadow-gray-200' :
@@ -107,7 +113,11 @@ export default function Rank() {
                 return (
                   <div
                     key={item.id}
-                    className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow flex items-center gap-4"
+                    className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center gap-4"
+                    onClick={(e) => {
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      onItemClick(item, rect);
+                    }}
                   >
                     {/* Rank Number */}
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">

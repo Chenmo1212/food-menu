@@ -157,7 +157,7 @@ function AppContent() {
         );
       
       case 'rank':
-        return <Rank />;
+        return <Rank onItemClick={handleItemClick} />;
       
       case 'settings':
         return (
@@ -197,12 +197,14 @@ function AppContent() {
         </div>
       </main>
 
-      {/* Right Sidebar (Order Summary) - Responsive */}
-      <Cart
-        cart={cart}
-        onUpdateQty={updateQty}
-        onCheckout={handleCheckout}
-      />
+      {/* Right Sidebar (Order Summary) - Only show on Menu page */}
+      {activeView === 'menu' && (
+        <Cart
+          cart={cart}
+          onUpdateQty={updateQty}
+          onCheckout={handleCheckout}
+        />
+      )}
 
       {/* Menu Item Detail Modal */}
       {selectedItem && (
