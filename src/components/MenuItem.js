@@ -1,9 +1,11 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function MenuItem({ item, onAddToCart, onItemClick }) {
   const cardRef = useRef(null);
+  const textRef = useRef(null);
   const { language, t } = useLanguage();
+  const [isOverflowing, setIsOverflowing] = useState(false);
 
   const handleClick = () => {
     if (cardRef.current && onItemClick) {
@@ -11,6 +13,13 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
       onItemClick(item, rect);
     }
   };
+
+  useEffect(() => {
+    if (textRef.current) {
+      const isTextOverflowing = textRef.current.scrollWidth > textRef.current.clientWidth;
+      setIsOverflowing(isTextOverflowing);
+    }
+  }, [item, language]);
 
   return (
     <div
@@ -26,9 +35,21 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
           className="w-full h-full object-cover"
         />
       </div>
-      <h3 className="font-bold text-base md:text-lg text-center mb-1 line-clamp-2 mt-2">
-        {language === 'zh' ? item.name : item.nameEn}
-      </h3>
+      <div className="w-full overflow-hidden mb-1 mt-2 relative">
+        <h3
+          ref={textRef}
+          className={`font-bold text-base md:text-lg text-center whitespace-nowrap ${
+            isOverflowing ? 'group-hover:animate-scroll-text' : ''
+          }`}
+        >
+          {language === 'zh' ? item.name : item.nameEn}
+          {isOverflowing && (
+            <span className="ml-8">
+              {language === 'zh' ? item.name : item.nameEn}
+            </span>
+          )}
+        </h3>
+      </div>
       <p className="text-gray-400 text-xs mb-4">
         {(item.orderCount || 0) > 3 ? '🔥 ' : ''}
         {item.orderCount || 0} {t('orders', '单')}
