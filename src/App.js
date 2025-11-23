@@ -12,10 +12,12 @@ import { MENU_ITEMS } from './data/menuData';
 import { sendMarkdownToWeChat } from './services/wechatNotification';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { HomeIcon, ClockIcon, OrderIcon, SettingsIcon, CheckIcon, WarningIcon, PlusIcon } from './utils/iconMapping';
+import { useLocalStorage } from './hooks/useLocalStorage';
 
 function AppContent() {
   const { t } = useLanguage();
-  const [cart, setCart] = useState([]);
+  // Use localStorage for cart persistence
+  const [cart, setCart] = useLocalStorage('foodMenuCart', []);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
@@ -72,6 +74,8 @@ function AppContent() {
     
     if (result.success) {
       alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nNotification sent successfully!`);
+      // Clear cart after successful order
+      setCart([]);
     } else {
       alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nFailed to send notification: ${result.message}\n\nPlease check console for details.`);
     }
