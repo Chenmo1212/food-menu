@@ -14,7 +14,7 @@ import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 function AppContent() {
   const { t } = useLanguage();
   const [cart, setCart] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('Rice');
+  const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -88,7 +88,7 @@ function AppContent() {
       ));
     
     return matchesCategory && matchesSearch;
-  });
+  }).sort((a, b) => b.orderCount - a.orderCount); // Sort by sales (orderCount) in descending order
 
   // Render different content based on active view
   const renderContent = () => {
@@ -218,12 +218,12 @@ function AppContent() {
       )}
 
       {/* Mobile Navigation Menu */}
-      <MobileNav
+      {/* <MobileNav
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
         activeView={activeView}
         onViewChange={setActiveView}
-      />
+      /> */}
     </div>
   );
 }

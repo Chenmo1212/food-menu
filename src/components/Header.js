@@ -11,13 +11,13 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
       <div className={`flex justify-between items-center transition-opacity duration-300 md:ml-4 ${showSearch ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
           {/* Menu Icon Button - Only on mobile/tablet */}
-          <button
+          {/* <button
             onClick={onMenuClick}
             className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105"
             title={t('Menu', '菜单')}
           >
             <span className="text-xl">☰</span>
-          </button>
+          </button> */}
 
           <div className="flex flex-col">
             <h1 className="text-xl md:text-2xl font-bold text-gray-800">

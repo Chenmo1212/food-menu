@@ -28,31 +28,31 @@ export default function Sidebar({ activeView, onViewChange }) {
       </div>
       
       <nav className="flex-1 flex flex-col gap-8 w-full">
-        <NavItem
+        {/* <NavItem
           icon="🏠"
           label="Home"
           active={activeView === 'home'}
           onClick={() => onViewChange('home')}
-        />
+        /> */}
         <NavItem
           icon="🍱"
           label="Menu"
           active={activeView === 'menu'}
           onClick={() => onViewChange('menu')}
         />
-        <NavItem
+        {/* <NavItem
           icon="🕐"
           label="History"
           active={activeView === 'history'}
           onClick={() => onViewChange('history')}
-        />
-        <NavItem
+        /> */}
+        {/* <NavItem
           icon="👜"
           label="Order"
           active={activeView === 'order'}
           onClick={() => onViewChange('order')}
-        />
-        <NavItem
+        /> */}
+        {/* <NavItem
           icon="🏆"
           label="Rank"
           active={activeView === 'rank'}
@@ -63,7 +63,7 @@ export default function Sidebar({ activeView, onViewChange }) {
           label="Settings"
           active={activeView === 'settings'}
           onClick={() => onViewChange('settings')}
-        />
+        /> */}
       </nav>
 
       <div className="mt-auto">

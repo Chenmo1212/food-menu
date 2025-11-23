@@ -100,7 +100,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
           {/* Modal Content */}
           <div>
             <div className="p-6 md:p-8">
-            {/* Title and Recommend Button */}
+            {/* Title */}
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
@@ -113,10 +113,6 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
                   </span>
                 </div>
               </div>
-              <button className="ml-4 px-4 py-2 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-xl font-medium text-sm hover:from-orange-500 hover:to-orange-600 transition-all shadow-md hover:shadow-lg flex items-center gap-2 whitespace-nowrap">
-                <span>⭐</span>
-                <span>{t('Recommend', '推荐')}</span>
-              </button>
             </div>
 
             {/* Description */}
