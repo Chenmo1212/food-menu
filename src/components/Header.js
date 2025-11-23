@@ -47,7 +47,11 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
             className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 group"
             title={t('Switch to Chinese', '切换到英文')}
           >
-            <GlobeIcon className="text-gray-600 group-hover:scale-110 transition-transform" />
+            <GlobeIcon
+              className={`group-hover:scale-110 transition-transform ${
+                language === 'zh' ? 'text-[#f26b25]' : 'text-gray-600'
+              }`}
+            />
           </button>
         </div>
       </div>

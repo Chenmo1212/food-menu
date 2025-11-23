@@ -10,6 +10,18 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
   const [showOrderSummary, setShowOrderSummary] = useState(false);
   const { t } = useLanguage();
   
+  // Generate order number based on current date and time
+  const getOrderNumber = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${year}${month}${day}${hours}${minutes}${seconds}`;
+  };
+  
   // Get next Monday
   const getNextMonday = () => {
     const today = new Date();
@@ -91,7 +103,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         <div className="flex justify-between items-start mb-6">
           <div>
             <h2 className="font-bold text-xl">{t('Current Order', '当前订单')}</h2>
-            <p className="text-gray-400 text-sm">#907653</p>
+            <p className="text-gray-400 text-sm">#{getOrderNumber()}</p>
           </div>
         </div>
 
