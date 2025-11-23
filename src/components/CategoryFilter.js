@@ -3,7 +3,7 @@ import { CATEGORIES } from '../data/menuData';
 
 export default function CategoryFilter({ activeCategory, onCategoryChange }) {
   return (
-    <div className="flex gap-3 md:gap-4 mt-4 md:mb-8 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="flex gap-3 md:gap-4 mt-4 md:mb-8 overflow-x-auto pb-2 pl-4 scrollbar-hide">
       {CATEGORIES.map(cat => (
         <button 
           key={cat.name}

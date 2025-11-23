@@ -1,14 +1,16 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-export default function MobileNav({ isMenuOpen, setIsMenuOpen }) {
+export default function MobileNav({ isMenuOpen, setIsMenuOpen, activeView, onViewChange }) {
   const { t } = useLanguage();
 
   const menuItems = [
-    { icon: '🏠', label: t('Home', '首页'), labelEn: 'Home' },
-    { icon: '📜', label: t('History', '历史'), labelEn: 'History' },
-    { icon: '📦', label: t('Order', '订单'), labelEn: 'Order' },
-    { icon: '⚙️', label: t('Settings', '设置'), labelEn: 'Settings' },
+    { icon: '🏠', label: t('Home', '首页'), labelEn: 'Home', view: 'home' },
+    { icon: '🍱', label: t('Menu', '菜单'), labelEn: 'Menu', view: 'menu' },
+    { icon: '🕐', label: t('History', '历史'), labelEn: 'History', view: 'history' },
+    { icon: '👜', label: t('Order', '订单'), labelEn: 'Order', view: 'order' },
+    { icon: '🔔', label: t('Alert', '通知'), labelEn: 'Alert', view: 'alert' },
+    { icon: '⚙️', label: t('Settings', '设置'), labelEn: 'Settings', view: 'settings' },
   ];
 
   return (
@@ -47,7 +49,7 @@ export default function MobileNav({ isMenuOpen, setIsMenuOpen }) {
             C
           </div>
           <h2 className="text-xl font-bold text-gray-800">
-            {t('Menu', '菜单')}
+            {t('Navigation', '导航')}
           </h2>
           <p className="text-sm text-gray-500">
             {t('Navigate through the app', '浏览应用')}
@@ -60,11 +62,14 @@ export default function MobileNav({ isMenuOpen, setIsMenuOpen }) {
             <button
               key={index}
               onClick={() => {
-                // Handle navigation here
-                console.log(`Navigate to ${item.labelEn}`);
+                onViewChange(item.view);
                 setIsMenuOpen(false);
               }}
-              className="w-full p-4 rounded-xl flex items-center gap-4 transition-all bg-gray-50 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+              className={`w-full p-4 rounded-xl flex items-center gap-4 transition-all ${
+                activeView === item.view
+                  ? 'bg-orange-500 text-white shadow-lg'
+                  : 'bg-gray-50 text-gray-700 hover:bg-orange-50 hover:text-orange-600'
+              }`}
             >
               <span className="text-3xl">{item.icon}</span>
               <div className="flex-1 text-left">

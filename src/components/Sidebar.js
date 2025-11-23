@@ -1,11 +1,14 @@
 import React from 'react';
 
-function NavItem({ icon, label, active }) {
+function NavItem({ icon, label, active, onClick }) {
   return (
-    <div className="flex flex-col items-center gap-1 cursor-pointer group relative px-4">
+    <div
+      className="flex flex-col items-center gap-1 cursor-pointer group relative px-4"
+      onClick={onClick}
+    >
       <div className={`p-3 rounded-xl transition-colors ${
-        active 
-          ? 'bg-orange-500 text-white shadow-lg shadow-orange-200' 
+        active
+          ? 'bg-orange-500 text-white shadow-lg shadow-orange-200'
           : 'bg-transparent text-gray-400 group-hover:bg-orange-50 group-hover:text-orange-400'
       }`}>
         <span className="text-xl">{icon}</span>
@@ -17,7 +20,7 @@ function NavItem({ icon, label, active }) {
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ activeView, onViewChange }) {
   return (
     <aside className="hidden lg:flex w-24 bg-white flex-col items-center py-8 shadow-lg z-10 rounded-r-3xl">
       <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-500 font-bold text-2xl mb-10">
@@ -25,12 +28,42 @@ export default function Sidebar() {
       </div>
       
       <nav className="flex-1 flex flex-col gap-8 w-full">
-        <NavItem icon="🏠" label="Home" />
-        <NavItem icon="🍱" label="Menu" active />
-        <NavItem icon="🕐" label="History" />
-        <NavItem icon="👜" label="Order" />
-        <NavItem icon="🔔" label="Alert" />
-        <NavItem icon="⚙️" label="Settings" />
+        <NavItem
+          icon="🏠"
+          label="Home"
+          active={activeView === 'home'}
+          onClick={() => onViewChange('home')}
+        />
+        <NavItem
+          icon="🍱"
+          label="Menu"
+          active={activeView === 'menu'}
+          onClick={() => onViewChange('menu')}
+        />
+        <NavItem
+          icon="🕐"
+          label="History"
+          active={activeView === 'history'}
+          onClick={() => onViewChange('history')}
+        />
+        <NavItem
+          icon="👜"
+          label="Order"
+          active={activeView === 'order'}
+          onClick={() => onViewChange('order')}
+        />
+        <NavItem
+          icon="🔔"
+          label="Alert"
+          active={activeView === 'alert'}
+          onClick={() => onViewChange('alert')}
+        />
+        <NavItem
+          icon="⚙️"
+          label="Settings"
+          active={activeView === 'settings'}
+          onClick={() => onViewChange('settings')}
+        />
       </nav>
 
       <div className="mt-auto">

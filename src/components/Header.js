@@ -8,7 +8,7 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
   return (
     <header className="relative">
       {/* Main Header Content */}
-      <div className={`flex justify-between items-center transition-opacity duration-300 ${showSearch ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`flex justify-between items-center transition-opacity duration-300 md:ml-4 ${showSearch ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
           {/* Menu Icon Button - Only on mobile/tablet */}
           <button
