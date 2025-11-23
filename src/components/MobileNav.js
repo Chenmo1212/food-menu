@@ -1,35 +1,87 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
-export default function MobileNav() {
-  return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-30">
-      <div className="flex justify-around items-center py-3">
-        <NavButton icon="🏠" label="Home" />
-        <NavButton icon="🍱" label="Menu" active />
-        <NavButton icon="🕐" label="History" />
-        <NavButton icon="👜" label="Order" />
-        <NavButton icon="⚙️" label="Settings" />
-      </div>
-    </nav>
-  );
-}
+export default function MobileNav({ isMenuOpen, setIsMenuOpen }) {
+  const { t } = useLanguage();
 
-function NavButton({ icon, label, active }) {
+  const menuItems = [
+    { icon: '🏠', label: t('Home', '首页'), labelEn: 'Home' },
+    { icon: '📜', label: t('History', '历史'), labelEn: 'History' },
+    { icon: '📦', label: t('Order', '订单'), labelEn: 'Order' },
+    { icon: '⚙️', label: t('Settings', '设置'), labelEn: 'Settings' },
+  ];
+
   return (
-    <button className="flex flex-col items-center gap-1">
-      <div className={`p-2 rounded-lg transition-colors ${
-        active
-          ? 'bg-orange-500 text-white'
-          : 'text-gray-400'
-      }`}>
-        <span className="text-xl">{icon}</span>
-      </div>
-      <span className={`text-xs font-medium ${
-        active ? 'text-orange-500' : 'text-gray-400'
-      }`}>
-        {label}
-      </span>
-    </button>
+    <>
+      {/* Overlay */}
+      {isMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
+      {/* Menu Sidebar - Slides in from left */}
+      <aside className={`
+        lg:hidden fixed
+        ${isMenuOpen ? 'left-0' : '-left-full'}
+        top-0 h-full
+        w-full sm:w-80
+        bg-white p-6
+        shadow-xl
+        flex flex-col
+        transition-all duration-300 ease-in-out
+        z-50
+      `}>
+        {/* Close button */}
+        <button
+          onClick={() => setIsMenuOpen(false)}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
+        >
+          ×
+        </button>
+
+        {/* Logo/Title */}
+        <div className="mb-8">
+          <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-500 font-bold text-2xl mb-4">
+            C
+          </div>
+          <h2 className="text-xl font-bold text-gray-800">
+            {t('Menu', '菜单')}
+          </h2>
+          <p className="text-sm text-gray-500">
+            {t('Navigate through the app', '浏览应用')}
+          </p>
+        </div>
+
+        {/* Navigation Items */}
+        <nav className="flex-1 space-y-2">
+          {menuItems.map((item, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                // Handle navigation here
+                console.log(`Navigate to ${item.labelEn}`);
+                setIsMenuOpen(false);
+              }}
+              className="w-full p-4 rounded-xl flex items-center gap-4 transition-all bg-gray-50 text-gray-700 hover:bg-orange-50 hover:text-orange-600"
+            >
+              <span className="text-3xl">{item.icon}</span>
+              <div className="flex-1 text-left">
+                <p className="font-semibold text-lg">{item.label}</p>
+              </div>
+            </button>
+          ))}
+        </nav>
+
+        {/* Footer */}
+        <div className="pt-6 border-t border-gray-200">
+          <p className="text-xs text-gray-400 text-center">
+            {t('Version 1.0.0', '版本 1.0.0')}
+          </p>
+        </div>
+      </aside>
+    </>
   );
 }
 

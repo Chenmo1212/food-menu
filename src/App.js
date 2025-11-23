@@ -5,6 +5,7 @@ import CategoryFilter from './components/CategoryFilter';
 import MenuGrid from './components/MenuGrid';
 import Cart from './components/Cart';
 import MenuItemModal from './components/MenuItemModal';
+import MobileNav from './components/MobileNav';
 import { MENU_ITEMS } from './data/menuData';
 import { sendMarkdownToWeChat } from './services/wechatNotification';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
@@ -17,6 +18,7 @@ function AppContent() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [cardRect, setCardRect] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Handle item click to open modal
   const handleItemClick = (item, rect) => {
@@ -98,6 +100,7 @@ function AppContent() {
           <Header
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            onMenuClick={() => setIsMenuOpen(true)}
           />
           
           <CategoryFilter
@@ -144,6 +147,12 @@ function AppContent() {
           cardRect={cardRect}
         />
       )}
+
+      {/* Mobile Navigation Menu */}
+      <MobileNav
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+      />
     </div>
   );
 }

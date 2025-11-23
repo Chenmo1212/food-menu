@@ -1,21 +1,32 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-export default function Header({ searchQuery, onSearchChange }) {
+export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
   const { language, toggleLanguage, t } = useLanguage();
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <header className="relative">
+    <header className="mb-6 md:mb-8 relative min-h-[80px]">
       {/* Main Header Content */}
       <div className={`flex justify-between items-center transition-opacity duration-300 ${showSearch ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <div className="flex flex-col">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-            {t('Welcome, Yuan Bao ❤️', '欢迎，元宝 ❤️')}
-          </h1>
-          <p className="text-gray-500 text-sm">
-            {t('What would you like to eat today?', '今天想吃什么？')}
-          </p>
+        <div className="flex items-center gap-3">
+          {/* Menu Icon Button - Only on mobile/tablet */}
+          <button
+            onClick={onMenuClick}
+            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105"
+            title={t('Menu', '菜单')}
+          >
+            <span className="text-xl">☰</span>
+          </button>
+
+          <div className="flex flex-col">
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+              {t('Welcome, Yuan Bao ❤️', '欢迎，元宝 ❤️')}
+            </h1>
+            <p className="text-gray-500 text-sm">
+              {t('What would you like to eat today?', '今天想吃什么？')}
+            </p>
+          </div>
         </div>
         
         {/* Action Buttons */}
@@ -46,7 +57,7 @@ export default function Header({ searchQuery, onSearchChange }) {
 
       {/* Search Overlay - Slides down from top and covers entire header */}
       {showSearch && (
-        <div className="absolute top-0 left-0 right-0 bg-gray-100 z-50 animate-slideDownOverlay">
+        <div className="absolute top-0 left-0 right-0 bg-gray-100 rounded-2xl shadow-lg z-50 animate-slideDownOverlay p-4">
           <div className="flex items-center gap-3">
             {/* Back Button */}
             <button
