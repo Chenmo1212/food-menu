@@ -100,13 +100,13 @@ function AppContent() {
             onSearchChange={setSearchQuery}
           />
           
-          {/* <CategoryFilter
+          <CategoryFilter
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
-          /> */}
+          />
 
           {/* Section Title - Also sticky */}
-          <div className="flex justify-between items-center mt-4 md:mt-6">
+          <div className="flex justify-between items-center mt-2 md:mt-6">
             <h2 className="text-lg md:text-xl font-bold">
               {searchQuery ? t('Search Results', '搜索结果') : `${t('Choose', '选择')} ${activeCategory}`}
             </h2>

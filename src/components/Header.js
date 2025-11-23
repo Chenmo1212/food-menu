@@ -1,51 +1,85 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Header({ searchQuery, onSearchChange }) {
   const { language, toggleLanguage, t } = useLanguage();
+  const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 md:mb-8">
-      <div className="flex flex-col">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-          {t('Welcome, Yuan Bao ❤️', '欢迎，元宝 ❤️')}
-        </h1>
-        <p className="text-gray-500 text-sm">
-          {t('What would you like to eat today?', '今天想吃什么？')}
-        </p>
-      </div>
-      
-      <div className="flex items-center gap-3 w-full md:w-auto">
-        <div className="relative flex-1 md:flex-initial">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={t('Search category or menu...', '搜索分类或菜品...')}
-            className="pl-10 pr-4 py-3 rounded-xl bg-white w-full md:w-80 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all"
-          />
-          <span className="absolute left-3 top-3.5 text-gray-400">🔍</span>
-          {searchQuery && (
-            <button
-              onClick={() => onSearchChange('')}
-              className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              ✕
-            </button>
-          )}
+    <header className="relative">
+      {/* Main Header Content */}
+      <div className={`flex justify-between items-center transition-opacity duration-300 ${showSearch ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+        <div className="flex flex-col">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800">
+            {t('Welcome, Yuan Bao ❤️', '欢迎，元宝 ❤️')}
+          </h1>
+          <p className="text-gray-500 text-sm">
+            {t('What would you like to eat today?', '今天想吃什么？')}
+          </p>
         </div>
         
-        {/* Language Toggle Button */}
-        <button
-          onClick={toggleLanguage}
-          className="flex items-center justify-center w-12 h-12 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 group"
-          title={t('Switch to Chinese', '切换到英文')}
-        >
-          <span className="text-xl group-hover:scale-110 transition-transform">
-            {language === 'en' ? '🇨🇳' : '🇬🇧'}
-          </span>
-        </button>
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          {/* Search Button */}
+          <button
+            onClick={() => setShowSearch(true)}
+            className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 group"
+            title={t('Search', '搜索')}
+          >
+            <span className="text-lg md:text-xl group-hover:scale-110 transition-transform">
+              🔍
+            </span>
+          </button>
+          
+          {/* Language Toggle Button */}
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 group"
+            title={t('Switch to Chinese', '切换到英文')}
+          >
+            <span className="text-lg md:text-xl group-hover:scale-110 transition-transform">
+              {language === 'en' ? '🇨🇳' : '🇬🇧'}
+            </span>
+          </button>
+        </div>
       </div>
+
+      {/* Search Overlay - Slides down from top and covers entire header */}
+      {showSearch && (
+        <div className="absolute top-0 left-0 right-0 bg-gray-100 z-50 animate-slideDownOverlay">
+          <div className="flex items-center gap-3">
+            {/* Back Button */}
+            <button
+              onClick={() => setShowSearch(false)}
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 flex-shrink-0"
+              title={t('Close', '关闭')}
+            >
+              <span className="text-xl">←</span>
+            </button>
+            
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                placeholder={t('Search category or menu...', '搜索分类或菜品...')}
+                className="pl-10 pr-10 py-3 rounded-xl bg-white w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all"
+                autoFocus
+              />
+              <span className="absolute left-3 top-3.5 text-gray-400">🔍</span>
+              {searchQuery && (
+                <button
+                  onClick={() => onSearchChange('')}
+                  className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
