@@ -75,9 +75,11 @@ function AppContent() {
     const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
     const matchesSearch = searchQuery === '' ||
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.nameEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (item.ingredients && item.ingredients.some(ingredient =>
+      (item.descriptionEn && item.descriptionEn.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (item.ingredientsEn && item.ingredientsEn.some(ingredient =>
         ingredient.toLowerCase().includes(searchQuery.toLowerCase())
       ));
     
@@ -98,10 +100,10 @@ function AppContent() {
             onSearchChange={setSearchQuery}
           />
           
-          <CategoryFilter
+          {/* <CategoryFilter
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
-          />
+          /> */}
 
           {/* Section Title - Also sticky */}
           <div className="flex justify-between items-center mt-4 md:mt-6">
@@ -115,7 +117,7 @@ function AppContent() {
         </div>
 
         {/* Scrollable Menu Grid */}
-        <div className="flex-1 overflow-y-auto p-4 pt-4 md:p-6 md:pt-6 lg:p-8 lg:pt-6">
+        <div className="flex-1 overflow-y-auto p-4 pt-0 md:p-6 md:pt-6 lg:p-8 lg:pt-6">
           <MenuGrid
             items={filteredItems}
             activeCategory={activeCategory}
