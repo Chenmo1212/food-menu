@@ -1,6 +1,8 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { MENU_ITEMS } from '../data/menuData';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrophy, faMedal } from '@fortawesome/free-solid-svg-icons';
 
 export default function Rank({ onItemClick }) {
   const { t, language } = useLanguage();
@@ -17,7 +19,7 @@ export default function Rank({ onItemClick }) {
   const podiumOrder = [top3[1], top3[0], top3[2]];
   const podiumHeights = ['h-32', 'h-40', 'h-24'];
   const podiumRanks = [2, 1, 3];
-  const medalEmojis = ['🥈', '🥇', '🥉'];
+  const medalColors = ['text-gray-400', 'text-yellow-400', 'text-orange-400'];
   const podiumColors = [
     'bg-gradient-to-br from-gray-300 to-gray-400',
     'bg-gradient-to-br from-yellow-400 to-yellow-600',
@@ -39,8 +41,9 @@ export default function Rank({ onItemClick }) {
 
         {/* Podium for Top 3 */}
         <div className="mb-12">
-          <h2 className="text-xl font-bold text-gray-700 mb-6 text-center">
-            {t('Top 3 Champions', '前三名冠军')} 🏆
+          <h2 className="text-xl font-bold text-gray-700 mb-6 text-center flex items-center justify-center gap-2">
+            <span>{t('Top 3 Champions', '前三名冠军')}</span>
+            <FontAwesomeIcon icon={faTrophy} className="text-yellow-500" />
           </h2>
           
           <div className="flex items-end justify-center gap-4 md:gap-8 mb-4">
@@ -49,7 +52,7 @@ export default function Rank({ onItemClick }) {
               const rank = podiumRanks[index];
               const height = podiumHeights[index];
               const color = podiumColors[index];
-              const medal = medalEmojis[index];
+              const medalColor = medalColors[index];
 
               return (
                 <div key={item.id} className="flex flex-col items-center" style={{ width: '140px' }}>
@@ -73,8 +76,8 @@ export default function Rank({ onItemClick }) {
                       />
                     </div>
                     {/* Medal Badge */}
-                    <div className="absolute -top-2 -right-2 text-4xl">
-                      {medal}
+                    <div className="absolute -top-2 -right-2">
+                      <FontAwesomeIcon icon={faMedal} className={`text-4xl ${medalColor}`} />
                     </div>
                   </div>
 

@@ -1,11 +1,12 @@
 import React from 'react';
 import MenuItem from './MenuItem';
+import { SearchIcon } from '../utils/iconMapping';
 
 export default function MenuGrid({ items, activeCategory, onAddToCart, onItemClick }) {
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="text-6xl mb-4">🔍</div>
+        <SearchIcon className="text-gray-400 mb-4" size="4x" />
         <h3 className="text-xl font-semibold text-gray-600 mb-2">No items found</h3>
         <p className="text-gray-500 max-w-md">
           Try adjusting your search terms or browse different categories to find what you're looking for.

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ClipboardIcon, PizzaIcon, ClockIcon, LockIcon, WarningIcon, LightbulbIcon, HeartIcon } from '../utils/iconMapping';
 
 export default function OrderSummaryModal({ 
   isOpen, 
@@ -107,7 +108,7 @@ export default function OrderSummaryModal({
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">📋</span>
+                <ClipboardIcon className="text-white" size="lg" />
               </div>
               <div>
                 <h3 className="text-2xl font-bold text-gray-800">Order Summary</h3>
@@ -127,7 +128,7 @@ export default function OrderSummaryModal({
             {/* Order Items Preview */}
             <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-5 border-2 border-orange-200">
               <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <span>🍕</span>
+                <PizzaIcon className="text-orange-500" />
                 <span>Your Order</span>
               </h4>
               <div className="space-y-2">
@@ -158,7 +159,7 @@ export default function OrderSummaryModal({
             {/* Delivery Time */}
             <div className="bg-gray-50 rounded-2xl p-5 border border-gray-200">
               <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <span>🕐</span>
+                <ClockIcon className="text-gray-600" />
                 <span>Delivery Time</span>
               </h4>
               <p className="text-gray-700">
@@ -177,7 +178,7 @@ export default function OrderSummaryModal({
             {/* Secret Code Input */}
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 border-2 border-purple-200">
               <label className="block font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <span>🔒</span>
+                <LockIcon className="text-purple-500" />
                 <span>Secret Code</span>
               </label>
               <input
@@ -202,13 +203,13 @@ export default function OrderSummaryModal({
               {codeError && (
                 <div className="mt-3 p-3 bg-red-100 border border-red-200 rounded-xl">
                   <p className="text-sm text-red-600 flex items-center gap-2">
-                    <span>⚠️</span>
+                    <WarningIcon />
                     <span>{codeError}</span>
                   </p>
                 </div>
               )}
               <p className="mt-3 text-xs text-purple-600 flex items-center gap-1">
-                <span>💡</span>
+                <LightbulbIcon />
                 <span>The full spelling of our safe word.</span>
               </p>
             </div>
@@ -218,9 +219,10 @@ export default function OrderSummaryModal({
           <div className="p-6 border-t border-gray-100 space-y-3 bg-gray-50 rounded-b-3xl">
             <button
               onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white py-4 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
             >
-              Submit Order ❤️
+              <span>Submit Order</span>
+              <HeartIcon className="text-red-200" />
             </button>
             <button
               onClick={handleClose}

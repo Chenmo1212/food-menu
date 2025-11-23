@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { FireIcon } from '../utils/iconMapping';
 
 export default function MenuItem({ item, onAddToCart, onItemClick }) {
   const cardRef = useRef(null);
@@ -25,7 +26,7 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
     <div
       ref={cardRef}
       onClick={handleClick}
-      className="bg-white p-4 pt-16 md:pt-24 rounded-3xl shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col items-center relative group hover:scale-105 md:min-h-[220px]"
+      className="bg-white p-4 pt-20 md:pt-24 rounded-3xl shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col items-center relative group hover:scale-105 md:min-h-[220px]"
     >
       {/* Image protruding above the card */}
       <div className="absolute -top-12 md:-top-14 left-1/2 transform -translate-x-1/2 w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl overflow-hidden shadow-lg border-4 border-white">
@@ -50,8 +51,8 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
           )}
         </h3>
       </div>
-      <p className="text-gray-400 text-xs mb-4">
-        {(item.orderCount || 0) > 3 ? '🔥 ' : ''}
+      <p className="text-gray-400 text-xs mb-4 flex items-center justify-center gap-1">
+        {(item.orderCount || 0) > 3 && <FireIcon className="text-orange-500" />}
         {item.orderCount || 0} {t('orders', '单')}
       </p>
       

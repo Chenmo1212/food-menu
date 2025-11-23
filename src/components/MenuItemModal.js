@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { FireIcon } from '../utils/iconMapping';
 
 export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, cardRect }) {
   const [isAnimating, setIsAnimating] = useState(false);
@@ -107,8 +108,8 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
                   {language === 'zh' ? item.name : item.nameEn}
                 </h2>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-500 text-sm">
-                    {(item.orderCount || 0) > 3 ? '🔥 ' : ''}
+                  <span className="text-gray-500 text-sm flex items-center gap-1">
+                    {(item.orderCount || 0) > 3 && <FireIcon className="text-orange-500" />}
                     {item.orderCount || 0} {t('orders', '单')}
                   </span>
                 </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import CartItem from './CartItem';
 import OrderSummaryModal from './OrderSummaryModal';
 import { useLanguage } from '../contexts/LanguageContext';
+import { CartIcon, ClockIcon, PenIcon, NoteIcon, TimesIcon } from '../utils/iconMapping';
 
 export default function Cart({ cart, onUpdateQty, onCheckout }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +55,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         onClick={() => setIsOpen(!isOpen)}
         className="lg:hidden fixed bottom-4 right-4 bg-orange-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2 z-50"
       >
-        <span>🛒</span>
+        <CartIcon />
         <span className="font-bold">({cart.length})</span>
       </button>
 
@@ -107,8 +108,9 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         {/* Cart List */}
         <div className="flex-1 overflow-y-auto pr-2 space-y-4 md:space-y-6">
           {cart.length === 0 ? (
-            <div className="text-center text-gray-400 mt-10">
-              {t('Cart is empty 🛒', '购物车是空的 🛒')}
+            <div className="text-center text-gray-400 mt-10 flex flex-col items-center gap-2">
+              <CartIcon size="2x" />
+              <span>{t('Cart is empty', '购物车是空的')}</span>
             </div>
           ) : (
             cart.map(item => (
@@ -129,7 +131,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
-                <span className="text-xl">🕐</span>
+                <ClockIcon className="text-orange-500" />
               </div>
               <div className="text-left">
                 <p className="text-xs text-gray-500 font-medium">
@@ -138,9 +140,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
                 <p className="text-sm font-bold text-gray-800">{formatDeliveryDisplay()}</p>
               </div>
             </div>
-            <span className="text-gray-400 group-hover:text-orange-500 transition-colors">
-              ✏️
-            </span>
+            <PenIcon className="text-gray-400 group-hover:text-orange-500 transition-colors" />
           </button>
         </div>
 
@@ -159,14 +159,14 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
                 {/* Header */}
                 <div className="flex items-center justify-between pb-4 border-b">
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <span>🕐</span>
+                    <ClockIcon className="text-orange-500" />
                     <span>Select Delivery Time</span>
                   </h3>
                   <button
                     onClick={() => setShowDeliveryPicker(false)}
                     className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
                   >
-                    ✕
+                    <TimesIcon />
                   </button>
                 </div>
 
@@ -241,7 +241,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         {cart.some(item => item.specialInstructions) && (
           <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
             <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-              <span>📝</span>
+              <NoteIcon className="text-orange-500" />
               <span>Special Instructions</span>
             </h3>
             <div className="space-y-2">

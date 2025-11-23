@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { SearchIcon, GlobeIcon, TimesIcon, HeartIcon } from '../utils/iconMapping';
 
 export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
   const { language, toggleLanguage, t } = useLanguage();
@@ -20,8 +21,8 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
           </button> */}
 
           <div className="flex flex-col">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800">
-              {t('Welcome, Yuan Bao ❤️', '欢迎，元宝 ❤️')}
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+              {t('Welcome, Yuan Bao', '欢迎，元宝')} <HeartIcon className="text-red-500" />
             </h1>
             <p className="text-gray-500 text-sm">
               {t('What would you like to eat today?', '今天想吃什么？')}
@@ -37,9 +38,7 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
             className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 group"
             title={t('Search', '搜索')}
           >
-            <span className="text-lg md:text-xl group-hover:scale-110 transition-transform">
-              🔍
-            </span>
+            <SearchIcon className="text-gray-600 group-hover:scale-110 transition-transform" />
           </button>
           
           {/* Language Toggle Button */}
@@ -48,9 +47,7 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
             className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 group"
             title={t('Switch to Chinese', '切换到英文')}
           >
-            <span className="text-lg md:text-xl group-hover:scale-110 transition-transform">
-              {language === 'en' ? '🇨🇳' : '🇬🇧'}
-            </span>
+            <GlobeIcon className="text-gray-600 group-hover:scale-110 transition-transform" />
           </button>
         </div>
       </div>
@@ -78,13 +75,13 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
                 className="pl-10 pr-10 py-3 rounded-xl bg-white w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all"
                 autoFocus
               />
-              <span className="absolute left-3 top-3.5 text-gray-400">🔍</span>
+              <SearchIcon className="absolute left-3 top-3.5 text-gray-400" />
               {searchQuery && (
                 <button
                   onClick={() => onSearchChange('')}
                   className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  ✕
+                  <TimesIcon />
                 </button>
               )}
             </div>

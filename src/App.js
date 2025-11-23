@@ -10,6 +10,7 @@ import Rank from './components/Rank';
 import { MENU_ITEMS } from './data/menuData';
 import { sendMarkdownToWeChat } from './services/wechatNotification';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { HomeIcon, ClockIcon, OrderIcon, SettingsIcon, CheckIcon, WarningIcon } from './utils/iconMapping';
 
 function AppContent() {
   const { t } = useLanguage();
@@ -68,9 +69,9 @@ function AppContent() {
     const result = await sendMarkdownToWeChat(markdown, deliveryInfo);
     
     if (result.success) {
-      alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\n✅ Notification sent successfully!`);
+      alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nNotification sent successfully!`);
     } else {
-      alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\n⚠️ Failed to send notification: ${result.message}\n\nPlease check console for details.`);
+      alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nFailed to send notification: ${result.message}\n\nPlease check console for details.`);
     }
   };
 
@@ -127,7 +128,7 @@ function AppContent() {
         return (
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="text-center">
-              <span className="text-6xl mb-4 block">🏠</span>
+              <HomeIcon className="text-6xl mb-4 text-gray-400" size="4x" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('Welcome Home', '欢迎回家')}</h2>
               <p className="text-gray-500">{t('Home page coming soon', '主页即将推出')}</p>
             </div>
@@ -138,7 +139,7 @@ function AppContent() {
         return (
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="text-center">
-              <span className="text-6xl mb-4 block">🕐</span>
+              <ClockIcon className="text-6xl mb-4 text-gray-400" size="4x" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('Order History', '订单历史')}</h2>
               <p className="text-gray-500">{t('Your order history will appear here', '您的订单历史将显示在这里')}</p>
             </div>
@@ -149,7 +150,7 @@ function AppContent() {
         return (
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="text-center">
-              <span className="text-6xl mb-4 block">👜</span>
+              <OrderIcon className="text-6xl mb-4 text-gray-400" size="4x" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('My Orders', '我的订单')}</h2>
               <p className="text-gray-500">{t('Track your orders here', '在这里跟踪您的订单')}</p>
             </div>
@@ -163,7 +164,7 @@ function AppContent() {
         return (
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="text-center">
-              <span className="text-6xl mb-4 block">⚙️</span>
+              <SettingsIcon className="text-6xl mb-4 text-gray-400" size="4x" />
               <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('Settings', '设置')}</h2>
               <p className="text-gray-500">{t('Manage your preferences', '管理您的偏好设置')}</p>
             </div>

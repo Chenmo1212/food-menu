@@ -1,6 +1,7 @@
 import React from 'react';
+import { MenuIcon } from '../utils/iconMapping';
 
-function NavItem({ icon, label, active, onClick }) {
+function NavItem({ IconComponent, label, active, onClick }) {
   return (
     <div
       className="flex flex-col items-center gap-1 cursor-pointer group relative px-4"
@@ -11,7 +12,7 @@ function NavItem({ icon, label, active, onClick }) {
           ? 'bg-orange-500 text-white shadow-lg shadow-orange-200'
           : 'bg-transparent text-gray-400 group-hover:bg-orange-50 group-hover:text-orange-400'
       }`}>
-        <span className="text-xl">{icon}</span>
+        {IconComponent && <IconComponent className="text-xl" />}
       </div>
       <span className={`text-xs font-medium ${active ? 'text-gray-800' : 'text-gray-400'}`}>
         {label}
@@ -29,37 +30,37 @@ export default function Sidebar({ activeView, onViewChange }) {
       
       <nav className="flex-1 flex flex-col gap-8 w-full">
         {/* <NavItem
-          icon="🏠"
+          IconComponent={HomeIcon}
           label="Home"
           active={activeView === 'home'}
           onClick={() => onViewChange('home')}
         /> */}
         <NavItem
-          icon="🍱"
+          IconComponent={MenuIcon}
           label="Menu"
           active={activeView === 'menu'}
           onClick={() => onViewChange('menu')}
         />
         {/* <NavItem
-          icon="🕐"
+          IconComponent={ClockIcon}
           label="History"
           active={activeView === 'history'}
           onClick={() => onViewChange('history')}
         /> */}
         {/* <NavItem
-          icon="👜"
+          IconComponent={OrderIcon}
           label="Order"
           active={activeView === 'order'}
           onClick={() => onViewChange('order')}
         /> */}
         {/* <NavItem
-          icon="🏆"
+          IconComponent={RankIcon}
           label="Rank"
           active={activeView === 'rank'}
           onClick={() => onViewChange('rank')}
         />
         <NavItem
-          icon="⚙️"
+          IconComponent={SettingsIcon}
           label="Settings"
           active={activeView === 'settings'}
           onClick={() => onViewChange('settings')}
