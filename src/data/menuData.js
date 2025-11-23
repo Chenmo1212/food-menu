@@ -542,11 +542,11 @@ export const MENU_ITEMS = [
 ];
 
 export const CATEGORIES = [
-  { name: 'All', nameZh: '全部', icon: '🍽️' },
-  { name: 'Pork', nameZh: '猪肉', icon: '🐷' },
-  { name: 'Chicken', nameZh: '鸡肉', icon: '🐔' },
-  { name: 'Seafood', nameZh: '海鲜', icon: '🦐' },
-  { name: 'Vegetables', nameZh: '素菜', icon: '🥬' },
+  { name: 'All', nameZh: '全部', iconName: 'all' },
+  { name: 'Pork', nameZh: '猪肉', iconName: 'pork' },
+  { name: 'Chicken', nameZh: '鸡肉', iconName: 'chicken' },
+  { name: 'Seafood', nameZh: '海鲜', iconName: 'seafood' },
+  { name: 'Vegetables', nameZh: '素菜', iconName: 'vegetables' },
 ];
 
 // Made with Bob

@@ -24,7 +24,7 @@ food-menu/
 │   │   └── menuData.js         # Menu items & categories
 │   │
 │   ├── App.js                   # ✅ REFACTORED: Main app (now clean!)
-│   ├── index.js                 # Entry point
+│   ├── icons.js                 # Entry point
 │   ├── index.css                # ✅ UPDATED: Global styles + utilities
 │   └── ...
 │
