@@ -154,23 +154,23 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         </div>
 
         {/* Delivery Time Section */}
-        <div className="mt-4 mb-4">
+        <div className="mt-3 mb-3">
           <button
             onClick={() => {
               soundManager.playTap();
               setShowDeliveryPicker(true);
             }}
-            className="w-full p-4 bg-white rounded-xl border-2 border-orange-200 hover:border-orange-300 hover:shadow-md transition-all flex items-center justify-between group"
+            className="w-full p-3 md:p-4 bg-white rounded-xl border-2 border-orange-200 hover:border-orange-300 hover:shadow-md transition-all flex items-center justify-between group"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-orange-100 rounded-full flex items-center justify-center group-hover:bg-orange-200 transition-colors">
                 <ClockIcon className="text-orange-500" />
               </div>
               <div className="text-left">
-                <p className="text-xs text-gray-500 font-medium">
+                <p className="text-[10px] md:text-xs text-gray-500 font-medium">
                   {t('Delivery Time', '送达时间')}
                 </p>
-                <p className="text-sm font-bold text-gray-800">{formatDeliveryDisplay()}</p>
+                <p className="text-xs md:text-sm font-bold text-gray-800">{formatDeliveryDisplay()}</p>
               </div>
             </div>
             <PenIcon className="text-gray-400 group-hover:text-orange-500 transition-colors" />
@@ -279,14 +279,14 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
 
         {/* Special Instructions Section */}
         {cart.some(item => item.specialInstructions) && (
-          <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
-            <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <div className="mt-3 p-3 md:p-4 bg-orange-50 rounded-xl border border-orange-100">
+            <h3 className="font-semibold text-xs md:text-base text-gray-800 mb-2 md:mb-3 flex items-center gap-1.5 md:gap-2">
               <NoteIcon className="text-orange-500" />
                 {t('Special Instructions', '特殊要求')}
             </h3>
-            <div className="space-y-2">
+            <div className="space-y-1.5 md:space-y-2">
               {cart.filter(item => item.specialInstructions).map((item, index) => (
-                <div key={`${item.id}-${index}`} className="text-sm">
+                <div key={`${item.id}-${index}`} className="text-xs md:text-sm">
                   <p className="font-medium text-gray-700">{item.name}:</p>
                   <p className="text-gray-600 italic pl-2">{item.specialInstructions}</p>
                 </div>
@@ -296,7 +296,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         )}
 
         {/* Footer Totals */}
-        <div className="mt-6 border-t pt-6 space-y-3">
+        <div className="mt-2 md:mt-4 border-t md:pt-4 space-y-3">
           {/* <div className="flex justify-between text-gray-500 text-sm">
             <span>Items ({cart.length})</span>
             <span className="font-bold text-gray-800">${subtotal.toFixed(2)}</span>
@@ -311,7 +311,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
           </div> */}
 
           <button
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-200 transition-all mt-4"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-lg shadow-orange-200 transition-all mt-3 md:mt-4"
             onClick={() => {
               soundManager.playTap();
               setShowOrderSummary(true);

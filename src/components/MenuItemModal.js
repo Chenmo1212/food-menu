@@ -95,7 +95,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
           </button>
 
           {/* Hero Image */}
-          <div className="relative w-full h-64 md:h-96 bg-gradient-to-br from-orange-50 to-orange-100">
+          <div className="relative w-full h-48 md:h-96 bg-gradient-to-br from-orange-50 to-orange-100">
             <img
               src={item.image}
               alt={language === 'zh' ? item.name : item.nameEn}
@@ -105,15 +105,15 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
 
           {/* Modal Content */}
           <div>
-            <div className="p-6 md:p-8">
+            <div className="p-4 md:p-8">
             {/* Title */}
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-start mb-3 md:mb-4">
               <div className="flex-1">
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+                <h2 className="text-lg md:text-3xl font-bold text-gray-800 mb-1 md:mb-2">
                   {language === 'zh' ? item.name : item.nameEn}
                 </h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-500 text-sm flex items-center gap-1">
+                <div className="flex items-center gap-1 md:gap-2">
+                  <span className="text-gray-500 text-xs md:text-sm flex items-center gap-1">
                     {(item.orderCount || 0) > 3 && <FireIcon className="text-orange-500" />}
                     {item.orderCount || 0} {(item.orderCount || 0) === 1 ? t('order', '单') : t('orders', '单')}
                   </span>
@@ -123,11 +123,11 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
 
             {/* Description */}
             {(item.description || item.descriptionEn) && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+              <div className="mb-4 md:mb-6">
+                <h3 className="text-sm md:text-lg font-semibold text-gray-800 mb-2 md:mb-3">
                   {t('Description', '描述')}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-xs md:text-base text-gray-600 leading-relaxed">
                   {language === 'zh' ? item.description : item.descriptionEn}
                 </p>
               </div>
@@ -135,15 +135,15 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
 
             {/* Ingredients */}
             {((language === 'zh' && item.ingredients) || (language === 'en' && item.ingredientsEn)) && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+              <div className="mb-4 md:mb-6">
+                <h3 className="text-sm md:text-lg font-semibold text-gray-800 mb-2 md:mb-3">
                   {t('Ingredients', '食材')}
                 </h3>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
                   {(language === 'zh' ? item.ingredients : item.ingredientsEn)?.map((ingredient, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                      className="px-2 md:px-3 py-0.5 md:py-1 bg-gray-100 text-gray-700 rounded-full text-xs md:text-sm"
                     >
                       {ingredient}
                     </span>
@@ -154,41 +154,41 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
 
             {/* Nutritional Info */}
             {item.nutrition && (
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+              <div className="mb-4 md:mb-6">
+                <h3 className="text-sm md:text-lg font-semibold text-gray-800 mb-2 md:mb-3">
                   {t('Nutritional Information', '营养信息')}
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-gray-50 p-3 rounded-xl text-center">
-                    <p className="text-2xl font-bold text-gray-800">{item.nutrition.calories}</p>
-                    <p className="text-xs text-gray-500">{t('Calories', '卡路里')}</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                  <div className="bg-gray-50 p-2 md:p-3 rounded-lg md:rounded-xl text-center">
+                    <p className="text-lg md:text-2xl font-bold text-gray-800">{item.nutrition.calories}</p>
+                    <p className="text-[10px] md:text-xs text-gray-500">{t('Calories', '卡路里')}</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-xl text-center">
-                    <p className="text-2xl font-bold text-gray-800">{item.nutrition.protein}</p>
-                    <p className="text-xs text-gray-500">{t('Protein', '蛋白质')}</p>
+                  <div className="bg-gray-50 p-2 md:p-3 rounded-lg md:rounded-xl text-center">
+                    <p className="text-lg md:text-2xl font-bold text-gray-800">{item.nutrition.protein}</p>
+                    <p className="text-[10px] md:text-xs text-gray-500">{t('Protein', '蛋白质')}</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-xl text-center">
-                    <p className="text-2xl font-bold text-gray-800">{item.nutrition.fat}</p>
-                    <p className="text-xs text-gray-500">{t('Fat', '脂肪')}</p>
+                  <div className="bg-gray-50 p-2 md:p-3 rounded-lg md:rounded-xl text-center">
+                    <p className="text-lg md:text-2xl font-bold text-gray-800">{item.nutrition.fat}</p>
+                    <p className="text-[10px] md:text-xs text-gray-500">{t('Fat', '脂肪')}</p>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-xl text-center">
-                    <p className="text-2xl font-bold text-gray-800">{item.nutrition.carbs}</p>
-                    <p className="text-xs text-gray-500">{t('Carbs', '碳水')}</p>
+                  <div className="bg-gray-50 p-2 md:p-3 rounded-lg md:rounded-xl text-center">
+                    <p className="text-lg md:text-2xl font-bold text-gray-800">{item.nutrition.carbs}</p>
+                    <p className="text-[10px] md:text-xs text-gray-500">{t('Carbs', '碳水')}</p>
                   </div>
                 </div>
               </div>
             )}
 
             {/* Special Notes */}
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+            <div className="mb-4 md:mb-8">
+              <h3 className="text-sm md:text-lg font-semibold text-gray-800 mb-2 md:mb-3">
                 {t('Special Instructions', '特殊要求')}
               </h3>
               <textarea
                 value={specialInstructions}
                 onChange={(e) => setSpecialInstructions(e.target.value)}
                 placeholder={t('Add any special requests or dietary requirements...', '添加任何特殊要求或饮食需求...')}
-                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none"
+                className="w-full p-3 md:p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 resize-none text-xs md:text-base"
                 rows="3"
               />
             </div>
@@ -196,7 +196,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
               {/* Add to Cart Button */}
               <button
                 onClick={handleAddToCart}
-                className="w-full bg-orange-500 text-white py-4 rounded-2xl font-semibold text-lg hover:bg-orange-600 transition-colors shadow-lg hover:shadow-xl"
+                className="w-full bg-orange-500 text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-semibold text-base md:text-lg hover:bg-orange-600 transition-colors shadow-lg hover:shadow-xl"
               >
                 {t('Add to Order', '加入订单')}
               </button>
