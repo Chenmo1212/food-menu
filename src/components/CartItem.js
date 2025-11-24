@@ -1,17 +1,23 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function CartItem({ item, onUpdateQty }) {
+  const { language } = useLanguage();
+  
+  // Display name based on current language
+  const displayName = language === 'zh' ? item.name : (item.nameEn || item.name);
+  
   return (
     <div className="flex gap-3 md:gap-4 items-center">
       <div className="w-12 h-12 md:w-14 md:h-14 rounded-xl overflow-hidden shrink-0">
-        <img 
-          src={item.image || 'https://via.placeholder.com/150'} 
-          alt={item.name} 
-          className="w-full h-full object-cover" 
+        <img
+          src={item.image || 'https://via.placeholder.com/150'}
+          alt={displayName}
+          className="w-full h-full object-cover"
         />
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-bold text-sm truncate">{item.name}</h4>
+        <h4 className="font-bold text-sm truncate">{displayName}</h4>
         {item.specialInstructions && (
           <p className="text-gray-400 text-xs truncate italic">
             {item.specialInstructions}

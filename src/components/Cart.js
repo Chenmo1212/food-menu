@@ -8,7 +8,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showDeliveryPicker, setShowDeliveryPicker] = useState(false);
   const [showOrderSummary, setShowOrderSummary] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   // Generate order number based on current date and time
   const getOrderNumber = () => {
@@ -38,14 +38,25 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
   // Format display text
   const formatDeliveryDisplay = () => {
     const date = new Date(deliveryDate + 'T' + deliveryTime);
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const dayName = days[date.getDay()];
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHours = hours % 12 || 12;
-    const displayMinutes = minutes.toString().padStart(2, '0');
-    return `${dayName}, ${displayHours}:${displayMinutes} ${period}`;
+    
+    if (language === 'zh') {
+      // Chinese format: 星期一, 19:30
+      const daysZh = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+      const dayName = daysZh[date.getDay()];
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${dayName}, ${hours}:${minutes}`;
+    } else {
+      // English format: Monday, 7:30 PM
+      const daysEn = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const dayName = daysEn[date.getDay()];
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const period = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12;
+      const displayMinutes = minutes.toString().padStart(2, '0');
+      return `${dayName}, ${displayHours}:${displayMinutes} ${period}`;
+    }
   };
   
   // Handle order submission
@@ -172,7 +183,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
                 <div className="flex items-center justify-between pb-4 border-b">
                   <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                     <ClockIcon className="text-orange-500" />
-                    <span>Select Delivery Time</span>
+                    <span>{t('Select Delivery Time', '选择送达时间')}</span>
                   </h3>
                   <button
                     onClick={() => setShowDeliveryPicker(false)}
@@ -184,13 +195,13 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
 
                 {/* Quick Select Buttons */}
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-3">Quick Select</p>
+                  <p className="text-sm font-medium text-gray-600 mb-3">{t('Quick Select', '快速选择')}</p>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      { label: 'Today 7:30 PM', offset: 0, time: '19:30' },
-                      { label: 'Tomorrow 7:30 PM', offset: 1, time: '19:30' },
-                      { label: 'Next Monday 7:30 PM', offset: null, time: '19:30' },
-                      { label: 'Next Week', offset: 7, time: '19:30' }
+                      { labelEn: 'Today 7:30 PM', labelZh: '今天 19:30', offset: 0, time: '19:30' },
+                      { labelEn: 'Tomorrow 7:30 PM', labelZh: '明天 19:30', offset: 1, time: '19:30' },
+                      { labelEn: 'Next Monday 7:30 PM', labelZh: '下周一 19:30', offset: null, time: '19:30' },
+                      { labelEn: 'Next Week', labelZh: '下周', offset: 7, time: '19:30' }
                     ].map((option, idx) => (
                       <button
                         key={idx}
@@ -200,14 +211,14 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
                             date.setDate(date.getDate() + option.offset);
                             setDeliveryDate(date.toISOString().split('T')[0]);
                             setDeliveryTime(option.time);
-                          } else if (option.label === 'Next Monday 7:30 PM') {
+                          } else {
                             setDeliveryDate(getNextMonday());
                             setDeliveryTime(option.time);
                           }
                         }}
                         className="px-4 py-3 bg-orange-50 hover:bg-orange-100 border-2 border-orange-200 hover:border-orange-300 rounded-xl text-sm font-medium text-gray-700 transition-all hover:shadow-md"
                       >
-                        {option.label}
+                        {language === 'zh' ? option.labelZh : option.labelEn}
                       </button>
                     ))}
                   </div>
@@ -215,9 +226,9 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
 
                 {/* Custom Date/Time Inputs */}
                 <div className="space-y-3">
-                  <p className="text-sm font-medium text-gray-600">Custom Time</p>
+                  <p className="text-sm font-medium text-gray-600">{t('Custom Time', '自定义时间')}</p>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-2">Date</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-2">{t('Date', '日期')}</label>
                     <input
                       type="date"
                       value={deliveryDate}
@@ -227,7 +238,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-2">Time</label>
+                    <label className="block text-xs font-medium text-gray-600 mb-2">{t('Time', '时间')}</label>
                     <input
                       type="time"
                       value={deliveryTime}
@@ -242,7 +253,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
                   onClick={() => setShowDeliveryPicker(false)}
                   className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl"
                 >
-                  Confirm
+                  {t('Confirm', '确认')}
                 </button>
               </div>
             </div>
@@ -254,7 +265,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
           <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
             <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
               <NoteIcon className="text-orange-500" />
-              <span>Special Instructions</span>
+                {t('Special Instructions', '特殊要求')}
             </h3>
             <div className="space-y-2">
               {cart.filter(item => item.specialInstructions).map((item, index) => (
