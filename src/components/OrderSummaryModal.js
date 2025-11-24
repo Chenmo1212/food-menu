@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ClipboardIcon, PizzaIcon, ClockIcon, LockIcon, WarningIcon, LightbulbIcon, HeartIcon } from '../utils/iconMapping';
 import { useLanguage } from '../contexts/LanguageContext';
+import soundManager from '../utils/soundManager';
 
 export default function OrderSummaryModal({
   isOpen,
@@ -73,10 +74,12 @@ export default function OrderSummaryModal({
   // Handle submission
   const handleSubmit = () => {
     if (secretCode.toLowerCase() !== SECRET_CODE.toLowerCase()) {
+      soundManager.playTap();
       setCodeError(t('Incorrect code. Please try again.', '密码错误，请重试。'));
       return;
     }
     
+    soundManager.playTap();
     const markdown = generateMarkdownSummary();
     onSubmit(markdown);
     handleClose();
@@ -84,6 +87,7 @@ export default function OrderSummaryModal({
 
   // Handle close
   const handleClose = () => {
+    soundManager.playTap();
     setSecretCode('');
     setCodeError('');
     setIsAnimating(false);

@@ -1,11 +1,15 @@
 import React from 'react';
 import { MenuIcon } from '../utils/iconMapping';
+import soundManager from '../utils/soundManager';
 
 function NavItem({ IconComponent, label, active, onClick }) {
   return (
     <div
       className="flex flex-col items-center gap-1 cursor-pointer group relative px-4"
-      onClick={onClick}
+      onClick={() => {
+        soundManager.playTap();
+        onClick();
+      }}
     >
       <div className={`p-3 rounded-xl transition-colors ${
         active

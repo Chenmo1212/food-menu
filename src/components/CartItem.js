@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import soundManager from '../utils/soundManager';
 
 export default function CartItem({ item, onUpdateQty }) {
   const { language } = useLanguage();
@@ -26,14 +27,20 @@ export default function CartItem({ item, onUpdateQty }) {
       </div>
       <div className="flex items-center gap-2 md:gap-3 bg-gray-100 rounded-lg px-2 py-1">
         <button
-          onClick={() => onUpdateQty(item.cartItemId, -1)}
+          onClick={() => {
+            soundManager.playTap();
+            onUpdateQty(item.cartItemId, -1);
+          }}
           className="text-gray-500 hover:text-orange-500 w-6 h-6 flex items-center justify-center"
         >
           -
         </button>
         <span className="font-bold text-sm w-4 text-center">{item.qty}</span>
         <button
-          onClick={() => onUpdateQty(item.cartItemId, 1)}
+          onClick={() => {
+            soundManager.playTap();
+            onUpdateQty(item.cartItemId, 1);
+          }}
           className="text-gray-500 hover:text-orange-500 w-6 h-6 flex items-center justify-center"
         >
           +

@@ -3,6 +3,7 @@ import CartItem from './CartItem';
 import OrderSummaryModal from './OrderSummaryModal';
 import { useLanguage } from '../contexts/LanguageContext';
 import { CartIcon, ClockIcon, PenIcon, NoteIcon, TimesIcon } from '../utils/iconMapping';
+import soundManager from '../utils/soundManager';
 
 export default function Cart({ cart, onUpdateQty, onCheckout }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -75,7 +76,10 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
     <>
       {/* Mobile Cart Button - Fixed at bottom */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          soundManager.playTap();
+          setIsOpen(!isOpen);
+        }}
         className="lg:hidden fixed bottom-4 right-4 bg-orange-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2 z-50"
       >
         <CartIcon />
@@ -104,7 +108,10 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
       `}>
         {/* Close button for mobile */}
         <button
-          onClick={() => setIsOpen(false)}
+          onClick={() => {
+            soundManager.playTap();
+            setIsOpen(false);
+          }}
           className="lg:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
         >
           ×
@@ -149,7 +156,10 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         {/* Delivery Time Section */}
         <div className="mt-4 mb-4">
           <button
-            onClick={() => setShowDeliveryPicker(true)}
+            onClick={() => {
+              soundManager.playTap();
+              setShowDeliveryPicker(true);
+            }}
             className="w-full p-4 bg-white rounded-xl border-2 border-orange-200 hover:border-orange-300 hover:shadow-md transition-all flex items-center justify-between group"
           >
             <div className="flex items-center gap-3">
@@ -186,7 +196,10 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
                     <span>{t('Select Delivery Time', '选择送达时间')}</span>
                   </h3>
                   <button
-                    onClick={() => setShowDeliveryPicker(false)}
+                    onClick={() => {
+                      soundManager.playTap();
+                      setShowDeliveryPicker(false);
+                    }}
                     className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
                   >
                     <TimesIcon />
@@ -206,6 +219,7 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
                       <button
                         key={idx}
                         onClick={() => {
+                          soundManager.playTap();
                           if (option.offset !== null) {
                             const date = new Date();
                             date.setDate(date.getDate() + option.offset);
@@ -250,7 +264,10 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
 
                 {/* Confirm Button */}
                 <button
-                  onClick={() => setShowDeliveryPicker(false)}
+                  onClick={() => {
+                    soundManager.playTap();
+                    setShowDeliveryPicker(false);
+                  }}
                   className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold transition-colors shadow-lg hover:shadow-xl"
                 >
                   {t('Confirm', '确认')}
@@ -295,7 +312,10 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
 
           <button
             className="w-full bg-orange-500 hover:bg-orange-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg shadow-orange-200 transition-all mt-4"
-            onClick={() => setShowOrderSummary(true)}
+            onClick={() => {
+              soundManager.playTap();
+              setShowOrderSummary(true);
+            }}
           >
             {t('Get Summary', '获取摘要')}
           </button>

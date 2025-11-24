@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { FireIcon } from '../utils/iconMapping';
+import soundManager from '../utils/soundManager';
 
 export default function MenuItem({ item, onAddToCart, onItemClick }) {
   const cardRef = useRef(null);
@@ -9,6 +10,7 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
   const [isOverflowing, setIsOverflowing] = useState(false);
 
   const handleClick = () => {
+    soundManager.playTap();
     if (cardRef.current && onItemClick) {
       const rect = cardRef.current.getBoundingClientRect();
       onItemClick(item, rect);
@@ -59,6 +61,7 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
       <button
         onClick={(e) => {
           e.stopPropagation();
+          soundManager.playAddToCart();
           onAddToCart(item);
         }}
         className="bg-orange-100 text-orange-600 px-4 py-2 rounded-xl font-medium text-sm hover:bg-orange-500 hover:text-white transition-colors w-full"

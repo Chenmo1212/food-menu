@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { FireIcon } from '../utils/iconMapping';
+import soundManager from '../utils/soundManager';
 
 export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, cardRect }) {
   const [isAnimating, setIsAnimating] = useState(false);
@@ -37,6 +38,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
   };
 
   const handleAddToCart = () => {
+    soundManager.playAddToCart();
     onAddToCart(item, specialInstructions);
     handleClose();
   };
@@ -81,7 +83,10 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
         >
           {/* Close Button */}
           <button
-            onClick={handleClose}
+            onClick={() => {
+              soundManager.playTap();
+              handleClose();
+            }}
             className={`absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all ${
               isAnimating ? 'opacity-100' : 'opacity-0'
             }`}

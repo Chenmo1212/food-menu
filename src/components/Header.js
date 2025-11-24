@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { SearchIcon, GlobeIcon, TimesIcon, HeartIcon } from '../utils/iconMapping';
+import soundManager from '../utils/soundManager';
 
 export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
   const { language, toggleLanguage, t } = useLanguage();
@@ -34,7 +35,10 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
         <div className="flex items-center gap-2">
           {/* Search Button */}
           <button
-            onClick={() => setShowSearch(true)}
+            onClick={() => {
+              soundManager.playTap();
+              setShowSearch(true);
+            }}
             className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 group"
             title={t('Search', '搜索')}
           >
@@ -43,7 +47,10 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
           
           {/* Language Toggle Button */}
           <button
-            onClick={toggleLanguage}
+            onClick={() => {
+              soundManager.playTap();
+              toggleLanguage();
+            }}
             className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 group"
             title={t('Switch to Chinese', '切换到英文')}
           >
@@ -62,7 +69,10 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
           <div className="flex items-center gap-3">
             {/* Back Button */}
             <button
-              onClick={() => setShowSearch(false)}
+              onClick={() => {
+                soundManager.playTap();
+                setShowSearch(false);
+              }}
               className="flex items-center justify-center w-10 h-10 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 flex-shrink-0"
               title={t('Close', '关闭')}
             >
@@ -82,7 +92,10 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
               <SearchIcon className="absolute left-3 top-3.5 text-gray-400" />
               {searchQuery && (
                 <button
-                  onClick={() => onSearchChange('')}
+                  onClick={() => {
+                    soundManager.playTap();
+                    onSearchChange('');
+                  }}
                   className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <TimesIcon />

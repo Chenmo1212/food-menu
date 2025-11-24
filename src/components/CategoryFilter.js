@@ -2,6 +2,7 @@ import React from 'react';
 import { CATEGORIES } from '../data/menuData';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AllIcon, PorkIcon, ChickenIcon, SeafoodIcon, VegetablesIcon } from '../assets/icons';
+import soundManager from '../utils/soundManager';
 
 // Icon mapping
 const iconComponents = {
@@ -22,7 +23,10 @@ export default function CategoryFilter({ activeCategory, onCategoryChange }) {
         return (
           <button
             key={cat.name}
-            onClick={() => onCategoryChange(cat.name)}
+            onClick={() => {
+              soundManager.playTap();
+              onCategoryChange(cat.name);
+            }}
             className={`px-4 md:px-6 py-2 md:py-3 rounded-2xl flex items-center gap-2 transition-all shadow-sm whitespace-nowrap flex-shrink-0 ${
               activeCategory === cat.name
               ? 'bg-orange-500 text-white shadow-orange-200'
