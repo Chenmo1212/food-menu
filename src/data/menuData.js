@@ -13,10 +13,10 @@ export const MENU_ITEMS = [
     ingredients: ['豆腐', '猪肉末', '豆瓣酱', '花椒', '葱姜蒜'],
     ingredientsEn: ['Tofu', 'Minced Pork', 'Doubanjiang', 'Sichuan Pepper', 'Scallions'],
     nutrition: {
-      calories: 280,
-      protein: '18g',
-      fat: '15g',
-      carbs: '20g'
+      calories: 93,
+      protein: '6g',
+      fat: '5g',
+      carbs: '6.7g'
     }
   },
   {
@@ -33,10 +33,10 @@ export const MENU_ITEMS = [
     ingredients: ['番茄', '鸡蛋', '葱', '糖', '盐'],
     ingredientsEn: ['Tomatoes', 'Eggs', 'Scallions', 'Sugar', 'Salt'],
     nutrition: {
-      calories: 220,
-      protein: '12g',
-      fat: '14g',
-      carbs: '15g'
+      calories: 73,
+      protein: '4g',
+      fat: '4.7g',
+      carbs: '5g'
     }
   },
   {
@@ -53,10 +53,10 @@ export const MENU_ITEMS = [
     ingredients: ['豆腐', '猪肉末', '青椒', '酱油', '蒜'],
     ingredientsEn: ['Tofu', 'Minced Pork', 'Green Pepper', 'Soy Sauce', 'Garlic'],
     nutrition: {
-      calories: 310,
-      protein: '20g',
-      fat: '18g',
-      carbs: '18g'
+      calories: 103,
+      protein: '6.7g',
+      fat: '6g',
+      carbs: '6g'
     }
   },
   {
@@ -73,10 +73,10 @@ export const MENU_ITEMS = [
     ingredients: ['花菜', '蒜', '干辣椒', '生抽', '盐'],
     ingredientsEn: ['Cauliflower', 'Garlic', 'Dried Chili', 'Light Soy Sauce', 'Salt'],
     nutrition: {
-      calories: 180,
-      protein: '8g',
-      fat: '8g',
-      carbs: '22g'
+      calories: 60,
+      protein: '2.7g',
+      fat: '2.7g',
+      carbs: '7.3g'
     }
   },
   {
@@ -93,10 +93,10 @@ export const MENU_ITEMS = [
     ingredients: ['西兰花', '蚝油', '蒜', '盐', '油'],
     ingredientsEn: ['Broccoli', 'Oyster Sauce', 'Garlic', 'Salt', 'Oil'],
     nutrition: {
-      calories: 150,
-      protein: '6g',
-      fat: '6g',
-      carbs: '18g'
+      calories: 50,
+      protein: '2g',
+      fat: '2g',
+      carbs: '6g'
     }
   },
   {
@@ -113,10 +113,10 @@ export const MENU_ITEMS = [
     ingredients: ['排骨', '辣椒', '花椒', '姜蒜', '料酒'],
     ingredientsEn: ['Pork Ribs', 'Chili', 'Sichuan Pepper', 'Ginger & Garlic', 'Cooking Wine'],
     nutrition: {
-      calories: 420,
-      protein: '28g',
-      fat: '25g',
-      carbs: '22g'
+      calories: 140,
+      protein: '9.3g',
+      fat: '8.3g',
+      carbs: '7.3g'
     }
   },
   {
@@ -133,10 +133,10 @@ export const MENU_ITEMS = [
     ingredients: ['鸡胸肉/鸡腿肉', '彩椒', '洋葱', '生抽', '黑胡椒'],
     ingredientsEn: ['Chicken Breast', 'Bell Peppers', 'Onion', 'Soy Sauce', 'Black Pepper'],
     nutrition: {
-      calories: 260,
-      protein: '32g',
-      fat: '8g',
-      carbs: '16g'
+      calories: 87,
+      protein: '10.7g',
+      fat: '2.7g',
+      carbs: '5.3g'
     }
   },
   {
@@ -153,10 +153,10 @@ export const MENU_ITEMS = [
     ingredients: ['鸡腿肉', '面包糠', '鸡蛋', '面粉', '调味料'],
     ingredientsEn: ['Chicken Thigh', 'Breadcrumbs', 'Egg', 'Flour', 'Seasonings'],
     nutrition: {
-      calories: 380,
-      protein: '26g',
-      fat: '20g',
-      carbs: '28g'
+      calories: 127,
+      protein: '8.7g',
+      fat: '6.7g',
+      carbs: '9.3g'
     }
   },
   {
@@ -173,10 +173,10 @@ export const MENU_ITEMS = [
     ingredients: ['五花肉', '冰糖', '酱油', '料酒', '八角'],
     ingredientsEn: ['Pork Belly', 'Rock Sugar', 'Soy Sauce', 'Cooking Wine', 'Star Anise'],
     nutrition: {
-      calories: 480,
-      protein: '22g',
-      fat: '35g',
-      carbs: '18g'
+      calories: 160,
+      protein: '7.3g',
+      fat: '11.7g',
+      carbs: '6g'
     }
   },
   {
@@ -193,10 +193,10 @@ export const MENU_ITEMS = [
     ingredients: ['鱼肉', '西兰花', '豆豉', '姜蒜', '料酒'],
     ingredientsEn: ['Fish', 'Broccoli', 'Black Beans', 'Ginger & Garlic', 'Cooking Wine'],
     nutrition: {
-      calories: 240,
-      protein: '28g',
-      fat: '8g',
-      carbs: '16g'
+      calories: 80,
+      protein: '9.3g',
+      fat: '2.7g',
+      carbs: '5.3g'
     }
   },
   {
@@ -213,10 +213,10 @@ export const MENU_ITEMS = [
     ingredients: ['虾仁', '西兰花', '蒜', '盐', '料酒'],
     ingredientsEn: ['Shrimp', 'Broccoli', 'Garlic', 'Salt', 'Cooking Wine'],
     nutrition: {
-      calories: 180,
-      protein: '24g',
-      fat: '5g',
-      carbs: '12g'
+      calories: 60,
+      protein: '8g',
+      fat: '1.7g',
+      carbs: '4g'
     }
   },
   {
@@ -233,10 +233,10 @@ export const MENU_ITEMS = [
     ingredients: ['皮蛋', '茄子', '辣椒', '蒜', '酱油'],
     ingredientsEn: ['Century Egg', 'Eggplant', 'Chili', 'Garlic', 'Soy Sauce'],
     nutrition: {
-      calories: 210,
-      protein: '10g',
-      fat: '12g',
-      carbs: '18g'
+      calories: 70,
+      protein: '3.3g',
+      fat: '4g',
+      carbs: '6g'
     }
   },
   {
@@ -253,10 +253,10 @@ export const MENU_ITEMS = [
     ingredients: ['四季豆', '猪肉末', '干辣椒', '花椒', '蒜'],
     ingredientsEn: ['Green Beans', 'Minced Pork', 'Dried Chili', 'Sichuan Pepper', 'Garlic'],
     nutrition: {
-      calories: 220,
-      protein: '12g',
-      fat: '14g',
-      carbs: '16g'
+      calories: 73,
+      protein: '4g',
+      fat: '4.7g',
+      carbs: '5.3g'
     }
   },
   {
@@ -273,10 +273,10 @@ export const MENU_ITEMS = [
     ingredients: ['猪肉丝', '木耳', '胡萝卜', '泡椒', '糖醋汁'],
     ingredientsEn: ['Pork Strips', 'Wood Ear', 'Carrot', 'Pickled Chili', 'Sweet & Sour Sauce'],
     nutrition: {
-      calories: 320,
-      protein: '24g',
-      fat: '16g',
-      carbs: '24g'
+      calories: 107,
+      protein: '8g',
+      fat: '5.3g',
+      carbs: '8g'
     }
   },
   {
@@ -293,10 +293,10 @@ export const MENU_ITEMS = [
     ingredients: ['鸡胸肉', '柠檬', '青椒', '洋葱', '香菜'],
     ingredientsEn: ['Chicken Breast', 'Lemon', 'Green Pepper', 'Onion', 'Cilantro'],
     nutrition: {
-      calories: 240,
-      protein: '30g',
-      fat: '8g',
-      carbs: '14g'
+      calories: 80,
+      protein: '10g',
+      fat: '2.7g',
+      carbs: '4.7g'
     }
   },
   {
@@ -313,10 +313,10 @@ export const MENU_ITEMS = [
     ingredients: ['鸡胸肉', '燕麦', '鸡蛋', '面粉', '香料'],
     ingredientsEn: ['Chicken Breast', 'Oats', 'Egg', 'Flour', 'Spices'],
     nutrition: {
-      calories: 320,
-      protein: '32g',
-      fat: '12g',
-      carbs: '24g'
+      calories: 107,
+      protein: '10.7g',
+      fat: '4g',
+      carbs: '8g'
     }
   },
   {
@@ -333,10 +333,10 @@ export const MENU_ITEMS = [
     ingredients: ['虾仁', '咸蛋黄', '牛奶', '黄油', '咖喱叶'],
     ingredientsEn: ['Shrimp', 'Salted Egg Yolk', 'Milk', 'Butter', 'Curry Leaves'],
     nutrition: {
-      calories: 340,
-      protein: '26g',
-      fat: '22g',
-      carbs: '12g'
+      calories: 113,
+      protein: '8.7g',
+      fat: '7.3g',
+      carbs: '4g'
     }
   },
   {
@@ -353,10 +353,10 @@ export const MENU_ITEMS = [
     ingredients: ['鱼片', '酸菜', '豆芽', '辣椒', '花椒'],
     ingredientsEn: ['Fish Slices', 'Pickled Cabbage', 'Bean Sprouts', 'Chili', 'Sichuan Pepper'],
     nutrition: {
-      calories: 280,
-      protein: '32g',
-      fat: '12g',
-      carbs: '16g'
+      calories: 93,
+      protein: '10.7g',
+      fat: '4g',
+      carbs: '5.3g'
     }
   },
   {
@@ -373,10 +373,10 @@ export const MENU_ITEMS = [
     ingredients: ['鸡翅', '辣椒粉', '孜然', '蒜', '酱油'],
     ingredientsEn: ['Chicken Wings', 'Chili Powder', 'Cumin', 'Garlic', 'Soy Sauce'],
     nutrition: {
-      calories: 360,
-      protein: '24g',
-      fat: '24g',
-      carbs: '14g'
+      calories: 120,
+      protein: '8g',
+      fat: '8g',
+      carbs: '4.7g'
     }
   },
   {
@@ -393,10 +393,10 @@ export const MENU_ITEMS = [
     ingredients: ['鸡翅', '辣椒', '花椒', '姜蒜', '料酒'],
     ingredientsEn: ['Chicken Wings', 'Chili', 'Sichuan Pepper', 'Ginger & Garlic', 'Cooking Wine'],
     nutrition: {
-      calories: 350,
-      protein: '26g',
-      fat: '22g',
-      carbs: '12g'
+      calories: 117,
+      protein: '8.7g',
+      fat: '7.3g',
+      carbs: '4g'
     }
   },
   {
@@ -413,10 +413,10 @@ export const MENU_ITEMS = [
     ingredients: ['杏鲍菇', '辣椒', '孜然', '蒜', '酱油'],
     ingredientsEn: ['King Oyster Mushroom', 'Chili', 'Cumin', 'Garlic', 'Soy Sauce'],
     nutrition: {
-      calories: 160,
-      protein: '8g',
-      fat: '8g',
-      carbs: '18g'
+      calories: 53,
+      protein: '2.7g',
+      fat: '2.7g',
+      carbs: '6g'
     }
   },
   {
@@ -433,10 +433,10 @@ export const MENU_ITEMS = [
     ingredients: ['莲藕', '辣椒', '花椒', '醋', '糖'],
     ingredientsEn: ['Lotus Root', 'Chili', 'Sichuan Pepper', 'Vinegar', 'Sugar'],
     nutrition: {
-      calories: 140,
-      protein: '4g',
-      fat: '6g',
-      carbs: '20g'
+      calories: 47,
+      protein: '1.3g',
+      fat: '2g',
+      carbs: '6.7g'
     }
   },
   {
@@ -453,10 +453,10 @@ export const MENU_ITEMS = [
     ingredients: ['平菇', '辣椒', '蒜', '酱油', '香油'],
     ingredientsEn: ['Oyster Mushroom', 'Chili', 'Garlic', 'Soy Sauce', 'Sesame Oil'],
     nutrition: {
-      calories: 120,
-      protein: '6g',
-      fat: '6g',
-      carbs: '14g'
+      calories: 40,
+      protein: '2g',
+      fat: '2g',
+      carbs: '4.7g'
     }
   },
   {
@@ -473,10 +473,10 @@ export const MENU_ITEMS = [
     ingredients: ['鱿鱼', '辣椒粉', '孜然', '蒜', '柠檬'],
     ingredientsEn: ['Squid', 'Chili Powder', 'Cumin', 'Garlic', 'Lemon'],
     nutrition: {
-      calories: 200,
-      protein: '22g',
-      fat: '8g',
-      carbs: '12g'
+      calories: 67,
+      protein: '7.3g',
+      fat: '2.7g',
+      carbs: '4g'
     }
   },
   {
@@ -493,10 +493,10 @@ export const MENU_ITEMS = [
     ingredients: ['青椒', '猪肉馅', '牛肉馅', '酱油', '红皮洋葱'],
     ingredientsEn: ['Peppers', 'Minced Pork', 'Minced Beef', 'Soy Sauce', 'Red Onion'],
     nutrition: {
-      calories: 280,
-      protein: '18g',
-      fat: '14g',
-      carbs: '24g'
+      calories: 93,
+      protein: '6g',
+      fat: '4.7g',
+      carbs: '8g'
     }
   },
   {
@@ -513,10 +513,10 @@ export const MENU_ITEMS = [
     ingredients: ['豆腐干', '虾米', '葱', '酱油', '香油'],
     ingredientsEn: ['Dried Tofu', 'Dried Shrimp', 'Scallions', 'Soy Sauce', 'Sesame Oil'],
     nutrition: {
-      calories: 180,
-      protein: '16g',
-      fat: '10g',
-      carbs: '10g'
+      calories: 60,
+      protein: '5.3g',
+      fat: '3.3g',
+      carbs: '3.3g'
     }
   },
   {
@@ -533,10 +533,10 @@ export const MENU_ITEMS = [
     ingredients: ['五花肉', '青蒜', '豆瓣酱', '甜面酱', '料酒'],
     ingredientsEn: ['Pork Belly', 'Garlic Sprouts', 'Doubanjiang', 'Sweet Bean Sauce', 'Cooking Wine'],
     nutrition: {
-      calories: 420,
-      protein: '20g',
-      fat: '32g',
-      carbs: '16g'
+      calories: 140,
+      protein: '6.7g',
+      fat: '10.7g',
+      carbs: '5.3g'
     }
   },
 ];

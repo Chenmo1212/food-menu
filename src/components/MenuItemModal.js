@@ -10,6 +10,42 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
   const contentRef = useRef(null);
   const { language, t } = useLanguage();
 
+  // Function to get nutrition level color based on EU standards
+  const getNutritionColor = (type, value) => {
+    // Remove 'g' or 'kcal' and convert to number
+    const numValue = parseFloat(value);
+    
+    switch(type) {
+      case 'calories':
+        // Per 100g: Low <100, Medium 100-400, High >400
+        if (numValue < 100) return 'bg-green-100 border-green-300 text-green-800';
+        if (numValue <= 400) return 'bg-yellow-100 border-yellow-300 text-yellow-800';
+        return 'bg-red-100 border-red-300 text-red-800';
+      
+      case 'fat':
+        // Per 100g: Low <3g, Medium 3-17.5g, High >17.5g
+        if (numValue < 3) return 'bg-green-100 border-green-300 text-green-800';
+        if (numValue <= 17.5) return 'bg-yellow-100 border-yellow-300 text-yellow-800';
+        return 'bg-red-100 border-red-300 text-red-800';
+      
+      case 'protein':
+        // Protein: High is good (green), but low is neutral (not bad for vegetables)
+        // Per 100g: High >15g (green), Medium 5-15g (yellow), Low <5g (neutral gray)
+        if (numValue >= 15) return 'bg-green-100 border-green-300 text-green-800';
+        if (numValue >= 5) return 'bg-yellow-100 border-yellow-300 text-yellow-800';
+        return 'bg-gray-100 border-gray-300 text-gray-800';
+      
+      case 'carbs':
+        // Per 100g: Low <10g, Medium 10-45g, High >45g
+        if (numValue < 10) return 'bg-green-100 border-green-300 text-green-800';
+        if (numValue <= 45) return 'bg-yellow-100 border-yellow-300 text-yellow-800';
+        return 'bg-red-100 border-red-300 text-red-800';
+      
+      default:
+        return 'bg-gray-50';
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       // Prevent body scroll when modal is open
@@ -157,23 +193,26 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
               <div className="mb-4 md:mb-6">
                 <h3 className="text-sm md:text-lg font-semibold text-gray-800 mb-2 md:mb-3">
                   {t('Nutritional Information', '营养信息')}
+                  <span className="text-xs md:text-sm font-normal text-gray-500 ml-1">
+                    ({t('per 100g', '每100克')})
+                  </span>
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-                  <div className="bg-gray-50 p-2 md:p-3 rounded-lg md:rounded-xl text-center">
-                    <p className="text-lg md:text-2xl font-bold text-gray-800">{item.nutrition.calories}</p>
-                    <p className="text-[10px] md:text-xs text-gray-500">{t('Calories', '卡路里')}</p>
+                <div className="grid grid-cols-4 gap-1.5 md:gap-4">
+                  <div className={`${getNutritionColor('calories', item.nutrition.calories)} p-1.5 md:p-3 rounded-lg md:rounded-xl text-center border-2 transition-colors`}>
+                    <p className="text-sm md:text-2xl font-bold">{item.nutrition.calories}</p>
+                    <p className="text-[9px] md:text-xs opacity-80">{t('Calories', '卡路里')}</p>
                   </div>
-                  <div className="bg-gray-50 p-2 md:p-3 rounded-lg md:rounded-xl text-center">
-                    <p className="text-lg md:text-2xl font-bold text-gray-800">{item.nutrition.protein}</p>
-                    <p className="text-[10px] md:text-xs text-gray-500">{t('Protein', '蛋白质')}</p>
+                  <div className={`${getNutritionColor('protein', item.nutrition.protein)} p-1.5 md:p-3 rounded-lg md:rounded-xl text-center border-2 transition-colors`}>
+                    <p className="text-sm md:text-2xl font-bold">{item.nutrition.protein}</p>
+                    <p className="text-[9px] md:text-xs opacity-80">{t('Protein', '蛋白质')}</p>
                   </div>
-                  <div className="bg-gray-50 p-2 md:p-3 rounded-lg md:rounded-xl text-center">
-                    <p className="text-lg md:text-2xl font-bold text-gray-800">{item.nutrition.fat}</p>
-                    <p className="text-[10px] md:text-xs text-gray-500">{t('Fat', '脂肪')}</p>
+                  <div className={`${getNutritionColor('fat', item.nutrition.fat)} p-1.5 md:p-3 rounded-lg md:rounded-xl text-center border-2 transition-colors`}>
+                    <p className="text-sm md:text-2xl font-bold">{item.nutrition.fat}</p>
+                    <p className="text-[9px] md:text-xs opacity-80">{t('Fat', '脂肪')}</p>
                   </div>
-                  <div className="bg-gray-50 p-2 md:p-3 rounded-lg md:rounded-xl text-center">
-                    <p className="text-lg md:text-2xl font-bold text-gray-800">{item.nutrition.carbs}</p>
-                    <p className="text-[10px] md:text-xs text-gray-500">{t('Carbs', '碳水')}</p>
+                  <div className={`${getNutritionColor('carbs', item.nutrition.carbs)} p-1.5 md:p-3 rounded-lg md:rounded-xl text-center border-2 transition-colors`}>
+                    <p className="text-sm md:text-2xl font-bold">{item.nutrition.carbs}</p>
+                    <p className="text-[9px] md:text-xs opacity-80">{t('Carbs', '碳水')}</p>
                   </div>
                 </div>
               </div>
