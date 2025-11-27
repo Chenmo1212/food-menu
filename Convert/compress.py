@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-HEIC to PNG Converter with Advanced Compression
-Converts HEIC images to PNG format, resizes them, and applies aggressive compression
+Image Converter and Compressor with Advanced Compression
+Converts HEIC and JPG images to PNG/JPEG format, resizes them, and applies aggressive compression
+Supports: HEIC, JPG, JPEG input formats
 """
 
 import os
@@ -52,20 +53,22 @@ def compress_with_pngquant(png_path):
         # pngquant not available or failed, skip this step
         return False
 
-def convert_heic_to_compressed(input_path, output_path, target_size=(TARGET_WIDTH, TARGET_HEIGHT)):
+def convert_image_to_compressed(input_path, output_path, target_size=(TARGET_WIDTH, TARGET_HEIGHT)):
     """
-    Convert HEIC image to compressed PNG/JPEG with resizing
+    Convert image (HEIC/JPG) to compressed PNG/JPEG with resizing
     
     Args:
-        input_path: Path to input HEIC file
+        input_path: Path to input image file (HEIC, JPG, JPEG)
         output_path: Path to output file
         target_size: Tuple of (width, height) for target dimensions
     """
     try:
-        # Register HEIF opener with Pillow
-        pillow_heif.register_heif_opener()
+        # Register HEIF opener with Pillow for HEIC files
+        input_suffix = input_path.suffix.lower()
+        if input_suffix in ['.heic', '.heif']:
+            pillow_heif.register_heif_opener()
         
-        # Open HEIC image
+        # Open image
         img = Image.open(input_path)
         
         # Convert to RGB if necessary
@@ -112,19 +115,25 @@ def convert_heic_to_compressed(input_path, output_path, target_size=(TARGET_WIDT
         return False
 
 def main():
-    """Main function to process all HEIC files in current directory"""
+    """Main function to process all HEIC and JPG files in current directory"""
     
     # Get current directory
     current_dir = Path(__file__).parent
     
-    # Find all HEIC files
-    heic_files = list(current_dir.glob('*.HEIC')) + list(current_dir.glob('*.heic'))
+    # Find all HEIC and JPG files
+    image_files = []
+    image_files.extend(current_dir.glob('*.HEIC'))
+    image_files.extend(current_dir.glob('*.heic'))
+    image_files.extend(current_dir.glob('*.JPG'))
+    image_files.extend(current_dir.glob('*.jpg'))
+    image_files.extend(current_dir.glob('*.JPEG'))
+    image_files.extend(current_dir.glob('*.jpeg'))
     
-    if not heic_files:
-        print("No HEIC files found in the current directory.")
+    if not image_files:
+        print("No HEIC or JPG files found in the current directory.")
         return
     
-    print(f"Found {len(heic_files)} HEIC file(s) to convert")
+    print(f"Found {len(image_files)} image file(s) to convert")
     print(f"Target size: {TARGET_WIDTH}x{TARGET_HEIGHT} (aspect ratio: {'preserved' if MAINTAIN_ASPECT_RATIO else 'exact'})")
     print(f"Output format: {OUTPUT_FORMAT}")
     print(f"Compression: {'Maximum PNG (level 9)' if OUTPUT_FORMAT.upper() == 'PNG' else f'JPEG Quality {JPEG_QUALITY}'}")
@@ -135,32 +144,32 @@ def main():
     total_original_size = 0
     total_new_size = 0
     
-    for heic_file in heic_files:
+    for image_file in image_files:
         # Create output filename
         if OUTPUT_FORMAT.upper() == 'JPEG' or OUTPUT_FORMAT.upper() == 'JPG':
-            output_file = heic_file.with_suffix('.jpg')
+            output_file = image_file.with_suffix('.jpg')
         else:
-            output_file = heic_file.with_suffix('.png')
+            output_file = image_file.with_suffix('.png')
         
         # Get original size
-        original_size = os.path.getsize(heic_file) / 1024
+        original_size = os.path.getsize(image_file) / 1024
         total_original_size += original_size
         
         # Convert
-        if convert_heic_to_compressed(heic_file, output_file):
+        if convert_image_to_compressed(image_file, output_file):
             success_count += 1
             new_size = os.path.getsize(output_file) / 1024
             total_new_size += new_size
         print()
     
     print("-" * 60)
-    print(f"Conversion complete: {success_count}/{len(heic_files)} files converted successfully")
+    print(f"Conversion complete: {success_count}/{len(image_files)} files converted successfully")
     
     if success_count > 0:
         total_compression = (1 - total_new_size / total_original_size) * 100
         print(f"\nTotal size: {total_original_size:.1f} KB → {total_new_size:.1f} KB")
         print(f"Overall compression: {total_compression:.1f}%")
-        print("\nNote: Original HEIC files are preserved. You can delete them manually if needed.")
+        print("\nNote: Original image files are preserved. You can delete them manually if needed.")
         
         # Check if pngquant is available
         if OUTPUT_FORMAT.upper() == 'PNG':
