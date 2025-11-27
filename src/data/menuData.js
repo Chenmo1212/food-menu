@@ -5,7 +5,7 @@ export const MENU_ITEMS = [
     nameEn: 'Mapo Tofu',
     price: 12.99,
     stock: 15,
-    orderCount: 3,
+    orderCount: 4,
     category: 'Pork',
     image: require('../assets/dishCovers/mapo_tofu.png'),
     description: '经典川菜，麻辣鲜香的豆腐配上香浓的肉末，口感嫩滑，回味无穷。',
@@ -85,7 +85,7 @@ export const MENU_ITEMS = [
     nameEn: 'Blanched Broccoli',
     price: 8.99,
     stock: 25,
-    orderCount: 2,
+    orderCount: 3,
     category: 'Vegetables',
     image: require('../assets/dishCovers/blanched_broccoli.png'),
     description: '保持蔬菜原味的健康做法，翠绿的西兰花配上蚝油，清淡营养。',
@@ -145,7 +145,7 @@ export const MENU_ITEMS = [
     nameEn: 'Fried Chicken Cutlet',
     price: 13.99,
     stock: 14,
-    orderCount: 1,
+    orderCount: 2,
     category: 'Chicken',
     image: require('../assets/dishCovers/fried_chicken_cutlet.png'),
     description: '金黄酥脆的外皮，多汁鲜嫩的鸡肉，搭配特制酱料，美味无比。',
@@ -245,7 +245,7 @@ export const MENU_ITEMS = [
     nameEn: 'Dry Fried Green Beans',
     price: 10.99,
     stock: 20,
-    orderCount: 1,
+    orderCount: 2,
     category: 'Pork',
     image: require('../assets/dishCovers/dry_fried_green_beans.png'),
     description: '外焦里嫩的四季豆，配上肉末和干辣椒，香脆可口，回味无穷。',
@@ -537,6 +537,46 @@ export const MENU_ITEMS = [
       protein: '6.7g',
       fat: '10.7g',
       carbs: '5.3g'
+    }
+  },
+  {
+    id: 28,
+    name: '马来西亚柠檬鸡',
+    nameEn: 'Malaysian Lemon Chicken',
+    price: 15.99,
+    stock: 14,
+    orderCount: 1,
+    category: 'Chicken',
+    image: require('../assets/dishCovers/malaysian_lemon_chicken.png'),
+    description: '以鸡腿肉或鸡胸肉搭配新鲜柠檬、洋葱与香菜制成，酸香开胃，口感清爽不腻。',
+    descriptionEn: 'Made with chicken thigh or breast, fresh lemon, onion, and cilantro. Refreshing and tangy with a bright citrus aroma.',
+    ingredients: ['鸡腿肉/鸡胸肉', '柠檬', '洋葱', '香菜', '生抽', '糖', '蒜'],
+    ingredientsEn: ['Chicken Thigh/Breast', 'Lemon', 'Onion', 'Cilantro', 'Soy Sauce', 'Sugar', 'Garlic'],
+    nutrition: {
+      calories: 87,
+      protein: '10g',
+      fat: '2.7g',
+      carbs: '4.7g'
+    }
+  },
+  {
+    id: 29,
+    name: '万能肉酱',
+    nameEn: 'Sichuan Style Meat Sauce',
+    price: 15.99,
+    stock: 14,
+    orderCount: 1,
+    category: 'Pork',
+    image: require('../assets/dishCovers/sichuan-style_meat_sauce.png'),
+    description: '以猪肉与牛肉混合炒制，加入洋葱与豆瓣酱增香提味，咸香浓郁，可搭配任意主食或蔬菜。',
+    descriptionEn: 'A rich Sichuan-style meat sauce made from mixed pork and beef, enhanced with onion and Doubanjiang for deep umami flavor. Pairs well with rice, noodles, or vegetables.',
+    ingredients: ['猪肉', '牛肉', '洋葱', '豆瓣酱', '姜蒜', '生抽', '糖'],
+    ingredientsEn: ['Pork', 'Beef', 'Onion', 'Doubanjiang', 'Ginger & Garlic', 'Soy Sauce', 'Sugar'],
+    nutrition: {
+      calories: 160,
+      protein: '10g',
+      fat: '10g',
+      carbs: '6g'
     }
   },
 ];
