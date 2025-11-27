@@ -565,7 +565,7 @@ export const MENU_ITEMS = [
     nameEn: 'Sichuan Style Meat Sauce',
     price: 15.99,
     stock: 14,
-    orderCount: 1,
+    orderCount: 3,
     category: 'Pork',
     image: require('../assets/dishCovers/sichuan-style_meat_sauce.png'),
     description: '以猪肉与牛肉混合炒制，加入洋葱与豆瓣酱增香提味，咸香浓郁，可搭配任意主食或蔬菜。',

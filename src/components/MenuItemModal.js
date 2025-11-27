@@ -23,7 +23,7 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
         return 'bg-red-100 border-red-300 text-red-800';
       
       case 'fat':
-        // Per 100g: Low <3g, Medium 3-17.5g, High >17.5g
+        // Per 100g: Low <3g, Medium 3-17.5g, High >1.5g
         if (numValue < 3) return 'bg-green-100 border-green-300 text-green-800';
         if (numValue <= 17.5) return 'bg-yellow-100 border-yellow-300 text-yellow-800';
         return 'bg-red-100 border-red-300 text-red-800';
