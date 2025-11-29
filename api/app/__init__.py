@@ -40,7 +40,7 @@ def create_app():
     origins = allowed_origins.split(',') if allowed_origins != '*' else '*'
     
     CORS(app, resources={
-        r"/api/*": {
+        r"/*": {
             "origins": origins,
             "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"]
@@ -65,7 +65,7 @@ def create_app():
     
     # Register blueprints
     from app.routes import api_bp
-    app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(api_bp)
     
     # Register error handlers
     register_error_handlers(app)
@@ -116,5 +116,7 @@ def register_error_handlers(app):
             'error': 'Bad request',
             'status_code': 400
         }), 400
+
+app = create_app()
 
 # Made with Bob

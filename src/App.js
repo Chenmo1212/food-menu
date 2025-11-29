@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import CategoryFilter from './components/CategoryFilter';
@@ -9,6 +9,7 @@ import CustomDishModal from './components/CustomDishModal';
 import MobileNav from './components/MobileNav';
 import Rank from './components/Rank';
 import { MENU_ITEMS } from './data/menuData';
+import { getDishes, createOrder } from './services/menuApi';
 import { sendMarkdownToWeChat } from './services/wechatNotification';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { HomeIcon, ClockIcon, OrderIcon, SettingsIcon, CheckIcon, WarningIcon, PlusIcon } from './utils/iconMapping';
@@ -26,6 +27,52 @@ function AppContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('menu');
   const [showCustomDishModal, setShowCustomDishModal] = useState(false);
+  
+  // API data states
+  const [menuItems, setMenuItems] = useState(MENU_ITEMS); // Fallback to local data
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Fetch dishes from API on component mount
+  useEffect(() => {
+    const fetchDishes = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await getDishes({ limit: 100, sort_by: 'order_count', order: 'desc' });
+        
+        if (response.success && response.data) {
+          // Transform API data to match local data structure
+          const transformedData = response.data.map(dish => ({
+            id: dish.dish_id,
+            name: dish.name,
+            nameEn: dish.name_en,
+            price: dish.price,
+            stock: dish.stock,
+            orderCount: dish.order_count,
+            category: dish.category,
+            image: dish.image_url ? dish.image_url : require(`./assets/dishCovers/${dish.image_url || 'default.png'}`),
+            description: dish.description || '',
+            descriptionEn: dish.description_en || '',
+            ingredients: dish.ingredients || [],
+            ingredientsEn: dish.ingredients_en || [],
+            nutrition: dish.nutrition || {}
+          }));
+          setMenuItems(transformedData);
+          console.log('✅ Dishes loaded from API:', transformedData.length);
+        }
+      } catch (err) {
+        console.error('❌ Failed to fetch dishes from API:', err);
+        setError(err.message);
+        // Keep using local MENU_ITEMS as fallback
+        console.log('📦 Using local menu data as fallback');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDishes();
+  }, []);
 
   // Handle item click to open modal
   const handleItemClick = (item, rect) => {
@@ -69,20 +116,53 @@ function AppContent() {
   const handleCheckout = async (total, deliveryInfo = '', markdown = '') => {
     console.log('Order Summary (Markdown):\n', markdown);
     
-    // Send to WeChat via backend
-    const result = await sendMarkdownToWeChat(markdown, deliveryInfo);
-    
-    if (result.success) {
-      alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nNotification sent successfully!`);
-      // Clear cart after successful order
-      setCart([]);
-    } else {
-      alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nFailed to send notification: ${result.message}\n\nPlease check console for details.`);
+    try {
+      // Prepare order data for API
+      const orderData = {
+        customer_name: 'Customer', // You can add a form to collect this
+        customer_email: '',
+        customer_phone: '',
+        delivery_date: new Date().toISOString().split('T')[0], // Today's date
+        delivery_time: '12:00-13:00', // Default time slot
+        delivery_address: '',
+        notes: '',
+        markdown_content: markdown,
+        items: cart.map(item => ({
+          dish_id: item.id,
+          quantity: item.qty,
+          is_custom: item.id === 999, // Custom dish has id 999
+          custom_notes: item.specialInstructions || ''
+        }))
+      };
+
+      // Create order via API
+      const orderResponse = await createOrder(orderData);
+      
+      if (orderResponse.success) {
+        console.log('✅ Order created:', orderResponse.data);
+        
+        // Send to WeChat via backend
+        const wechatResult = await sendMarkdownToWeChat(markdown, deliveryInfo);
+        
+        if (wechatResult.success) {
+          alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderResponse.data.order.order_number}\nNotification sent successfully!`);
+        } else {
+          alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderResponse.data.order.order_number}\nFailed to send notification: ${wechatResult.message}`);
+        }
+        
+        // Clear cart after successful order
+        setCart([]);
+      } else {
+        throw new Error(orderResponse.error || 'Failed to create order');
+      }
+    } catch (error) {
+      console.error('❌ Checkout failed:', error);
+      alert(`Failed to place order: ${error.message}\n\nPlease try again or contact support.`);
     }
   };
 
   // Filter items based on search query and active category
-  const filteredItems = MENU_ITEMS.filter(item => {
+  const filteredItems = menuItems.filter(item => {
     const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
     const matchesSearch = searchQuery === '' ||
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -111,10 +191,18 @@ function AppContent() {
             {/* Section Title */}
             <div className="flex justify-between items-center mb-2 px-4 lg:px-4">
               <h2 className="text-lg md:text-xl font-bold">
-                {searchQuery ? t('Search Results', '搜索结果') : `${t('Choose', '选择')} ${activeCategory}`}
-                <span className="text-gray-400 text-sm font-normal ml-2">
-                  ({filteredItems.length})
-                </span>
+                {loading ? (
+                  <span className="text-gray-400">Loading...</span>
+                ) : error ? (
+                  <span className="text-red-500">Error loading dishes</span>
+                ) : (
+                  <>
+                    {searchQuery ? t('Search Results', '搜索结果') : `${t('Choose', '选择')} ${activeCategory}`}
+                    <span className="text-gray-400 text-sm font-normal ml-2">
+                      ({filteredItems.length})
+                    </span>
+                  </>
+                )}
               </h2>
               <button
                 onClick={() => setShowCustomDishModal(true)}
@@ -127,12 +215,30 @@ function AppContent() {
 
             {/* Scrollable Menu Grid */}
             <div className="flex-1 overflow-y-auto p-4 pt-0 md:p-6 md:pt-6 lg:p-4">
-              <MenuGrid
-                items={filteredItems}
-                activeCategory={activeCategory}
-                onAddToCart={addToCart}
-                onItemClick={handleItemClick}
-              />
+              {loading ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                    <p className="text-gray-500">Loading dishes...</p>
+                  </div>
+                </div>
+              ) : error ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="text-center">
+                    <WarningIcon className="text-red-400 mb-4" size="4x" />
+                    <h3 className="text-xl font-semibold text-gray-600 mb-2">Failed to load dishes</h3>
+                    <p className="text-gray-500 mb-4">{error}</p>
+                    <p className="text-sm text-gray-400">Using local menu data</p>
+                  </div>
+                </div>
+              ) : (
+                <MenuGrid
+                  items={filteredItems}
+                  activeCategory={activeCategory}
+                  onAddToCart={addToCart}
+                  onItemClick={handleItemClick}
+                />
+              )}
             </div>
           </>
         );
