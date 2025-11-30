@@ -61,9 +61,9 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
   };
   
   // Handle order submission
-  const handleSubmitOrder = (markdown) => {
+  const handleSubmitOrder = async (markdown) => {
     const deliveryInfo = `${deliveryDate} at ${deliveryTime}`;
-    onCheckout(0, deliveryInfo, markdown);
+    await onCheckout(0, deliveryInfo, markdown);
     setIsOpen(false);
   };
   

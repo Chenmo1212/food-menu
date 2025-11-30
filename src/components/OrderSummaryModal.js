@@ -16,6 +16,7 @@ export default function OrderSummaryModal({
   const [codeError, setCodeError] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const SECRET_CODE = process.env.REACT_APP_SECRET_CODE;
 
@@ -257,14 +258,29 @@ export default function OrderSummaryModal({
           <div className="p-3 sm:p-6 border-t border-gray-100 space-y-2 sm:space-y-3 bg-gray-50 rounded-b-2xl sm:rounded-b-3xl">
             <button
               onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white py-3 sm:py-4 rounded-lg sm:rounded-xl font-bold text-base sm:text-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
+              disabled={isSubmitting}
+              className={`w-full bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white py-3 sm:py-4 rounded-lg sm:rounded-xl font-bold text-base sm:text-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2 ${
+                isSubmitting ? 'opacity-75 cursor-not-allowed' : ''
+              }`}
             >
-              <span>{t('Submit Order', '提交订单')}</span>
-              <HeartIcon className="text-red-200" size="sm" />
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>{t('Submitting...', '提交中...')}</span>
+                </>
+              ) : (
+                <>
+                  <span>{t('Submit Order', '提交订单')}</span>
+                  <HeartIcon className="text-red-200" size="sm" />
+                </>
+              )}
             </button>
             <button
               onClick={handleClose}
-              className="w-full bg-white hover:bg-gray-100 text-gray-700 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-colors border-2 border-gray-200"
+              disabled={isSubmitting}
+              className={`w-full bg-white hover:bg-gray-100 text-gray-700 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-semibold text-sm sm:text-base transition-colors border-2 border-gray-200 ${
+                isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               {t('Cancel', '取消')}
             </button>
