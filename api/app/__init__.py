@@ -7,7 +7,6 @@ extensions, and blueprints.
 """
 
 from flask import Flask, jsonify
-from flask_cors import CORS
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
@@ -35,17 +34,9 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key')
     app.config['DEBUG'] = os.getenv('DEBUG', 'False').lower() == 'true'
     
-    # Initialize CORS
-    allowed_origins = os.getenv('ALLOWED_ORIGINS', '*')
-    origins = allowed_origins.split(',') if allowed_origins != '*' else '*'
-    
-    CORS(app, resources={
-        r"/*": {
-            "origins": origins,
-            "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
-        }
-    })
+    # CORS is handled by reverse proxy (Nginx/Apache)
+    # No Flask-CORS configuration needed
+    print("ℹ️  CORS handled by reverse proxy")
     
     # Initialize MongoDB connection
     global mongo_client, db

@@ -11,6 +11,7 @@ import Rank from './components/Rank';
 import { MENU_ITEMS } from './data/menuData';
 import { getDishes, createOrder } from './services/menuApi';
 import { sendMarkdownToWeChat } from './services/wechatNotification';
+import { resolveImageUrl } from './utils/imageMapper';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { HomeIcon, ClockIcon, OrderIcon, SettingsIcon, CheckIcon, WarningIcon, PlusIcon } from './utils/iconMapping';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -51,7 +52,8 @@ function AppContent() {
             stock: dish.stock,
             orderCount: dish.order_count,
             category: dish.category,
-            image: dish.image_url ? dish.image_url : require(`./assets/dishCovers/${dish.image_url || 'default.png'}`),
+            // Use imageMapper to resolve image URL (supports both full URLs and filenames)
+            image: resolveImageUrl(dish.image_url),
             description: dish.description || '',
             descriptionEn: dish.description_en || '',
             ingredients: dish.ingredients || [],
