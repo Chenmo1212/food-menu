@@ -42,6 +42,22 @@ code {
       transform: translateY(0);
     }
   }
+  
+  /* Slide in from right animation */
+  .animate-slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+  }
+  
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 }
 
 /* Smooth transitions for mobile menu */

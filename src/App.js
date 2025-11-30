@@ -8,6 +8,7 @@ import MenuItemModal from './components/MenuItemModal';
 import CustomDishModal from './components/CustomDishModal';
 import MobileNav from './components/MobileNav';
 import Rank from './components/Rank';
+import OrderHistory from './components/OrderHistory';
 import { MENU_ITEMS } from './data/menuData';
 import { getDishes, createOrder } from './services/menuApi';
 import { resolveImageUrl } from './utils/imageMapper';
@@ -257,15 +258,7 @@ function AppContent() {
         );
       
       case 'history':
-        return (
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="text-center">
-              <ClockIcon className="text-6xl mb-4 text-gray-400" size="4x" />
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('Order History', '订单历史')}</h2>
-              <p className="text-gray-500">{t('Your order history will appear here', '您的订单历史将显示在这里')}</p>
-            </div>
-          </div>
-        );
+        return <OrderHistory />;
       
       case 'order':
         return (

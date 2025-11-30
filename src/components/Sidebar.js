@@ -1,5 +1,5 @@
 import React from 'react';
-import { MenuIcon } from '../utils/iconMapping';
+import { MenuIcon, ClockIcon } from '../utils/iconMapping';
 import soundManager from '../utils/soundManager';
 
 function NavItem({ IconComponent, label, active, onClick }) {
@@ -45,12 +45,12 @@ export default function Sidebar({ activeView, onViewChange }) {
           active={activeView === 'menu'}
           onClick={() => onViewChange('menu')}
         />
-        {/* <NavItem
+        <NavItem
           IconComponent={ClockIcon}
           label="History"
           active={activeView === 'history'}
           onClick={() => onViewChange('history')}
-        /> */}
+        />
         {/* <NavItem
           IconComponent={OrderIcon}
           label="Order"
