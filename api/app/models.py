@@ -392,6 +392,7 @@ class StatsModel:
 def serialize_doc(doc):
     """
     Serialize MongoDB document to JSON-compatible format.
+    Converts all ObjectId instances to strings and handles datetime objects.
     
     Args:
         doc: MongoDB document or list of documents
@@ -405,9 +406,28 @@ def serialize_doc(doc):
     if isinstance(doc, list):
         return [serialize_doc(d) for d in doc]
     
-    if '_id' in doc:
-        doc['_id'] = str(doc['_id'])
+    if not isinstance(doc, dict):
+        return doc
     
-    return doc
+    # Create a copy to avoid modifying the original
+    serialized = {}
+    
+    for key, value in doc.items():
+        if isinstance(value, ObjectId):
+            # Convert ObjectId to string
+            serialized[key] = str(value)
+        elif isinstance(value, datetime):
+            # Convert datetime to ISO format string
+            serialized[key] = value.isoformat()
+        elif isinstance(value, dict):
+            # Recursively serialize nested dictionaries
+            serialized[key] = serialize_doc(value)
+        elif isinstance(value, list):
+            # Recursively serialize lists
+            serialized[key] = [serialize_doc(item) if isinstance(item, (dict, ObjectId)) else item for item in value]
+        else:
+            serialized[key] = value
+    
+    return serialized
 
 # Made with Bob
