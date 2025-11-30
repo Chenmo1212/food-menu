@@ -10,7 +10,6 @@ import MobileNav from './components/MobileNav';
 import Rank from './components/Rank';
 import { MENU_ITEMS } from './data/menuData';
 import { getDishes, createOrder } from './services/menuApi';
-import { sendMarkdownToWeChat } from './services/wechatNotification';
 import { resolveImageUrl } from './utils/imageMapper';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { HomeIcon, ClockIcon, OrderIcon, SettingsIcon, CheckIcon, WarningIcon, PlusIcon } from './utils/iconMapping';
@@ -137,20 +136,12 @@ function AppContent() {
         }))
       };
 
-      // Create order via API
+      // Create order via API (backend will handle WeChat notification)
       const orderResponse = await createOrder(orderData);
       
       if (orderResponse.success) {
         console.log('✅ Order created:', orderResponse.data);
-        
-        // Send to WeChat via backend
-        const wechatResult = await sendMarkdownToWeChat(markdown, deliveryInfo);
-        
-        if (wechatResult.success) {
-          alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderResponse.data.order.order_number}\nNotification sent successfully!`);
-        } else {
-          alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderResponse.data.order.order_number}\nFailed to send notification: ${wechatResult.message}`);
-        }
+        alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderResponse.data.order.order_number}`);
         
         // Clear cart after successful order
         setCart([]);

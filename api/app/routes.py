@@ -7,6 +7,9 @@ This module defines all API routes and their handlers using Flask blueprints.
 
 from flask import Blueprint, request, jsonify, current_app
 from app.models import DishModel, OrderModel, StatsModel, serialize_doc
+import requests
+import json
+import os
 
 # Create blueprint
 api_bp = Blueprint('api', __name__)
@@ -42,6 +45,81 @@ def validate_required_fields(data, required_fields):
         if field not in data or data[field] is None:
             return False, f'Missing required field: {field}'
     return True, None
+
+
+def send_wechat_notification(markdown_content, delivery_info='', order_number=''):
+    """
+    Send order notification to WeChat Work (企业微信) via API.
+    
+    Args:
+        markdown_content (str): Markdown formatted order summary
+        delivery_info (str): Delivery date and time information
+        order_number (str): Order number
+        
+    Returns:
+        dict: Response with status and message
+    """
+    try:
+        # Get WeChat Work credentials from environment variables
+        CORPID = os.getenv('CORPID')  # Enterprise ID
+        AGENTID = os.getenv('AGENTID')  # Application ID
+        CORPSECRET = os.getenv('CORPSECRET')  # Application Secret
+        
+        if not all([CORPID, AGENTID, CORPSECRET]):
+            print('⚠️ WeChat Work credentials not configured')
+            return {'error': 'WeChat Work credentials not configured', 'status': 500}
+        
+        # Step 1: Get access token
+        get_token_url = f"https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid={CORPID}&corpsecret={CORPSECRET}"
+        token_response = requests.get(get_token_url, timeout=10)
+        token_data = token_response.json()
+        access_token = token_data.get('access_token')
+        
+        if not access_token:
+            error_msg = token_data.get('errmsg', 'Unknown error')
+            print(f'❌ Failed to get access token: {error_msg}')
+            return {'error': f'Failed to get access token: {error_msg}', 'status': 500}
+        
+        # Step 2: Send message
+        send_msg_url = f'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={access_token}'
+        
+        # Format content for textcard
+        content = f"🍕 New Order!\n\n📅 Delivery: {delivery_info}\n📦 Order: {order_number}\n\n{markdown_content}"
+        
+        message_data = {
+            "touser": '@all',  # Send to all users
+            "agentid": AGENTID,
+            "msgtype": "textcard",
+            "textcard": {
+                "title": f"🍕 New Food Order - {order_number}",
+                "description": content,
+                "btntxt": "View Details"
+            },
+            "enable_id_trans": 0,
+            "enable_duplicate_check": 0,
+            "duplicate_check_interval": 1800
+        }
+        
+        msg_response = requests.post(
+            send_msg_url,
+            data=json.dumps(message_data),
+            headers={'Content-Type': 'application/json'},
+            timeout=10
+        )
+        
+        msg_result = msg_response.json()
+        
+        if msg_result.get('errcode') == 0:
+            print(f'✅ WeChat Work notification sent successfully')
+            return {'msg': 'WeChat notification sent successfully', 'status': 200}
+        else:
+            error_msg = msg_result.get('errmsg', 'Unknown error')
+            print(f'⚠️ WeChat Work notification failed: {error_msg}')
+            return {'error': f'Failed to send notification: {error_msg}', 'status': msg_response.status_code}
+            
+    except Exception as e:
+        print(f'❌ Failed to send WeChat Work notification: {e}')
+        return {'error': f'Failed to send notification: {str(e)}', 'status': 500}
 
 
 # ============================================
@@ -389,6 +467,14 @@ def create_order():
         # Get created order and items
         order = order_model.find_by_order_number(order_number)
         items = order_model.find_items_by_order_number(order_number)
+        
+        # Send WeChat Work notification (non-blocking, don't fail order if notification fails)
+        try:
+            markdown_content = data.get('markdown_content', '')
+            delivery_info = f"{data['delivery_date']} {data['delivery_time']}"
+            send_wechat_notification(markdown_content, delivery_info, order_number)
+        except Exception as e:
+            print(f'⚠️ WeChat Work notification error (order still created): {e}')
         
         return jsonify({
             'success': True,
