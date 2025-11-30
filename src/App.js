@@ -139,18 +139,27 @@ function AppContent() {
       // Create order via API (backend will handle WeChat notification)
       const orderResponse = await createOrder(orderData);
       
-      if (orderResponse.success) {
+      // Check if order was created successfully
+      if (orderResponse && orderResponse.success && orderResponse.data) {
         console.log('✅ Order created:', orderResponse.data);
-        alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderResponse.data.order.order_number}`);
         
-        // Clear cart after successful order
+        // Show success message
+        const orderNumber = orderResponse.data.order?.order_number || 'N/A';
+        alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderNumber}`);
+        
+        // Clear cart ONLY after successful order
         setCart([]);
+        console.log('🛒 Cart cleared after successful order');
       } else {
-        throw new Error(orderResponse.error || 'Failed to create order');
+        // Order failed - keep cart items
+        const errorMsg = orderResponse?.error || 'Failed to create order';
+        throw new Error(errorMsg);
       }
     } catch (error) {
+      // On error, cart items are preserved
       console.error('❌ Checkout failed:', error);
-      alert(`Failed to place order: ${error.message}\n\nPlease try again or contact support.`);
+      console.log('🛒 Cart preserved due to checkout failure');
+      alert(`Failed to place order: ${error.message}\n\nYour cart has been preserved. Please try again or contact support.`);
     }
   };
 
