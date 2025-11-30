@@ -73,7 +73,7 @@ export default function OrderSummaryModal({
   };
 
   // Handle submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (secretCode.toLowerCase() !== SECRET_CODE.toLowerCase()) {
       soundManager.playTap();
       setCodeError(t('Incorrect code. Please try again.', '密码错误，请重试。'));
@@ -81,9 +81,20 @@ export default function OrderSummaryModal({
     }
     
     soundManager.playTap();
-    const markdown = generateMarkdownSummary();
-    onSubmit(markdown);
-    handleClose();
+    setIsSubmitting(true);
+    
+    try {
+      const markdown = generateMarkdownSummary();
+      await onSubmit(markdown);
+      // Only close if submission was successful
+      handleClose();
+    } catch (error) {
+      // If submission fails, keep modal open and show error
+      console.error('Submission failed:', error);
+      setCodeError(t('Failed to submit order. Please try again.', '提交订单失败，请重试。'));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Handle close
@@ -91,6 +102,7 @@ export default function OrderSummaryModal({
     soundManager.playTap();
     setSecretCode('');
     setCodeError('');
+    setIsSubmitting(false);
     setIsAnimating(false);
     // Wait for animation to complete before calling onClose
     setTimeout(() => onClose(), 300);
