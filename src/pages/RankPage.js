@@ -3,12 +3,13 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { MENU_ITEMS } from '../data/menuData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrophy, faMedal } from '@fortawesome/free-solid-svg-icons';
+import soundManager from '../utils/soundManager';
 
-export default function Rank({ onItemClick }) {
+export default function RankPage({ onItemClick, menuItems = MENU_ITEMS }) {
   const { t, language } = useLanguage();
 
   // Sort items by orderCount (sales) in descending order and get top 10
-  const topItems = [...MENU_ITEMS]
+  const topItems = [...menuItems]
     .sort((a, b) => b.orderCount - a.orderCount)
     .slice(0, 10);
 
@@ -60,6 +61,7 @@ export default function Rank({ onItemClick }) {
                   <div
                     className="relative mb-3 cursor-pointer transform hover:scale-105 transition-transform"
                     onClick={(e) => {
+                      soundManager.playTap();
                       const rect = e.currentTarget.getBoundingClientRect();
                       onItemClick(item, rect);
                     }}
@@ -118,6 +120,7 @@ export default function Rank({ onItemClick }) {
                     key={item.id}
                     className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center gap-4"
                     onClick={(e) => {
+                      soundManager.playTap();
                       const rect = e.currentTarget.getBoundingClientRect();
                       onItemClick(item, rect);
                     }}
@@ -157,16 +160,6 @@ export default function Rank({ onItemClick }) {
                         {item.orderCount}
                       </p>
                     </div>
-
-                    {/* Price */}
-                    {/* <div className="flex-shrink-0 text-right">
-                      <p className="text-sm text-gray-500">
-                        {t('Price', '价格')}
-                      </p>
-                      <p className="text-lg font-bold text-gray-800">
-                        €{item.price}
-                      </p>
-                    </div> */}
                   </div>
                 );
               })}

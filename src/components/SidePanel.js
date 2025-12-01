@@ -59,15 +59,13 @@ export default function SidePanel({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, closeOnEscape, onClose]);
 
-  // Position classes
-  const positionClasses = position === 'left' 
-    ? 'left-0 lg:left-0 rounded-r-3xl'
-    : 'right-0 lg:right-0 rounded-l-3xl';
+  // Slide animation classes for mobile
+  const mobileSlideClasses = position === 'left'
+    ? isOpen ? 'left-0' : '-left-full'
+    : isOpen ? 'right-0' : '-right-full';
 
-  // Slide animation classes
-  const slideClasses = position === 'left'
-    ? isOpen ? 'left-0' : '-left-full lg:left-0'
-    : isOpen ? 'right-0' : '-right-full lg:right-0';
+  // Border radius based on position
+  const borderRadius = position === 'left' ? 'rounded-r-3xl' : 'rounded-l-3xl';
 
   return (
     <>
@@ -84,11 +82,11 @@ export default function SidePanel({
         ref={panelRef}
         className={`
           fixed lg:relative
-          ${isOpen ? positionClasses.replace('left-0', 'left-0').replace('right-0', 'right-0') : (position === 'left' ? '-left-full lg:left-0' : '-right-full lg:right-0')}
+          ${mobileSlideClasses} lg:${position === 'left' ? 'left' : 'right'}-0
           top-0 h-full
           ${width}
           bg-white
-          ${positionClasses.includes('rounded') ? positionClasses.split(' ').find(c => c.includes('rounded')) : ''}
+          ${borderRadius}
           flex flex-col
           transition-all duration-300 ease-in-out
           z-50 lg:z-auto

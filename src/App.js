@@ -1,41 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import CategoryFilter from './components/CategoryFilter';
-import MenuGrid from './components/MenuGrid';
-import Cart from './components/Cart';
 import MenuItemModal from './components/MenuItemModal';
-import CustomDishModal from './components/CustomDishModal';
-import MobileNav from './components/MobileNav';
-import Rank from './components/Rank';
-import OrderHistory from './components/OrderHistory';
+import Cart from './components/Cart';
 import OrderDetailsPanel from './components/OrderDetailsPanel';
+import MenuPage from './pages/MenuPage';
+import HistoryPage from './pages/HistoryPage';
+import RankPage from './pages/RankPage';
 import { MENU_ITEMS } from './data/menuData';
 import { getDishes, createOrder, getOrderByNumber, cancelOrder, updateOrderStatus } from './services/menuApi';
 import { resolveImageUrl } from './utils/imageMapper';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
-import { HomeIcon, ClockIcon, OrderIcon, SettingsIcon, CheckIcon, WarningIcon, PlusIcon } from './utils/iconMapping';
+import { HomeIcon, OrderIcon, SettingsIcon } from './utils/iconMapping';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
 function AppContent() {
   const { t, language } = useLanguage();
   // Use localStorage for cart persistence
   const [cart, setCart] = useLocalStorage('foodMenuCart', []);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [cardRect, setCardRect] = useState(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState('menu');
-  const [showCustomDishModal, setShowCustomDishModal] = useState(false);
   
   // API data states
-  const [menuItems, setMenuItems] = useState(MENU_ITEMS); // Fallback to local data
+  const [menuItems, setMenuItems] = useState(MENU_ITEMS);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // OrderHistory states
+  // Order history states
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [loadingOrderDetails, setLoadingOrderDetails] = useState(false);
@@ -51,7 +44,6 @@ function AppContent() {
         const response = await getDishes({ limit: 100, sort_by: 'order_count', order: 'desc' });
         
         if (response.success && response.data) {
-          // Transform API data to match local data structure
           const transformedData = response.data.map(dish => ({
             id: dish.dish_id,
             name: dish.name,
@@ -60,7 +52,6 @@ function AppContent() {
             stock: dish.stock,
             orderCount: dish.order_count,
             category: dish.category,
-            // Use imageMapper to resolve image URL (supports both full URLs and filenames)
             image: resolveImageUrl(dish.image_url),
             description: dish.description || '',
             descriptionEn: dish.description_en || '',
@@ -74,7 +65,6 @@ function AppContent() {
       } catch (err) {
         console.error('❌ Failed to fetch dishes from API:', err);
         setError(err.message);
-        // Keep using local MENU_ITEMS as fallback
         console.log('📦 Using local menu data as fallback');
       } finally {
         setLoading(false);
@@ -122,11 +112,60 @@ function AppContent() {
     }).filter(item => item.qty > 0));
   };
 
-  // OrderHistory: Fetch order details
-  const fetchOrderDetails = async (orderNumber) => {
+  // Handle checkout
+  const handleCheckout = async (total, deliveryInfo = '', markdown = '') => {
+    console.log('Order Summary (Markdown):\n', markdown);
+    
+    try {
+      const orderData = {
+        customer_name: 'Customer',
+        customer_email: '',
+        customer_phone: '',
+        delivery_date: new Date().toISOString().split('T')[0],
+        delivery_time: '12:00-13:00',
+        delivery_address: '',
+        notes: '',
+        markdown_content: markdown,
+        items: cart.map(item => ({
+          dish_id: item.id,
+          quantity: item.qty,
+          is_custom: item.id === 999,
+          custom_notes: item.specialInstructions || ''
+        }))
+      };
+
+      const orderResponse = await createOrder(orderData);
+      
+      if (orderResponse && orderResponse.success && orderResponse.data) {
+        console.log('✅ Order created:', orderResponse.data);
+        const orderNumber = orderResponse.data.order?.order_number || 'N/A';
+        alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderNumber}`);
+        setCart([]);
+        console.log('🛒 Cart cleared after successful order');
+      } else {
+        const errorMsg = orderResponse?.error || 'Failed to create order';
+        throw new Error(errorMsg);
+      }
+    } catch (error) {
+      console.error('❌ Checkout failed:', error);
+      console.log('🛒 Cart preserved due to checkout failure');
+      alert(`Failed to place order: ${error.message}\n\nYour cart has been preserved. Please try again or contact support.`);
+    }
+  };
+
+  // Handle order selection from history
+  const handleOrderSelect = async (order) => {
+    if (!order) {
+      setSelectedOrder(null);
+      setSelectedOrderDetails(null);
+      return;
+    }
+
+    setSelectedOrder(order);
+    
     try {
       setLoadingOrderDetails(true);
-      const response = await getOrderByNumber(orderNumber);
+      const response = await getOrderByNumber(order.order_number);
       
       if (response.success && response.data) {
         setSelectedOrderDetails(response.data);
@@ -142,20 +181,8 @@ function AppContent() {
     }
   };
 
-  // OrderHistory: Handle order selection
-  const handleOrderSelect = (order) => {
-    setSelectedOrder(order);
-    fetchOrderDetails(order.order_number);
-  };
-
-  // OrderHistory: Handle close details
-  const handleCloseOrderDetails = () => {
-    setSelectedOrder(null);
-    setSelectedOrderDetails(null);
-  };
-
-  // OrderHistory: Handle delete order
-  const handleDeleteOrder = async (orderNumber, onSuccess) => {
+  // Handle delete order
+  const handleDeleteOrder = async (orderNumber) => {
     try {
       const confirmed = window.confirm(
         t(
@@ -167,16 +194,13 @@ function AppContent() {
       if (!confirmed) return;
 
       setCancelingOrder(true);
-
       const response = await cancelOrder(orderNumber);
 
       if (response.success) {
         console.log('✅ Order deleted successfully');
         alert(t('Order deleted successfully', '订单删除成功'));
-        
-        handleCloseOrderDetails();
-        
-        if (onSuccess) onSuccess();
+        setSelectedOrder(null);
+        setSelectedOrderDetails(null);
       } else {
         throw new Error(response.error || 'Failed to delete order');
       }
@@ -188,8 +212,8 @@ function AppContent() {
     }
   };
 
-  // OrderHistory: Handle restore order
-  const handleRestoreOrder = async (orderNumber, onSuccess) => {
+  // Handle restore order
+  const handleRestoreOrder = async (orderNumber) => {
     try {
       const confirmed = window.confirm(
         t(
@@ -201,16 +225,13 @@ function AppContent() {
       if (!confirmed) return;
 
       setRestoringOrder(true);
-
       const response = await updateOrderStatus(orderNumber, 'pending');
 
       if (response.success) {
         console.log('✅ Order restored successfully');
         alert(t('Order restored successfully', '订单恢复成功'));
-        
-        handleCloseOrderDetails();
-        
-        if (onSuccess) onSuccess();
+        setSelectedOrder(null);
+        setSelectedOrderDetails(null);
       } else {
         throw new Error(response.error || 'Failed to restore order');
       }
@@ -225,31 +246,11 @@ function AppContent() {
   // Get status badge styling
   const getStatusBadge = (status) => {
     const statusConfig = {
-      pending: {
-        bg: 'bg-yellow-100',
-        text: 'text-yellow-700',
-        label: { en: 'Pending', zh: '待处理' }
-      },
-      confirmed: {
-        bg: 'bg-blue-100',
-        text: 'text-blue-700',
-        label: { en: 'Confirmed', zh: '已确认' }
-      },
-      preparing: {
-        bg: 'bg-purple-100',
-        text: 'text-purple-700',
-        label: { en: 'Preparing', zh: '准备中' }
-      },
-      completed: {
-        bg: 'bg-green-100',
-        text: 'text-green-700',
-        label: { en: 'Completed', zh: '已完成' }
-      },
-      cancelled: {
-        bg: 'bg-red-100',
-        text: 'text-red-700',
-        label: { en: 'Cancelled', zh: '已取消' }
-      }
+      pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: { en: 'Pending', zh: '待处理' } },
+      confirmed: { bg: 'bg-blue-100', text: 'text-blue-700', label: { en: 'Confirmed', zh: '已确认' } },
+      preparing: { bg: 'bg-purple-100', text: 'text-purple-700', label: { en: 'Preparing', zh: '准备中' } },
+      completed: { bg: 'bg-green-100', text: 'text-green-700', label: { en: 'Completed', zh: '已完成' } },
+      cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: { en: 'Cancelled', zh: '已取消' } }
     };
 
     const config = statusConfig[status] || statusConfig.pending;
@@ -260,136 +261,18 @@ function AppContent() {
     );
   };
 
-  // Handle checkout
-  const handleCheckout = async (total, deliveryInfo = '', markdown = '') => {
-    console.log('Order Summary (Markdown):\n', markdown);
-    
-    try {
-      // Prepare order data for API
-      const orderData = {
-        customer_name: 'Customer', // You can add a form to collect this
-        customer_email: '',
-        customer_phone: '',
-        delivery_date: new Date().toISOString().split('T')[0], // Today's date
-        delivery_time: '12:00-13:00', // Default time slot
-        delivery_address: '',
-        notes: '',
-        markdown_content: markdown,
-        items: cart.map(item => ({
-          dish_id: item.id,
-          quantity: item.qty,
-          is_custom: item.id === 999, // Custom dish has id 999
-          custom_notes: item.specialInstructions || ''
-        }))
-      };
-
-      // Create order via API (backend will handle WeChat notification)
-      const orderResponse = await createOrder(orderData);
-      
-      // Check if order was created successfully
-      if (orderResponse && orderResponse.success && orderResponse.data) {
-        console.log('✅ Order created:', orderResponse.data);
-        
-        // Show success message
-        const orderNumber = orderResponse.data.order?.order_number || 'N/A';
-        alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderNumber}`);
-        
-        // Clear cart ONLY after successful order
-        setCart([]);
-        console.log('🛒 Cart cleared after successful order');
-      } else {
-        // Order failed - keep cart items
-        const errorMsg = orderResponse?.error || 'Failed to create order';
-        throw new Error(errorMsg);
-      }
-    } catch (error) {
-      // On error, cart items are preserved
-      console.error('❌ Checkout failed:', error);
-      console.log('🛒 Cart preserved due to checkout failure');
-      alert(`Failed to place order: ${error.message}\n\nYour cart has been preserved. Please try again or contact support.`);
-    }
-  };
-
-  // Filter items based on search query and active category
-  const filteredItems = menuItems.filter(item => {
-    const matchesCategory = activeCategory === 'All' || item.category === activeCategory;
-    const matchesSearch = searchQuery === '' ||
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.nameEn.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (item.descriptionEn && item.descriptionEn.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (item.ingredientsEn && item.ingredientsEn.some(ingredient =>
-        ingredient.toLowerCase().includes(searchQuery.toLowerCase())
-      ));
-    
-    return matchesCategory && matchesSearch;
-  }).sort((a, b) => b.orderCount - a.orderCount); // Sort by sales (orderCount) in descending order
-
   // Render different content based on active view
   const renderContent = () => {
     switch (activeView) {
       case 'menu':
         return (
-          <>
-            <CategoryFilter
-              activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
-            />
-
-            {/* Section Title */}
-            <div className="flex justify-between items-center mb-2 px-4 lg:px-4">
-              <h2 className="text-lg md:text-xl font-bold">
-                {loading ? (
-                  <span className="text-gray-400">Loading...</span>
-                ) : error ? (
-                  <span className="text-red-500">Error loading dishes</span>
-                ) : (
-                  <>
-                    {searchQuery ? t('Search Results', '搜索结果') : `${t('Choose', '选择')} ${activeCategory}`}
-                    <span className="text-gray-400 text-sm font-normal ml-2">
-                      ({filteredItems.length})
-                    </span>
-                  </>
-                )}
-              </h2>
-              <button
-                onClick={() => setShowCustomDishModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors shadow-sm hover:shadow-md text-sm font-medium"
-              >
-                <PlusIcon className="text-white" />
-                <span>{t('Add', '添加')}</span>
-              </button>
-            </div>
-
-            {/* Scrollable Menu Grid */}
-            <div className="flex-1 overflow-y-auto p-4 pt-0 md:p-6 md:pt-6 lg:p-4">
-              {loading ? (
-                <div className="flex items-center justify-center py-16">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-                    <p className="text-gray-500">Loading dishes...</p>
-                  </div>
-                </div>
-              ) : error ? (
-                <div className="flex items-center justify-center py-16">
-                  <div className="text-center">
-                    <WarningIcon className="text-red-400 mb-4" size="4x" />
-                    <h3 className="text-xl font-semibold text-gray-600 mb-2">Failed to load dishes</h3>
-                    <p className="text-gray-500 mb-4">{error}</p>
-                    <p className="text-sm text-gray-400">Using local menu data</p>
-                  </div>
-                </div>
-              ) : (
-                <MenuGrid
-                  items={filteredItems}
-                  activeCategory={activeCategory}
-                  onAddToCart={addToCart}
-                  onItemClick={handleItemClick}
-                />
-              )}
-            </div>
-          </>
+          <MenuPage
+            menuItems={menuItems}
+            loading={loading}
+            error={error}
+            onAddToCart={addToCart}
+            onItemClick={handleItemClick}
+          />
         );
       
       case 'home':
@@ -404,12 +287,7 @@ function AppContent() {
         );
       
       case 'history':
-        return (
-          <OrderHistory
-            selectedOrder={selectedOrder}
-            onOrderSelect={handleOrderSelect}
-          />
-        );
+        return <HistoryPage onOrderSelect={handleOrderSelect} />;
       
       case 'order':
         return (
@@ -423,7 +301,7 @@ function AppContent() {
         );
       
       case 'rank':
-        return <Rank onItemClick={handleItemClick} />;
+        return <RankPage onItemClick={handleItemClick} menuItems={menuItems} />;
       
       case 'settings':
         return (
@@ -443,17 +321,17 @@ function AppContent() {
 
   return (
     <div className="flex h-screen bg-gray-100 font-sans text-gray-800 overflow-hidden">
-      {/* Left Sidebar Navigation - Hidden on mobile */}
+      {/* Left Sidebar Navigation */}
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
 
-      {/* Main Content Area - Responsive */}
+      {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header - Always visible on all pages */}
+        {/* Header */}
         <div className="lg:relative lg:p-6 lg:pt-8 sticky top-0 z-20 bg-gray-100 p-4">
           <Header
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onMenuClick={() => setIsMenuOpen(true)}
+            searchQuery=""
+            onSearchChange={() => {}}
+            onMenuClick={() => {}}
           />
         </div>
 
@@ -463,7 +341,7 @@ function AppContent() {
         </div>
       </main>
 
-      {/* Right Sidebar (Order Summary) - Only show on Menu page */}
+      {/* Right Sidebar - Cart (only on menu page) */}
       {activeView === 'menu' && (
         <Cart
           cart={cart}
@@ -472,7 +350,7 @@ function AppContent() {
         />
       )}
 
-      {/* Right Sidebar (Order Details) - Only show on History page */}
+      {/* Right Sidebar - Order Details (only on history page) */}
       {activeView === 'history' && (
         <OrderDetailsPanel
           selectedOrder={selectedOrder}
@@ -480,17 +358,13 @@ function AppContent() {
           loadingOrderDetails={loadingOrderDetails}
           cancelingOrder={cancelingOrder}
           restoringOrder={restoringOrder}
-          onClose={handleCloseOrderDetails}
+          onClose={() => handleOrderSelect(null)}
           onEdit={(orderNumber) => {
             console.log('Edit order:', orderNumber);
             alert(t('Edit functionality coming soon', '编辑功能即将推出'));
           }}
-          onDelete={(orderNumber) => handleDeleteOrder(orderNumber, () => {
-            // Trigger refresh in OrderHistory component if needed
-          })}
-          onRestore={(orderNumber) => handleRestoreOrder(orderNumber, () => {
-            // Trigger refresh in OrderHistory component if needed
-          })}
+          onDelete={handleDeleteOrder}
+          onRestore={handleRestoreOrder}
           getStatusBadge={getStatusBadge}
         />
       )}
@@ -505,21 +379,6 @@ function AppContent() {
           cardRect={cardRect}
         />
       )}
-
-      {/* Custom Dish Modal */}
-      <CustomDishModal
-        isOpen={showCustomDishModal}
-        onClose={() => setShowCustomDishModal(false)}
-        onAddToCart={addToCart}
-      />
-
-      {/* Mobile Navigation Menu */}
-      {/* <MobileNav
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        activeView={activeView}
-        onViewChange={setActiveView}
-      /> */}
     </div>
   );
 }

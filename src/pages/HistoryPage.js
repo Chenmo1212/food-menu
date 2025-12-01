@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getOrders } from '../services/menuApi';
 import { ClockIcon, WarningIcon, PizzaIcon } from '../utils/iconMapping';
+import soundManager from '../utils/soundManager';
 
-export default function OrderHistory({ selectedOrder, onOrderSelect }) {
+export default function HistoryPage({ onOrderSelect }) {
   const { t, language } = useLanguage();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('on-process'); // 'on-process' or 'completed'
+  const [activeTab, setActiveTab] = useState('on-process');
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   // Fetch orders on component mount
   useEffect(() => {
@@ -54,42 +56,13 @@ export default function OrderHistory({ selectedOrder, onOrderSelect }) {
     }
   };
 
-  // Get status badge styling
-  const getStatusBadge = (status) => {
-    const statusConfig = {
-      pending: {
-        bg: 'bg-yellow-100',
-        text: 'text-yellow-700',
-        label: { en: 'Pending', zh: '待处理' }
-      },
-      confirmed: {
-        bg: 'bg-blue-100',
-        text: 'text-blue-700',
-        label: { en: 'Confirmed', zh: '已确认' }
-      },
-      preparing: {
-        bg: 'bg-purple-100',
-        text: 'text-purple-700',
-        label: { en: 'Preparing', zh: '准备中' }
-      },
-      completed: {
-        bg: 'bg-green-100',
-        text: 'text-green-700',
-        label: { en: 'Completed', zh: '已完成' }
-      },
-      cancelled: {
-        bg: 'bg-red-100',
-        text: 'text-red-700',
-        label: { en: 'Cancelled', zh: '已取消' }
-      }
-    };
-
-    const config = statusConfig[status] || statusConfig.pending;
-    return (
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
-        {language === 'zh' ? config.label.zh : config.label.en}
-      </span>
-    );
+  // Handle order selection
+  const handleOrderSelect = (order) => {
+    soundManager.playTap();
+    setSelectedOrder(order);
+    if (onOrderSelect) {
+      onOrderSelect(order);
+    }
   };
 
   // Format date for title
@@ -149,7 +122,10 @@ export default function OrderHistory({ selectedOrder, onOrderSelect }) {
           <h3 className="text-xl font-semibold text-gray-600 mb-2">{t('Failed to load orders', '加载订单失败')}</h3>
           <p className="text-gray-500 mb-4">{error}</p>
           <button
-            onClick={fetchOrders}
+            onClick={() => {
+              soundManager.playTap();
+              fetchOrders();
+            }}
             className="px-6 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors"
           >
             {t('Retry', '重试')}
@@ -159,7 +135,6 @@ export default function OrderHistory({ selectedOrder, onOrderSelect }) {
     );
   }
 
-
   return (
     <>
       {/* Header with Tabs */}
@@ -167,7 +142,10 @@ export default function OrderHistory({ selectedOrder, onOrderSelect }) {
         {/* Tabs */}
         <div className="flex gap-3">
           <button
-            onClick={() => setActiveTab('on-process')}
+            onClick={() => {
+              soundManager.playTap();
+              setActiveTab('on-process');
+            }}
             className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
               activeTab === 'on-process'
                 ? 'bg-[#fff0df] text-orange-600 shadow-sm'
@@ -177,7 +155,10 @@ export default function OrderHistory({ selectedOrder, onOrderSelect }) {
             {t('On-Process', '进行中')}
           </button>
           <button
-            onClick={() => setActiveTab('completed')}
+            onClick={() => {
+              soundManager.playTap();
+              setActiveTab('completed');
+            }}
             className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
               activeTab === 'completed'
                 ? 'bg-[#fff0df] text-orange-600 shadow-sm'
@@ -190,7 +171,10 @@ export default function OrderHistory({ selectedOrder, onOrderSelect }) {
 
         {/* Refresh Button */}
         <button
-          onClick={fetchOrders}
+          onClick={() => {
+            soundManager.playTap();
+            fetchOrders();
+          }}
           className="px-4 py-2 bg-orange-50 text-orange-600 rounded-xl hover:bg-orange-100 transition-colors text-sm font-medium flex items-center gap-2"
         >
           <ClockIcon size="sm" />
@@ -221,7 +205,7 @@ export default function OrderHistory({ selectedOrder, onOrderSelect }) {
               return (
                 <div
                   key={order._id}
-                  onClick={() => onOrderSelect && onOrderSelect(order)}
+                  onClick={() => handleOrderSelect(order)}
                   className={`bg-white rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer border-2 overflow-hidden ${
                     selectedOrder?._id === order._id
                       ? 'border-orange-300 shadow-md'
@@ -235,7 +219,9 @@ export default function OrderHistory({ selectedOrder, onOrderSelect }) {
                         {formatDateTitle(order.delivery_date || order.created_at)}
                       </h3>
                       <div className="flex items-center gap-3 flex-wrap">
-                        {getStatusBadge(order.status)}
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                          {order.status}
+                        </span>
                         <span className="text-sm text-gray-500">
                           {formatTime(order.created_at)}
                         </span>
