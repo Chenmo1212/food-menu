@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import CartItem from './CartItem';
+import CartItem from '../../components/CartItem';
 import OrderSummaryModal from './OrderSummaryModal';
-import SidePanel from './SidePanel';
-import { useLanguage } from '../contexts/LanguageContext';
-import { CartIcon, ClockIcon, PenIcon, NoteIcon, TimesIcon } from '../utils/iconMapping';
-import soundManager from '../utils/soundManager';
+import SidePanel from '../../components/SidePanel';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { CartIcon, ClockIcon, PenIcon, NoteIcon, TimesIcon } from '../../utils/iconMapping';
+import soundManager from '../../utils/soundManager';
 
 export default function Cart({ cart, onUpdateQty, onCheckout }) {
   const [isOpen, setIsOpen] = useState(false);

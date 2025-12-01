@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { PlusIcon, WarningIcon, SearchIcon } from '../utils/iconMapping';
-import MenuItem from '../components/MenuItem';
-import CustomDishModal from '../components/CustomDishModal';
-import { CATEGORIES } from '../data/menuData';
-import { AllIcon, PorkIcon, ChickenIcon, SeafoodIcon, VegetablesIcon } from '../assets/icons';
-import soundManager from '../utils/soundManager';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { PlusIcon, WarningIcon, SearchIcon } from '../../utils/iconMapping';
+import MenuItem from '../../components/MenuItem';
+import CustomDishModal from './CustomDishModal';
+import { CATEGORIES } from '../../data/menuData';
+import { AllIcon, PorkIcon, ChickenIcon, SeafoodIcon, VegetablesIcon } from '../../assets/icons';
+import soundManager from '../../utils/soundManager';
 
 // Icon mapping for categories
 const iconComponents = {

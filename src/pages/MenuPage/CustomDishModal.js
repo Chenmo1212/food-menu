@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { PlusIcon, TimesIcon } from '../utils/iconMapping';
-import customSvg from '../assets/svgs/custom.svg';
-import soundManager from '../utils/soundManager';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { PlusIcon, TimesIcon } from '../../utils/iconMapping';
+import customSvg from '../../assets/svgs/custom.svg';
+import soundManager from '../../utils/soundManager';
 
 export default function CustomDishModal({ isOpen, onClose, onAddToCart }) {
   const { t } = useLanguage();

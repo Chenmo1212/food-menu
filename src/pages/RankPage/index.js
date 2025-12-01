@@ -1,9 +1,9 @@
 import React from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { MENU_ITEMS } from '../data/menuData';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { MENU_ITEMS } from '../../data/menuData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrophy, faMedal } from '@fortawesome/free-solid-svg-icons';
-import soundManager from '../utils/soundManager';
+import soundManager from '../../utils/soundManager';
 
 export default function RankPage({ onItemClick, menuItems = MENU_ITEMS }) {
   const { t, language } = useLanguage();

@@ -1,8 +1,8 @@
 import React from 'react';
-import SidePanel from './SidePanel';
-import { useLanguage } from '../contexts/LanguageContext';
-import { ClockIcon, PizzaIcon } from '../utils/iconMapping';
-import { resolveImageUrl } from '../utils/imageMapper';
+import SidePanel from '../../components/SidePanel';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { ClockIcon, PizzaIcon } from '../../utils/iconMapping';
+import { resolveImageUrl } from '../../utils/imageMapper';
 
 export default function OrderDetailsPanel({
   selectedOrder,

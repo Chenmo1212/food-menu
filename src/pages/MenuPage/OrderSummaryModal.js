@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ClipboardIcon, PizzaIcon, ClockIcon, LockIcon, WarningIcon, LightbulbIcon, HeartIcon } from '../utils/iconMapping';
-import { useLanguage } from '../contexts/LanguageContext';
-import soundManager from '../utils/soundManager';
+import { ClipboardIcon, PizzaIcon, ClockIcon, LockIcon, WarningIcon, LightbulbIcon, HeartIcon } from '../../utils/iconMapping';
+import { useLanguage } from '../../contexts/LanguageContext';
+import soundManager from '../../utils/soundManager';
 
 export default function OrderSummaryModal({
   isOpen,

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { getOrders } from '../services/menuApi';
-import { ClockIcon, WarningIcon, PizzaIcon } from '../utils/iconMapping';
-import soundManager from '../utils/soundManager';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { getOrders } from '../../services/menuApi';
+import { ClockIcon, WarningIcon, PizzaIcon } from '../../utils/iconMapping';
+import soundManager from '../../utils/soundManager';
 
 export default function HistoryPage({ onOrderSelect }) {
   const { t, language } = useLanguage();
