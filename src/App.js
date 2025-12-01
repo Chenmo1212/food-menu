@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
+import MobileNav from './components/MobileNav';
 import Header from './components/Header';
 import MenuItemModal from './components/MenuItemModal';
 import Cart from './pages/MenuPage/Cart';
@@ -22,6 +23,7 @@ function AppContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [cardRect, setCardRect] = useState(null);
   const [activeView, setActiveView] = useState('menu');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // API data states
   const [menuItems, setMenuItems] = useState(MENU_ITEMS);
@@ -321,7 +323,15 @@ function AppContent() {
 
   return (
     <div className="flex h-screen bg-gray-100 font-sans text-gray-800 overflow-hidden">
-      {/* Left Sidebar Navigation */}
+      {/* Mobile Navigation */}
+      <MobileNav
+        isMenuOpen={isMenuOpen}
+        setIsMenuOpen={setIsMenuOpen}
+        activeView={activeView}
+        onViewChange={setActiveView}
+      />
+
+      {/* Left Sidebar Navigation - Desktop only */}
       <Sidebar activeView={activeView} onViewChange={setActiveView} />
 
       {/* Main Content Area */}
@@ -331,7 +341,7 @@ function AppContent() {
           <Header
             searchQuery=""
             onSearchChange={() => {}}
-            onMenuClick={() => {}}
+            onMenuClick={() => setIsMenuOpen(true)}
           />
         </div>
 

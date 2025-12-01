@@ -1,8 +1,10 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { GlobeIcon } from '../utils/iconMapping';
+import soundManager from '../utils/soundManager';
 
 export default function MobileNav({ isMenuOpen, setIsMenuOpen, activeView, onViewChange }) {
-  const { t } = useLanguage();
+  const { language, toggleLanguage, t } = useLanguage();
 
   const menuItems = [
     { icon: '🏠', label: t('Home', '首页'), labelEn: 'Home', view: 'home' },
@@ -80,7 +82,27 @@ export default function MobileNav({ isMenuOpen, setIsMenuOpen, activeView, onVie
         </nav>
 
         {/* Footer */}
-        <div className="pt-6 border-t border-gray-200">
+        <div className="pt-6 border-t border-gray-200 space-y-4">
+          {/* Language Toggle Button */}
+          <button
+            onClick={() => {
+              soundManager.playTap();
+              toggleLanguage();
+            }}
+            className="w-full p-4 rounded-xl flex items-center gap-4 transition-all bg-gray-50 text-gray-700 hover:bg-orange-50 hover:text-orange-600 group"
+          >
+            <GlobeIcon
+              className={`text-2xl transition-transform group-hover:scale-110 ${
+                language === 'zh' ? 'text-[#f26b25]' : ''
+              }`}
+            />
+            <div className="flex-1 text-left">
+              <p className="font-semibold text-lg">
+                {language === 'zh' ? 'English' : '中文'}
+              </p>
+            </div>
+          </button>
+          
           <p className="text-xs text-gray-400 text-center">
             {t('Version 1.0.0', '版本 1.0.0')}
           </p>

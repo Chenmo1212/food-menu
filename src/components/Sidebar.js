@@ -1,5 +1,6 @@
 import React from 'react';
-import { MenuIcon, ClockIcon } from '../utils/iconMapping';
+import { MenuIcon, ClockIcon, GlobeIcon } from '../utils/iconMapping';
+import { useLanguage } from '../contexts/LanguageContext';
 import soundManager from '../utils/soundManager';
 
 function NavItem({ IconComponent, label, active, onClick }) {
@@ -26,6 +27,8 @@ function NavItem({ IconComponent, label, active, onClick }) {
 }
 
 export default function Sidebar({ activeView, onViewChange }) {
+  const { language, toggleLanguage } = useLanguage();
+  
   return (
     <aside className="hidden lg:flex w-24 bg-white flex-col items-center py-8 shadow-lg z-10 rounded-r-3xl">
       <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-500 font-bold text-2xl mb-10">
@@ -71,7 +74,23 @@ export default function Sidebar({ activeView, onViewChange }) {
         /> */}
       </nav>
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col items-center gap-4">
+        {/* Language Toggle Button */}
+        <button
+          onClick={() => {
+            soundManager.playTap();
+            toggleLanguage();
+          }}
+          className="p-3 rounded-xl transition-colors bg-transparent text-gray-400 hover:bg-orange-50 hover:text-orange-400 group"
+          title={language === 'zh' ? 'Switch to English' : '切换到中文'}
+        >
+          <GlobeIcon
+            className={`text-xl transition-transform group-hover:scale-110 ${
+              language === 'zh' ? 'text-[#f26b25]' : ''
+            }`}
+          />
+        </button>
+        
         <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden border-2 border-white shadow-md">
           <img src="https://i.pravatar.cc/150?u=boyfriend" alt="Profile" />
         </div>

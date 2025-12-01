@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { SearchIcon, GlobeIcon, TimesIcon, HeartIcon } from '../utils/iconMapping';
+import { SearchIcon, TimesIcon, HeartIcon } from '../utils/iconMapping';
 import soundManager from '../utils/soundManager';
 
 export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
-  const { language, toggleLanguage, t } = useLanguage();
+  const { t } = useLanguage();
   const [showSearch, setShowSearch] = useState(false);
 
   return (
@@ -13,13 +13,13 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
       <div className={`flex justify-between items-center transition-opacity duration-300 md:ml-4 ${showSearch ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="flex items-center gap-3">
           {/* Menu Icon Button - Only on mobile/tablet */}
-          {/* <button
+          <button
             onClick={onMenuClick}
             className="lg:hidden flex items-center justify-center w-10 h-10 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105"
             title={t('Menu', '菜单')}
           >
             <span className="text-xl">☰</span>
-          </button> */}
+          </button>
 
           <div className="flex flex-col">
             <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -43,22 +43,6 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
             title={t('Search', '搜索')}
           >
             <SearchIcon className="text-gray-600 group-hover:scale-110 transition-transform" />
-          </button>
-          
-          {/* Language Toggle Button */}
-          <button
-            onClick={() => {
-              soundManager.playTap();
-              toggleLanguage();
-            }}
-            className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white shadow-sm hover:shadow-md transition-all hover:scale-105 group"
-            title={t('Switch to Chinese', '切换到英文')}
-          >
-            <GlobeIcon
-              className={`group-hover:scale-110 transition-transform ${
-                language === 'zh' ? 'text-[#f26b25]' : 'text-gray-600'
-              }`}
-            />
           </button>
         </div>
       </div>
