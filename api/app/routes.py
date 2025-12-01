@@ -549,7 +549,7 @@ def get_orders():
 @api_bp.route('/orders/<order_number>', methods=['GET'])
 def get_order(order_number):
     """
-    Get details of a specific order including items.
+    Get details of a specific order including items with dish images.
     
     Args:
         order_number: Order number
@@ -558,7 +558,7 @@ def get_order(order_number):
         JSON response with order details and items
     """
     try:
-        _, order_model, _ = get_models()
+        dish_model, order_model, _ = get_models()
         
         order = order_model.find_by_order_number(order_number)
         
@@ -570,11 +570,30 @@ def get_order(order_number):
         
         items = order_model.find_items_by_order_number(order_number)
         
+        # Enrich items with dish images from dishes collection
+        enriched_items = []
+        for item in items:
+            # Serialize the item first
+            item_data = serialize_doc(item)
+            
+            # Fetch the dish details using dish_id (business key, not _id)
+            dish = dish_model.find_by_id(item['dish_id'])
+            
+            # Add dish image if dish exists
+            if dish:
+                item_data['dish_image'] = dish.get('image_url', '')
+            else:
+                # If dish not found, use empty string as fallback
+                item_data['dish_image'] = ''
+                print(f'⚠️ Dish not found for dish_id: {item["dish_id"]}')
+            
+            enriched_items.append(item_data)
+        
         return jsonify({
             'success': True,
             'data': {
                 'order': serialize_doc(order),
-                'items': serialize_doc(items)
+                'items': enriched_items
             }
         }), 200
         

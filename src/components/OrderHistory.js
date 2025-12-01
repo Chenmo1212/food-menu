@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getOrders } from '../services/menuApi';
+import { getOrders, getOrderByNumber, cancelOrder, updateOrderStatus } from '../services/menuApi';
+import { resolveImageUrl } from '../utils/imageMapper';
 import { ClockIcon, CheckIcon, WarningIcon, PizzaIcon, CalendarIcon, TimesIcon } from '../utils/iconMapping';
 
 export default function OrderHistory() {
@@ -9,7 +10,12 @@ export default function OrderHistory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [cancelingOrder, setCancelingOrder] = useState(false);
+  const [restoringOrder, setRestoringOrder] = useState(false);
   const [activeTab, setActiveTab] = useState('on-process'); // 'on-process' or 'completed'
+  const asideRef = useRef(null);
 
   // Fetch orders on component mount
   useEffect(() => {
@@ -28,6 +34,32 @@ export default function OrderHistory() {
     }
   }, [orders, loading, activeTab]);
 
+  // Close aside when switching tabs
+  useEffect(() => {
+    if (selectedOrder) {
+      handleCloseDetails();
+    }
+  }, [activeTab]);
+
+  // Handle click outside to close aside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (asideRef.current && !asideRef.current.contains(event.target)) {
+        handleCloseDetails();
+      }
+    };
+
+    if (selectedOrder) {
+      // Add event listener when aside is open
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      // Cleanup event listener
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [selectedOrder]);
+
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -45,6 +77,112 @@ export default function OrderHistory() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch order details when an order is selected
+  const fetchOrderDetails = async (orderNumber) => {
+    try {
+      setLoadingDetails(true);
+      const response = await getOrderByNumber(orderNumber);
+      
+      if (response.success && response.data) {
+        setSelectedOrderDetails(response.data);
+        console.log('✅ Order details loaded:', response.data);
+      } else {
+        throw new Error(response.error || 'Failed to load order details');
+      }
+    } catch (err) {
+      console.error('❌ Failed to fetch order details:', err);
+      setSelectedOrderDetails(null);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  // Handle order selection
+  const handleOrderClick = (order) => {
+    setSelectedOrder(order);
+    fetchOrderDetails(order.order_number);
+  };
+
+  // Handle close details
+  const handleCloseDetails = () => {
+    setSelectedOrder(null);
+    setSelectedOrderDetails(null);
+  };
+
+  // Handle delete order
+  const handleDeleteOrder = async (orderNumber) => {
+    try {
+      const confirmed = window.confirm(
+        t(
+          'Are you sure you want to delete this order? This action cannot be undone.',
+          '确定要删除此订单吗？此操作无法撤销。'
+        )
+      );
+
+      if (!confirmed) return;
+
+      setCancelingOrder(true);
+
+      // Call cancel order API
+      const response = await cancelOrder(orderNumber);
+
+      if (response.success) {
+        console.log('✅ Order deleted successfully');
+        alert(t('Order deleted successfully', '订单删除成功'));
+        
+        // Close details panel
+        handleCloseDetails();
+        
+        // Refresh orders list
+        fetchOrders();
+      } else {
+        throw new Error(response.error || 'Failed to delete order');
+      }
+    } catch (error) {
+      console.error('❌ Failed to delete order:', error);
+      alert(t('Failed to delete order: ', '删除订单失败：') + error.message);
+    } finally {
+      setCancelingOrder(false);
+    }
+  };
+
+  // Handle restore order
+  const handleRestoreOrder = async (orderNumber) => {
+    try {
+      const confirmed = window.confirm(
+        t(
+          'Are you sure you want to restore this order? It will be set to pending status.',
+          '确定要恢复此订单吗？订单将被设置为待处理状态。'
+        )
+      );
+
+      if (!confirmed) return;
+
+      setRestoringOrder(true);
+
+      // Call update order status API to change from cancelled to pending
+      const response = await updateOrderStatus(orderNumber, 'pending');
+
+      if (response.success) {
+        console.log('✅ Order restored successfully');
+        alert(t('Order restored successfully', '订单恢复成功'));
+        
+        // Close details panel
+        handleCloseDetails();
+        
+        // Refresh orders list
+        fetchOrders();
+      } else {
+        throw new Error(response.error || 'Failed to restore order');
+      }
+    } catch (error) {
+      console.error('❌ Failed to restore order:', error);
+      alert(t('Failed to restore order: ', '恢复订单失败：') + error.message);
+    } finally {
+      setRestoringOrder(false);
     }
   };
 
@@ -158,15 +296,15 @@ export default function OrderHistory() {
     <div className="flex-1 flex overflow-hidden">
       {/* Main Content - Orders List */}
       <div className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${
-        selectedOrder ? 'mr-96' : ''
+        selectedOrder ? 'lg:mr-96' : ''
       }`}>
         {/* Header with Tabs */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4 p-4 lg:px-4 lg:py-4">
           {/* Tabs */}
           <div className="flex gap-3">
             <button
               onClick={() => setActiveTab('on-process')}
-              className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+              className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
                 activeTab === 'on-process'
                   ? 'bg-[#fff0df] text-orange-600 shadow-sm'
                   : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
@@ -176,7 +314,7 @@ export default function OrderHistory() {
             </button>
             <button
               onClick={() => setActiveTab('completed')}
-              className={`px-6 py-2.5 rounded-xl font-semibold text-sm transition-all ${
+              className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
                 activeTab === 'completed'
                   ? 'bg-[#fff0df] text-orange-600 shadow-sm'
                   : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
@@ -197,7 +335,7 @@ export default function OrderHistory() {
         </div>
 
         {/* Orders List */}
-        <div className="flex-1 overflow-y-auto px-1 py-6">
+        <div className="flex-1 overflow-y-auto px-4 py-4 lg:px-4 lg:py-4">
           {filteredOrders.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -219,7 +357,7 @@ export default function OrderHistory() {
                 return (
                   <div
                     key={order._id}
-                    onClick={() => setSelectedOrder(order)}
+                    onClick={() => handleOrderClick(order)}
                     className={`bg-white rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer border-2 overflow-hidden ${
                       selectedOrder?._id === order._id
                         ? 'border-orange-300 shadow-md'
@@ -265,14 +403,14 @@ export default function OrderHistory() {
 
       {/* Right Sidebar - Order Details */}
       {selectedOrder && (
-        <aside className="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl flex flex-col z-40 animate-slide-in-right rounded-l-3xl">
+        <aside ref={asideRef} className="fixed right-0 top-0 h-full w-full lg:w-96 bg-white shadow-2xl flex flex-col z-40 animate-slide-in-right lg:rounded-l-3xl">
           {/* Header */}
           <div className="p-6 border-b border-gray-200 flex items-center justify-between">
             <h3 className="text-xl font-bold text-gray-800">
               {t('Order Details', '订单详情')}
             </h3>
             <button
-              onClick={() => setSelectedOrder(null)}
+              onClick={handleCloseDetails}
               className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
             >
               <TimesIcon />
@@ -307,24 +445,40 @@ export default function OrderHistory() {
                 <PizzaIcon className="text-orange-500" size="sm" />
                 <span>{t('Items', '商品')}</span>
               </h4>
-              {selectedOrder.items && selectedOrder.items.length > 0 ? (
+              {loadingDetails ? (
+                <div className="flex items-center justify-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                </div>
+              ) : selectedOrderDetails?.items && selectedOrderDetails.items.length > 0 ? (
                 <div className="space-y-2">
-                  {selectedOrder.items.map((item, index) => (
+                  {selectedOrderDetails.items.map((item, index) => (
                     <div
                       key={index}
-                      className="bg-white border border-gray-200 rounded-xl p-3 flex justify-between items-center"
+                      className="bg-white border border-gray-200 rounded-xl p-3 flex gap-3 items-center"
                     >
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-800">
+                      {/* Dish Image */}
+                      <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0">
+                        <img
+                          src={resolveImageUrl(item.dish_image)}
+                          alt={item.dish_name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      
+                      {/* Dish Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-800 truncate">
                           {item.dish_name || `${t('Item', '商品')} #${item.dish_id}`}
                         </p>
                         {item.custom_notes && (
-                          <p className="text-xs text-gray-500 italic mt-1">
+                          <p className="text-xs text-gray-500 italic mt-1 truncate">
                             "{item.custom_notes}"
                           </p>
                         )}
                       </div>
-                      <span className="ml-3 px-2 py-1 bg-orange-100 text-orange-600 rounded-lg text-sm font-bold">
+                      
+                      {/* Quantity Badge */}
+                      <span className="px-2 py-1 bg-orange-100 text-orange-600 rounded-lg text-sm font-bold shrink-0">
                         x{item.quantity}
                       </span>
                     </div>
@@ -358,24 +512,68 @@ export default function OrderHistory() {
             )}
 
             {/* Total */}
-            <div className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl p-4 text-white">
+            {/* <div className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl p-4 text-white">
               <div className="flex items-center justify-between">
                 <span className="text-sm opacity-90">{t('Total Amount', '总金额')}</span>
                 <span className="text-2xl font-bold">
                   ${selectedOrder.total_amount?.toFixed(2) || '0.00'}
                 </span>
               </div>
-            </div>
+            </div> */}
           </div>
 
-          {/* Footer - Action Button */}
-          <div className="p-6 border-t border-gray-200 bg-gray-50">
-            <button
-              onClick={() => setSelectedOrder(null)}
-              className="w-full bg-white hover:bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold transition-colors border-2 border-gray-200"
-            >
-              {t('Close', '关闭')}
-            </button>
+          {/* Footer - Action Buttons */}
+          <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-3">
+            {/* Show different buttons based on tab and order status */}
+            {activeTab === 'completed' && selectedOrder.status === 'cancelled' ? (
+              // For cancelled orders in Completed tab: only show Restore Order button
+              <button
+                onClick={() => handleRestoreOrder(selectedOrder.order_number)}
+                disabled={restoringOrder}
+                className={`w-full bg-gradient-to-br from-orange-400 to-orange-500 hover:from-orange-600 hover:to-orange-700 text-white py-3 rounded-xl font-semibold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 ${
+                  restoringOrder ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {restoringOrder ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>{t('Restoring...', '恢复中...')}</span>
+                  </>
+                ) : (
+                  <span>{t('Restore Order', '恢复订单')}</span>
+                )}
+              </button>
+            ) : (
+              // For all other cases: show Edit Order and Cancel Order buttons
+              <>
+                <button
+                  onClick={() => {
+                    // TODO: Implement edit functionality
+                    console.log('Edit order:', selectedOrder.order_number);
+                    alert(t('Edit functionality coming soon', '编辑功能即将推出'));
+                  }}
+                  className="w-full bg-gradient-to-br from-orange-400 to-orange-500 hover:from-orange-600 hover:to-orange-700 text-white py-3 rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
+                >
+                  {t('Edit Order', '编辑订单')}
+                </button>
+                <button
+                  onClick={() => handleDeleteOrder(selectedOrder.order_number)}
+                  disabled={cancelingOrder}
+                  className={`w-full bg-white hover:bg-red-50 text-red-600 py-3 rounded-xl font-semibold transition-colors border-2 border-red-200 hover:border-red-300 flex items-center justify-center gap-2 ${
+                    cancelingOrder ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {cancelingOrder ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600"></div>
+                      <span>{t('Canceling...', '取消中...')}</span>
+                    </>
+                  ) : (
+                    <span>{t('Cancel Order', '取消订单')}</span>
+                  )}
+                </button>
+              </>
+            )}
           </div>
         </aside>
       )}
