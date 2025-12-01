@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import CartItem from './CartItem';
 import OrderSummaryModal from './OrderSummaryModal';
+import SidePanel from './SidePanel';
 import { useLanguage } from '../contexts/LanguageContext';
 import { CartIcon, ClockIcon, PenIcon, NoteIcon, TimesIcon } from '../utils/iconMapping';
 import soundManager from '../utils/soundManager';
@@ -86,57 +87,40 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
         {cart.length ? <span className="font-bold">({cart.length})</span> : ""}
       </button>
 
-      {/* Mobile Cart Overlay */}
-      {isOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Cart Sidebar - Responsive */}
-      <aside className={`
-        fixed lg:relative
-        ${isOpen ? 'right-0' : '-right-full lg:right-0'}
-        top-0 h-full
-        w-full sm:w-96
-        bg-white p-4 md:p-6
-        shadow-xl rounded-l-3xl
-        flex flex-col
-        transition-all duration-300 ease-in-out
-        z-50 lg:z-auto
-      `}>
-        {/* Close button for mobile */}
-        <button
-          onClick={() => {
-            soundManager.playTap();
-            setIsOpen(false);
-          }}
-          className="lg:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
-        >
-          ×
-        </button>
-
-        {/* Header */}
-        <div className="flex justify-between items-start mb-6">
+      {/* Cart Sidebar - Using SidePanel */}
+      <SidePanel
+        isOpen={isOpen}
+        onClose={() => {
+          soundManager.playTap();
+          setIsOpen(false);
+        }}
+        title={
           <div>
             <h2 className="font-bold text-xl">{t('Current Order', '当前订单')}</h2>
             <p className="text-gray-400 text-sm">#{getOrderNumber()}</p>
           </div>
-        </div>
-
-        {/* Toggle */}
-        {/* <div className="flex bg-gray-100 p-1 rounded-xl mb-6">
-          <button className="flex-1 py-2 rounded-lg bg-orange-500 text-white text-sm font-bold shadow-sm">
-            Dine In
-          </button>
-          <button className="flex-1 py-2 rounded-lg text-gray-500 text-sm font-medium">
-            Take Away
-          </button>
-        </div> */}
-
-        {/* Cart List */}
-        <div className="flex-1 overflow-y-auto pr-2 space-y-4 md:space-y-6">
+        }
+        width="w-full sm:w-96"
+        showBackdrop={true}
+        closeOnClickOutside={false}
+        closeOnEscape={true}
+        footer={
+          <div className="p-4 md:p-6 space-y-3">
+            <button
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-lg shadow-orange-200 transition-all"
+              onClick={() => {
+                soundManager.playTap();
+                setShowOrderSummary(true);
+              }}
+            >
+              {t('Get Summary', '获取摘要')}
+            </button>
+          </div>
+        }
+      >
+        <div className="p-4 md:p-6 flex flex-col h-full">
+          {/* Cart List */}
+          <div className="flex-1 overflow-y-auto pr-2 space-y-4 md:space-y-6 mb-3">
           {cart.length === 0 ? (
             <div className="text-center text-gray-400 mt-10 flex flex-col items-center gap-2">
               <CartIcon size="2x" />
@@ -277,50 +261,25 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
           </>
         )}
 
-        {/* Special Instructions Section */}
-        {cart.some(item => item.specialInstructions) && (
-          <div className="mt-3 p-3 md:p-4 bg-orange-50 rounded-xl border border-orange-100">
-            <h3 className="font-semibold text-xs md:text-base text-gray-800 mb-2 md:mb-3 flex items-center gap-1.5 md:gap-2">
-              <NoteIcon className="text-orange-500" />
-                {t('Special Instructions', '特殊要求')}
-            </h3>
-            <div className="space-y-1.5 md:space-y-2">
-              {cart.filter(item => item.specialInstructions).map((item, index) => (
-                <div key={`${item.id}-${index}`} className="text-xs md:text-sm">
-                  <p className="font-medium text-gray-700">{item.name}:</p>
-                  <p className="text-gray-600 italic pl-2">{item.specialInstructions}</p>
-                </div>
-              ))}
+          {/* Special Instructions Section */}
+          {cart.some(item => item.specialInstructions) && (
+            <div className="mt-3 p-3 md:p-4 bg-orange-50 rounded-xl border border-orange-100">
+              <h3 className="font-semibold text-xs md:text-base text-gray-800 mb-2 md:mb-3 flex items-center gap-1.5 md:gap-2">
+                <NoteIcon className="text-orange-500" />
+                  {t('Special Instructions', '特殊要求')}
+              </h3>
+              <div className="space-y-1.5 md:space-y-2">
+                {cart.filter(item => item.specialInstructions).map((item, index) => (
+                  <div key={`${item.id}-${index}`} className="text-xs md:text-sm">
+                    <p className="font-medium text-gray-700">{item.name}:</p>
+                    <p className="text-gray-600 italic pl-2">{item.specialInstructions}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Footer Totals */}
-        <div className="mt-2 md:mt-4 border-t md:pt-4 space-y-3">
-          {/* <div className="flex justify-between text-gray-500 text-sm">
-            <span>Items ({cart.length})</span>
-            <span className="font-bold text-gray-800">${subtotal.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-gray-500 text-sm">
-            <span>Tax (10%)</span>
-            <span className="font-bold text-gray-800">${tax.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-xl font-bold border-t border-dashed pt-4 mt-2">
-            <span>Total</span>
-            <span className="text-orange-500">${total.toFixed(2)}</span>
-          </div> */}
-
-          <button
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 md:py-4 rounded-xl font-bold text-base md:text-lg shadow-lg shadow-orange-200 transition-all mt-3 md:mt-4"
-            onClick={() => {
-              soundManager.playTap();
-              setShowOrderSummary(true);
-            }}
-          >
-            {t('Get Summary', '获取摘要')}
-          </button>
+          )}
         </div>
-      </aside>
+      </SidePanel>
 
       {/* Order Summary Modal */}
       <OrderSummaryModal

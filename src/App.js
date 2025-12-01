@@ -9,15 +9,16 @@ import CustomDishModal from './components/CustomDishModal';
 import MobileNav from './components/MobileNav';
 import Rank from './components/Rank';
 import OrderHistory from './components/OrderHistory';
+import OrderDetailsPanel from './components/OrderDetailsPanel';
 import { MENU_ITEMS } from './data/menuData';
-import { getDishes, createOrder } from './services/menuApi';
+import { getDishes, createOrder, getOrderByNumber, cancelOrder, updateOrderStatus } from './services/menuApi';
 import { resolveImageUrl } from './utils/imageMapper';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
 import { HomeIcon, ClockIcon, OrderIcon, SettingsIcon, CheckIcon, WarningIcon, PlusIcon } from './utils/iconMapping';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
 function AppContent() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   // Use localStorage for cart persistence
   const [cart, setCart] = useLocalStorage('foodMenuCart', []);
   const [activeCategory, setActiveCategory] = useState('All');
@@ -33,6 +34,13 @@ function AppContent() {
   const [menuItems, setMenuItems] = useState(MENU_ITEMS); // Fallback to local data
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // OrderHistory states
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  const [loadingOrderDetails, setLoadingOrderDetails] = useState(false);
+  const [cancelingOrder, setCancelingOrder] = useState(false);
+  const [restoringOrder, setRestoringOrder] = useState(false);
 
   // Fetch dishes from API on component mount
   useEffect(() => {
@@ -112,6 +120,144 @@ function AppContent() {
       }
       return item;
     }).filter(item => item.qty > 0));
+  };
+
+  // OrderHistory: Fetch order details
+  const fetchOrderDetails = async (orderNumber) => {
+    try {
+      setLoadingOrderDetails(true);
+      const response = await getOrderByNumber(orderNumber);
+      
+      if (response.success && response.data) {
+        setSelectedOrderDetails(response.data);
+        console.log('✅ Order details loaded:', response.data);
+      } else {
+        throw new Error(response.error || 'Failed to load order details');
+      }
+    } catch (err) {
+      console.error('❌ Failed to fetch order details:', err);
+      setSelectedOrderDetails(null);
+    } finally {
+      setLoadingOrderDetails(false);
+    }
+  };
+
+  // OrderHistory: Handle order selection
+  const handleOrderSelect = (order) => {
+    setSelectedOrder(order);
+    fetchOrderDetails(order.order_number);
+  };
+
+  // OrderHistory: Handle close details
+  const handleCloseOrderDetails = () => {
+    setSelectedOrder(null);
+    setSelectedOrderDetails(null);
+  };
+
+  // OrderHistory: Handle delete order
+  const handleDeleteOrder = async (orderNumber, onSuccess) => {
+    try {
+      const confirmed = window.confirm(
+        t(
+          'Are you sure you want to delete this order? This action cannot be undone.',
+          '确定要删除此订单吗？此操作无法撤销。'
+        )
+      );
+
+      if (!confirmed) return;
+
+      setCancelingOrder(true);
+
+      const response = await cancelOrder(orderNumber);
+
+      if (response.success) {
+        console.log('✅ Order deleted successfully');
+        alert(t('Order deleted successfully', '订单删除成功'));
+        
+        handleCloseOrderDetails();
+        
+        if (onSuccess) onSuccess();
+      } else {
+        throw new Error(response.error || 'Failed to delete order');
+      }
+    } catch (error) {
+      console.error('❌ Failed to delete order:', error);
+      alert(t('Failed to delete order: ', '删除订单失败：') + error.message);
+    } finally {
+      setCancelingOrder(false);
+    }
+  };
+
+  // OrderHistory: Handle restore order
+  const handleRestoreOrder = async (orderNumber, onSuccess) => {
+    try {
+      const confirmed = window.confirm(
+        t(
+          'Are you sure you want to restore this order? It will be set to pending status.',
+          '确定要恢复此订单吗？订单将被设置为待处理状态。'
+        )
+      );
+
+      if (!confirmed) return;
+
+      setRestoringOrder(true);
+
+      const response = await updateOrderStatus(orderNumber, 'pending');
+
+      if (response.success) {
+        console.log('✅ Order restored successfully');
+        alert(t('Order restored successfully', '订单恢复成功'));
+        
+        handleCloseOrderDetails();
+        
+        if (onSuccess) onSuccess();
+      } else {
+        throw new Error(response.error || 'Failed to restore order');
+      }
+    } catch (error) {
+      console.error('❌ Failed to restore order:', error);
+      alert(t('Failed to restore order: ', '恢复订单失败：') + error.message);
+    } finally {
+      setRestoringOrder(false);
+    }
+  };
+
+  // Get status badge styling
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      pending: {
+        bg: 'bg-yellow-100',
+        text: 'text-yellow-700',
+        label: { en: 'Pending', zh: '待处理' }
+      },
+      confirmed: {
+        bg: 'bg-blue-100',
+        text: 'text-blue-700',
+        label: { en: 'Confirmed', zh: '已确认' }
+      },
+      preparing: {
+        bg: 'bg-purple-100',
+        text: 'text-purple-700',
+        label: { en: 'Preparing', zh: '准备中' }
+      },
+      completed: {
+        bg: 'bg-green-100',
+        text: 'text-green-700',
+        label: { en: 'Completed', zh: '已完成' }
+      },
+      cancelled: {
+        bg: 'bg-red-100',
+        text: 'text-red-700',
+        label: { en: 'Cancelled', zh: '已取消' }
+      }
+    };
+
+    const config = statusConfig[status] || statusConfig.pending;
+    return (
+      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+        {language === 'zh' ? config.label.zh : config.label.en}
+      </span>
+    );
   };
 
   // Handle checkout
@@ -258,7 +404,12 @@ function AppContent() {
         );
       
       case 'history':
-        return <OrderHistory />;
+        return (
+          <OrderHistory
+            selectedOrder={selectedOrder}
+            onOrderSelect={handleOrderSelect}
+          />
+        );
       
       case 'order':
         return (
@@ -318,6 +469,29 @@ function AppContent() {
           cart={cart}
           onUpdateQty={updateQty}
           onCheckout={handleCheckout}
+        />
+      )}
+
+      {/* Right Sidebar (Order Details) - Only show on History page */}
+      {activeView === 'history' && (
+        <OrderDetailsPanel
+          selectedOrder={selectedOrder}
+          selectedOrderDetails={selectedOrderDetails}
+          loadingOrderDetails={loadingOrderDetails}
+          cancelingOrder={cancelingOrder}
+          restoringOrder={restoringOrder}
+          onClose={handleCloseOrderDetails}
+          onEdit={(orderNumber) => {
+            console.log('Edit order:', orderNumber);
+            alert(t('Edit functionality coming soon', '编辑功能即将推出'));
+          }}
+          onDelete={(orderNumber) => handleDeleteOrder(orderNumber, () => {
+            // Trigger refresh in OrderHistory component if needed
+          })}
+          onRestore={(orderNumber) => handleRestoreOrder(orderNumber, () => {
+            // Trigger refresh in OrderHistory component if needed
+          })}
+          getStatusBadge={getStatusBadge}
         />
       )}
 
