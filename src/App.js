@@ -66,8 +66,11 @@ function AppContent() {
         }
       } catch (err) {
         console.error('❌ Failed to fetch dishes from API:', err);
-        setError(err.message);
-        console.log('📦 Using local menu data as fallback');
+        // Don't set error state - silently fall back to local data
+        // setError(err.message);
+        console.log('📦 Using local menu data as fallback (MENU_ITEMS)');
+        // Ensure local data is set (it's already in initial state, but being explicit)
+        setMenuItems(MENU_ITEMS);
       } finally {
         setLoading(false);
       }
