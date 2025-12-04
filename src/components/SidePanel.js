@@ -59,7 +59,7 @@ export default function SidePanel({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, closeOnEscape, onClose]);
 
-  // Slide animation classes for mobile
+  // Slide animation classes for mobile only
   const mobileSlideClasses = position === 'left'
     ? isOpen ? 'left-0' : '-left-full'
     : isOpen ? 'right-0' : '-right-full';
@@ -82,8 +82,8 @@ export default function SidePanel({
         ref={panelRef}
         className={`
           fixed lg:relative
-          ${mobileSlideClasses} lg:${position === 'left' ? 'left' : 'right'}-0
-          top-0 h-full
+          ${mobileSlideClasses} lg:left-auto lg:right-auto
+          top-0 lg:top-auto h-full
           ${width}
           bg-white
           ${borderRadius}

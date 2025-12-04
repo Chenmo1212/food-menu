@@ -7,12 +7,12 @@ export default function MobileNav({ isMenuOpen, setIsMenuOpen, activeView, onVie
   const { language, toggleLanguage, t } = useLanguage();
 
   const menuItems = [
-    { icon: '🏠', label: t('Home', '首页'), labelEn: 'Home', view: 'home' },
+    // { icon: '🏠', label: t('Home', '首页'), labelEn: 'Home', view: 'home' },
     { icon: '🍱', label: t('Menu', '菜单'), labelEn: 'Menu', view: 'menu' },
     { icon: '🕐', label: t('History', '历史'), labelEn: 'History', view: 'history' },
-    { icon: '👜', label: t('Order', '订单'), labelEn: 'Order', view: 'order' },
-    { icon: '🏆', label: t('Rank', '排行'), labelEn: 'Rank', view: 'rank' },
-    { icon: '⚙️', label: t('Settings', '设置'), labelEn: 'Settings', view: 'settings' },
+    // { icon: '👜', label: t('Order', '订单'), labelEn: 'Order', view: 'order' },
+    // { icon: '🏆', label: t('Rank', '排行'), labelEn: 'Rank', view: 'rank' },
+    // { icon: '⚙️', label: t('Settings', '设置'), labelEn: 'Settings', view: 'settings' },
   ];
 
   return (
