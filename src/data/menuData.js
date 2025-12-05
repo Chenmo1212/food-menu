@@ -579,6 +579,86 @@ export const MENU_ITEMS = [
       carbs: '6g'
     }
   },
+  {
+  id: 30,
+  name: '葱烧豆腐',
+  nameEn: 'Braised Tofu with Scallions',
+  price: 10.99,
+  stock: 20,
+  orderCount: 0,
+  category: 'Vegetarian',
+  image: require('../assets/dishCovers/braised_tofu_scallions.png'),
+  description: '嫩滑豆腐配上香葱，用酱油和糖调味，口感软嫩，葱香浓郁。',
+  descriptionEn: 'Silky tofu braised with fragrant scallions in savory-sweet sauce. Tender texture with rich onion aroma.',
+  ingredients: ['豆腐', '香葱', '生抽', '老抽', '糖', '蒜'],
+  ingredientsEn: ['Tofu', 'Scallions', 'Light Soy Sauce', 'Dark Soy Sauce', 'Sugar', 'Garlic'],
+  nutrition: {
+    calories: 95,
+    protein: '8g',
+    fat: '5g',
+    carbs: '6g'
+  }
+},
+{
+  id: 31,
+  name: '西兰花炒香菇',
+  nameEn: 'Stir-Fried Broccoli with Shiitake Mushrooms',
+  price: 11.99,
+  stock: 18,
+  orderCount: 0,
+  category: 'Vegetarian',
+  image: require('../assets/dishCovers/broccoli_shiitake_mushrooms.png'),
+  description: '新鲜西兰花与香菇快炒，口感爽脆，营养丰富，清淡健康。',
+  descriptionEn: 'Fresh broccoli stir-fried with shiitake mushrooms. Crisp texture, nutritious and light.',
+  ingredients: ['西兰花', '香菇', '蒜', '蚝油', '盐'],
+  ingredientsEn: ['Broccoli', 'Shiitake Mushrooms', 'Garlic', 'Oyster Sauce', 'Salt'],
+  nutrition: {
+    calories: 68,
+    protein: '5g',
+    fat: '2g',
+    carbs: '10g'
+  }
+},
+{
+  id: 32,
+  name: '三色炒虾仁',
+  nameEn: 'Stir-Fried Shrimp with Three Vegetables',
+  price: 16.99,
+  stock: 12,
+  orderCount: 0,
+  category: 'Seafood',
+  image: require('../assets/dishCovers/shrimp_three_vegetables.png'),
+  description: '鲜嫩虾仁搭配胡萝卜、豌豆和玉米粒，色彩缤纷，清甜爽口。',
+  descriptionEn: 'Tender shrimp with carrots, peas, and corn. Colorful and naturally sweet with fresh flavors.',
+  ingredients: ['虾仁', '胡萝卜', '豌豆', '玉米', '盐', '料酒', '淀粉'],
+  ingredientsEn: ['Shrimp', 'Carrots', 'Peas', 'Corn', 'Salt', 'Cooking Wine', 'Starch'],
+  nutrition: {
+    calories: 125,
+    protein: '18g',
+    fat: '2g',
+    carbs: '10g'
+  }
+},
+{
+  id: 33,
+  name: '红烧排骨',
+  nameEn: 'Braised Pork Ribs',
+  price: 17.99,
+  stock: 15,
+  orderCount: 0,
+  category: 'Pork',
+  image: require('../assets/dishCovers/braised_pork_ribs.png'),
+  description: '排骨经过慢炖，肉质软烂入味，酱汁浓郁，香甜可口。',
+  descriptionEn: 'Pork ribs slowly braised until tender in rich, savory-sweet sauce. Fall-off-the-bone delicious.',
+  ingredients: ['排骨', '生抽', '老抽', '料酒', '冰糖', '八角', '姜', '葱'],
+  ingredientsEn: ['Pork Ribs', 'Light Soy Sauce', 'Dark Soy Sauce', 'Cooking Wine', 'Rock Sugar', 'Star Anise', 'Ginger', 'Scallions'],
+  nutrition: {
+    calories: 285,
+    protein: '22g',
+    fat: '18g',
+    carbs: '8g'
+  }
+}
 ];
 
 export const CATEGORIES = [

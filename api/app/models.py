@@ -130,6 +130,84 @@ class DishModel:
                 '$set': {'updated_at': datetime.now()}
             }
         )
+    
+    def create(self, dish_data):
+        """
+        Create a new dish.
+        
+        Args:
+            dish_data (dict): Dish information
+            
+        Returns:
+            dict: Created dish document
+        """
+        # Prepare dish document
+        dish_doc = {
+            'dish_id': dish_data['dish_id'],
+            'name': dish_data['name'],
+            'name_en': dish_data['name_en'],
+            'price': dish_data['price'],
+            'stock': dish_data.get('stock', 0),
+            'order_count': dish_data.get('order_count', 0),
+            'category': dish_data['category'],
+            'image_url': dish_data.get('image_url', ''),
+            'description': dish_data.get('description', ''),
+            'description_en': dish_data.get('description_en', ''),
+            'ingredients': dish_data.get('ingredients', []),
+            'ingredients_en': dish_data.get('ingredients_en', []),
+            'nutrition': dish_data.get('nutrition', {}),
+            'is_active': dish_data.get('is_active', True),
+            'created_at': datetime.now(),
+            'updated_at': datetime.now()
+        }
+        
+        # Insert dish
+        result = self.collection.insert_one(dish_doc)
+        
+        # Return created dish
+        return self.collection.find_one({'_id': result.inserted_id})
+    
+    def update(self, dish_id, dish_data):
+        """
+        Update an existing dish.
+        
+        Args:
+            dish_id (int): Dish ID
+            dish_data (dict): Updated dish information
+            
+        Returns:
+            dict: Updated dish document or None
+        """
+        # Prepare update data
+        update_doc = {
+            'name': dish_data['name'],
+            'name_en': dish_data['name_en'],
+            'price': dish_data['price'],
+            'category': dish_data['category'],
+            'updated_at': datetime.now()
+        }
+        
+        # Add optional fields if provided
+        optional_fields = [
+            'stock', 'order_count', 'image_url', 'description',
+            'description_en', 'ingredients', 'ingredients_en',
+            'nutrition', 'is_active'
+        ]
+        
+        for field in optional_fields:
+            if field in dish_data:
+                update_doc[field] = dish_data[field]
+        
+        # Update dish
+        result = self.collection.update_one(
+            {'dish_id': dish_id},
+            {'$set': update_doc}
+        )
+        
+        if result.matched_count == 0:
+            return None
+        
+        return self.find_by_id(dish_id)
 
 
 class OrderModel:

@@ -94,6 +94,31 @@ export async function updateDishStock(dishId, quantity) {
   });
 }
 
+/**
+ * Create a new dish
+ * @param {object} dishData - Dish data
+ * @returns {Promise<object>} Created dish
+ */
+export async function createDish(dishData) {
+  return apiRequest('/dishes', {
+    method: 'POST',
+    body: JSON.stringify(dishData),
+  });
+}
+
+/**
+ * Update an existing dish
+ * @param {number} dishId - Dish ID
+ * @param {object} dishData - Updated dish data
+ * @returns {Promise<object>} Updated dish
+ */
+export async function updateDish(dishId, dishData) {
+  return apiRequest(`/dishes/${dishId}`, {
+    method: 'PUT',
+    body: JSON.stringify(dishData),
+  });
+}
+
 // ============================================
 // Order API Functions
 // ============================================

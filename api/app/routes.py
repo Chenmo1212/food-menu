@@ -350,6 +350,133 @@ def search_dishes():
         }), 500
 
 
+@api_bp.route('/dishes', methods=['POST'])
+def create_dish():
+    """
+    Create a new dish.
+    
+    Request Body:
+        {
+            "dish_id": 100,
+            "name": "新菜品",
+            "name_en": "New Dish",
+            "price": 12.99,
+            "stock": 10,
+            "order_count": 0,
+            "category": "Pork",
+            "image_url": "path/to/image.png",
+            "description": "描述",
+            "description_en": "Description",
+            "ingredients": ["ingredient1"],
+            "ingredients_en": ["Ingredient1"],
+            "nutrition": {"calories": 100},
+            "is_active": true
+        }
+    
+    Returns:
+        JSON response with created dish
+    """
+    try:
+        dish_model, _, _ = get_models()
+        
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['dish_id', 'name', 'name_en', 'price', 'category']
+        is_valid, error_msg = validate_required_fields(data, required_fields)
+        if not is_valid:
+            return jsonify({
+                'success': False,
+                'error': error_msg
+            }), 400
+        
+        # Check if dish_id already exists
+        existing_dish = dish_model.find_by_id(data['dish_id'])
+        if existing_dish:
+            return jsonify({
+                'success': False,
+                'error': f'Dish with ID {data["dish_id"]} already exists'
+            }), 400
+        
+        # Create dish
+        dish = dish_model.create(data)
+        
+        return jsonify({
+            'success': True,
+            'data': serialize_doc(dish),
+            'message': 'Dish created successfully'
+        }), 201
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@api_bp.route('/dishes/<int:dish_id>', methods=['PUT'])
+def update_dish(dish_id):
+    """
+    Update an existing dish.
+    
+    Args:
+        dish_id: Dish ID
+    
+    Request Body:
+        {
+            "name": "更新的菜品",
+            "name_en": "Updated Dish",
+            "price": 13.99,
+            "stock": 15,
+            "category": "Chicken",
+            "image_url": "path/to/new_image.png",
+            "description": "新描述",
+            "description_en": "New Description",
+            "ingredients": ["ingredient1", "ingredient2"],
+            "ingredients_en": ["Ingredient1", "Ingredient2"],
+            "nutrition": {"calories": 120},
+            "is_active": true
+        }
+    
+    Returns:
+        JSON response with updated dish
+    """
+    try:
+        dish_model, _, _ = get_models()
+        
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['name', 'name_en', 'price', 'category']
+        is_valid, error_msg = validate_required_fields(data, required_fields)
+        if not is_valid:
+            return jsonify({
+                'success': False,
+                'error': error_msg
+            }), 400
+        
+        # Update dish
+        dish = dish_model.update(dish_id, data)
+        
+        if not dish:
+            return jsonify({
+                'success': False,
+                'error': 'Dish not found'
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'data': serialize_doc(dish),
+            'message': 'Dish updated successfully'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 # ============================================
 # Order Endpoints
 # ============================================
