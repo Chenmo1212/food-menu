@@ -1,492 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grand Luxury Christmas Tree</title>
+  
+  <!-- External Dependencies -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Monsieur+La+Doulaise&display=swap" rel="stylesheet">
+  
+  <!-- Custom Styles -->
+  <style>
+    @import url(https://fonts.googleapis.com/css?family=Google+Sans+Text);
+    
+    html {
+      font-family: 'Google Sans Text', 'Google Sans';
+      font-size: 14px;
+      color-scheme: light dark;
+      background: light-dark(white, black);
+      color: light-dark(black, white);
+    }
+    
+    body { 
+      margin: 0; 
+      background-color: #010a05; 
+      overflow: hidden; 
+    }
+    
+    .font-luxury { font-family: 'Cinzel', serif; }
+    .font-body { font-family: 'Playfair Display', serif; }
+    .font-script { font-family: 'Monsieur La Doulaise', cursive; }
+  </style>
 
-<style>
-  @import url(https://fonts.googleapis.com/css?family=Google+Sans+Text);
-  html {
-    font-family: 'Google Sans Text', 'Google Sans';
-    font-size: 14px;
-    color-scheme: light dark;
-    background: light-dark(white, black);
-    color: light-dark(black, white);
-  }
-</style>
-
-<script type="importmap">
-{
-  "imports":{
-    "@modelcontextprotocol/sdk/":"https://aistudiocdn.com/@modelcontextprotocol/sdk/dist/esm/",
-    "https://aistudiocdn.com/@modelcontextprotocol/sdk@^1.11.0/es2022/":"https://aistudiocdn.com/@modelcontextprotocol/sdk@^1.11.0/es2022/dist/esm/",
-    "https://aistudiocdn.com/@modelcontextprotocol/sdk@^1.11.0/client/index?target=es2022":"https://aistudiocdn.com/@modelcontextprotocol/sdk@^1.11.0/dist/esm/client/index?target=es2022",
-    "https://aistudiocdn.com/@modelcontextprotocol/sdk@^1.11.0/types?target=es2022":"https://aistudiocdn.com/@modelcontextprotocol/sdk@^1.11.0/dist/esm/types?target=es2022",
-    "react":"https://esm.sh/react@18.2.0",
-    "react/":"https://esm.sh/react@18.2.0/",
-    "react-dom/client":"https://esm.sh/react-dom@18.2.0/client?external=react",
-    "three":"https://esm.sh/three@0.160.0",
-    "@react-three/fiber":"https://esm.sh/@react-three/fiber@8.15.16?external=react,react-dom,three",
-    "@react-three/drei":"https://esm.sh/@react-three/drei@9.99.0?external=react,react-dom,three,@react-three/fiber",
-    "@react-three/postprocessing":"https://esm.sh/@react-three/postprocessing@2.16.0?external=react,react-dom,three,@react-three/fiber",
-    "@tensorflow/tfjs":"https://esm.sh/@tensorflow/tfjs@4.17.0",
-    "@tensorflow-models/handpose":"https://esm.sh/@tensorflow-models/handpose@0.1.0?external=@tensorflow/tfjs",
-    "react-webcam":"https://esm.sh/react-webcam@7.2.0?external=react,react-dom",
-    "react-dom/":"https://aistudiocdn.com/react-dom@^19.2.1/",
-    "@/index": "
-      import { jsx as _jsx } from "react/jsx-runtime";
-      import React from 'react';
-      import ReactDOM from 'react-dom/client';
-      import App from '@/App';
-      const rootElement = document.getElementById('root');
-      if (!rootElement) {
-          throw new Error("Could not find root element to mount to");
-      }
-      const root = ReactDOM.createRoot(rootElement);
-      root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
-      ",
-    "@":"
-      import { jsx as _jsx } from "react/jsx-runtime";
-      import React from 'react';
-      import ReactDOM from 'react-dom/client';
-      import App from '@/App';
-      const rootElement = document.getElementById('root');
-      if (!rootElement) {
-          throw new Error("Could not find root element to mount to");
-      }
-      const root = ReactDOM.createRoot(rootElement);
-      root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
-    ",
-    "@/utils/math":"
-      import * as THREE from 'three';
-      export const randomVector3 = (r) => {
-          const theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos(2 * Math.random() - 1);
-          const x = r * Math.sin(phi) * Math.cos(theta);
-          const y = r * Math.sin(phi) * Math.sin(theta);
-          const z = r * Math.cos(phi);
-          return new THREE.Vector3(x, y, z);
-      };
-      export const getConePosition = (height, radius, progress) => {
-          const y = (progress - 0.5) * height; // -height/2 to height/2
-          const r = (1 - progress) * radius; // Taper to top
-          const angle = Math.random() * Math.PI * 2;
-          const x = r * Math.cos(angle);
-          const z = r * Math.sin(angle);
-          return new THREE.Vector3(x, y, z);
-      };
-      // Returns { target: Float32Array, chaos: Float32Array, randoms: Float32Array }
-      export const generateFoliageData = (count, treeHeight, treeRadius) => {
-          const target = new Float32Array(count * 3);
-          const chaos = new Float32Array(count * 3);
-          const randoms = new Float32Array(count); // For size variation and snow mask
-          for (let i = 0; i < count; i++) {
-              // Tree Shape (Target)
-              // FIX: Use Inverse CDF for Cone Surface Area distribution: 1 - sqrt(random)
-              // This pushes significantly more density to the bottom (progress near 0)
-              // progress 0 = bottom, 1 = top.
-              const r = Math.random();
-              const progress = 1 - Math.sqrt(Math.random());
-              const posT = getConePosition(treeHeight, treeRadius, progress);
-              // Add volume noise (fluffiness)
-              posT.x += (Math.random() - 0.5) * 1.0;
-              posT.z += (Math.random() - 0.5) * 1.0;
-              posT.y += (Math.random() - 0.5) * 1.0;
-              target[i * 3] = posT.x;
-              target[i * 3 + 1] = posT.y;
-              target[i * 3 + 2] = posT.z;
-              // Chaos Shape (Exploded)
-              const posC = randomVector3(treeHeight * 1.5);
-              chaos[i * 3] = posC.x;
-              chaos[i * 3 + 1] = posC.y;
-              chaos[i * 3 + 2] = posC.z;
-              randoms[i] = Math.random();
-          }
-          return { target, chaos, randoms };
-      };
-      export const generateSpiralData = (count, height, radius, turns) => {
-          const target = new Float32Array(count * 3);
-          const chaos = new Float32Array(count * 3);
-          for (let i = 0; i < count; i++) {
-              const t = i / count; // 0 to 1
-              // Spiral Math
-              const y = (t - 0.5) * height;
-              const r = (1 - t) * radius + 0.5; // Slight offset so it sits on leaves
-              const angle = t * Math.PI * 2 * turns;
-              target[i * 3] = r * Math.cos(angle);
-              target[i * 3 + 1] = y;
-              target[i * 3 + 2] = r * Math.sin(angle);
-              // Chaos
-              const posC = randomVector3(height * 1.2);
-              chaos[i * 3] = posC.x;
-              chaos[i * 3 + 1] = posC.y;
-              chaos[i * 3 + 2] = posC.z;
-          }
-          return { target, chaos };
-      };
-      export const lerp = (start, end, t) => {
-          return start * (1 - t) + end * t;
-      };",
-    "@/components/Foliage":"
-      import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-      import { useMemo, useRef } from 'react';
-      import { useFrame } from '@react-three/fiber';
-      import * as THREE from 'three';
-      import { generateFoliageData, lerp } from '@/utils/math';
-      const vertexShader = `
-        precision highp float;
-        uniform float uTime;
-        uniform float uMix;
-        uniform float uSize;
-        
-        attribute vec3 aTargetPos;
-        attribute vec3 aChaosPos;
-        attribute float aRandom;
-        
-        varying vec3 vPos;
-        varying float vRandom;
-        varying float vIsSnow;
-
-        void main() {
-          vRandom = aRandom;
-          vIsSnow = step(0.85, aRandom); // Top 15% random values become snow
-
-          // Interpolate position
-          vec3 pos = mix(aChaosPos, aTargetPos, uMix);
-          
-          // Breathing effect
-          float breath = sin(uTime + pos.y * 0.5) * 0.05 * uMix;
-          pos.x += pos.x * breath;
-          pos.z += pos.z * breath;
-
-          vPos = pos;
-
-          vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-          gl_Position = projectionMatrix * mvPosition;
-          
-          // Size attenuation
-          gl_PointSize = uSize * (20.0 / -mvPosition.z) * (0.6 + 0.8 * aRandom);
-        }
-      `;
-      const fragmentShader = `
-        precision highp float;
-        uniform vec3 uColorBottom;
-        uniform vec3 uColorTop;
-        
-        varying vec3 vPos;
-        varying float vRandom;
-        varying float vIsSnow;
-
-        void main() {
-          // Exact height normalization for tree (-9 to 9)
-          float h = (vPos.y + 9.0) / 18.0;
-          h = clamp(h, 0.0, 1.0);
-          
-          // Mix gradient
-          vec3 color = mix(uColorBottom, uColorTop, h);
-          
-          // Depth Variation
-          color *= 0.6 + 0.6 * vRandom;
-
-          // Apply Snow
-          // If vIsSnow is 1.0, mix with white
-          vec3 snowColor = vec3(0.95, 0.98, 1.0);
-          color = mix(color, snowColor, vIsSnow * 0.9); // 90% white blend
-
-          // Circular particle
-          float dist = length(gl_PointCoord - vec2(0.5));
-          if (dist > 0.5) discard;
-          
-          // Soft edge
-          float alpha = 1.0 - smoothstep(0.3, 0.5, dist);
-
-          gl_FragColor = vec4(color, alpha);
-        }
-      `;
-      const Foliage = ({ mixFactor, colors }) => {
-          // RESTORED: Full particle count for high fidelity on all devices
-          const count = 75000;
-          const materialRef = useRef(null);
-          const currentMixRef = useRef(1);
-          const { target, chaos, randoms } = useMemo(() => generateFoliageData(count, 18, 7.5), [count]);
-          const uniforms = useMemo(() => ({
-              uTime: { value: 0 },
-              uMix: { value: 1 },
-              uSize: { value: 4.0 },
-              uColorBottom: { value: new THREE.Color(colors.bottom) },
-              uColorTop: { value: new THREE.Color(colors.top) }
-          }), []);
-          useFrame((state, delta) => {
-              if (materialRef.current) {
-                  const speed = 2.0 * delta;
-                  currentMixRef.current = lerp(currentMixRef.current, mixFactor, speed);
-                  materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-                  materialRef.current.uniforms.uMix.value = currentMixRef.current;
-                  materialRef.current.uniforms.uColorBottom.value.set(colors.bottom);
-                  materialRef.current.uniforms.uColorTop.value.set(colors.top);
-              }
+  <!-- Service Worker Registration -->
+  <script src="/public/websocket-interceptor.js" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registered successfully with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.error('Service Worker registration failed:', error);
           });
-          return (_jsxs("points", { children: [_jsxs("bufferGeometry", { children: [_jsx("bufferAttribute", { attach: "attributes-position", count: count, array: target, itemSize: 3 }), _jsx("bufferAttribute", { attach: "attributes-aTargetPos", count: count, array: target, itemSize: 3 }), _jsx("bufferAttribute", { attach: "attributes-aChaosPos", count: count, array: chaos, itemSize: 3 }), _jsx("bufferAttribute", { attach: "attributes-aRandom", count: count, array: randoms, itemSize: 1 })] }), _jsx("shaderMaterial", { ref: materialRef, vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, transparent: true, depthWrite: false })] }));
-      };
-      export default Foliage;
-      ",
-    "@/components/Ornaments":"
-        import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import React, { useMemo, useRef, useLayoutEffect } from 'react';
-import { useFrame, useLoader } from '@react-three/fiber';
-import * as THREE from 'three';
-import { lerp, randomVector3 } from '@/utils/math';
-// --- Procedural Geometry Generators ---
-const createCandyCaneGeometry = () => {
-    // Create a path: Line up, then curve for the hook
-    const path = new THREE.CatmullRomCurve3([
+      });
+    } else {
+      console.log('Service workers are not supported in this browser.');
+    }
+  </script>
+
+  <!-- Environment Setup -->
+  <script>
+    const geminiUrl = window.location.origin + '/api-proxy';
+    window.API_KEY = 'UNUSED_PLACEHOLDER_FOR_API_KEY';
+    window.GEMINI_API_KEY = 'UNUSED_PLACEHOLDER_FOR_API_KEY';
+    window.process = window.process || {};
+    window.process.env = window.process.env || {};
+    window.process.env.API_KEY = window.API_KEY;
+    window.process.env.GEMINI_API_KEY = window.GEMINI_API_KEY;
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <!-- External Libraries via ESM -->
+  <script type="module">
+    // Import external dependencies
+    import React from 'https://esm.sh/react@18.2.0';
+    import ReactDOM from 'https://esm.sh/react-dom@18.2.0/client?external=react';
+    import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from 'https://esm.sh/react@18.2.0/jsx-runtime';
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    import { Canvas, useFrame, useThree, useLoader } from 'https://esm.sh/@react-three/fiber@8.15.16?external=react,react-dom,three';
+    import { Environment, Stars } from 'https://esm.sh/@react-three/drei@9.99.0?external=react,react-dom,three,@react-three/fiber';
+    import { EffectComposer, Bloom, Vignette } from 'https://esm.sh/@react-three/postprocessing@2.16.0?external=react,react-dom,three,@react-three/fiber';
+    import * as tf from 'https://esm.sh/@tensorflow/tfjs@4.17.0';
+    import * as handpose from 'https://esm.sh/@tensorflow-models/handpose@0.1.0?external=@tensorflow/tfjs';
+    import Webcam from 'https://esm.sh/react-webcam@7.2.0?external=react,react-dom';
+    
+    const { useMemo, useRef, useState, useEffect, useCallback, useLayoutEffect } = React;
+
+    // ============================================================================
+    // UTILITY FUNCTIONS - Math helpers
+    // ============================================================================
+    const randomVector3 = (r) => {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const x = r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta);
+      const z = r * Math.cos(phi);
+      return new THREE.Vector3(x, y, z);
+    };
+
+    const getConePosition = (height, radius, progress) => {
+      const y = (progress - 0.5) * height;
+      const r = (1 - progress) * radius;
+      const angle = Math.random() * Math.PI * 2;
+      const x = r * Math.cos(angle);
+      const z = r * Math.sin(angle);
+      return new THREE.Vector3(x, y, z);
+    };
+
+    const generateFoliageData = (count, treeHeight, treeRadius) => {
+      const target = new Float32Array(count * 3);
+      const chaos = new Float32Array(count * 3);
+      const randoms = new Float32Array(count);
+      
+      for (let i = 0; i < count; i++) {
+        const progress = 1 - Math.sqrt(Math.random());
+        const posT = getConePosition(treeHeight, treeRadius, progress);
+        
+        posT.x += (Math.random() - 0.5) * 1.0;
+        posT.z += (Math.random() - 0.5) * 1.0;
+        posT.y += (Math.random() - 0.5) * 1.0;
+        
+        target[i * 3] = posT.x;
+        target[i * 3 + 1] = posT.y;
+        target[i * 3 + 2] = posT.z;
+        
+        const posC = randomVector3(treeHeight * 1.5);
+        chaos[i * 3] = posC.x;
+        chaos[i * 3 + 1] = posC.y;
+        chaos[i * 3 + 2] = posC.z;
+        
+        randoms[i] = Math.random();
+      }
+      
+      return { target, chaos, randoms };
+    };
+
+    const generateSpiralData = (count, height, radius, turns) => {
+      const target = new Float32Array(count * 3);
+      const chaos = new Float32Array(count * 3);
+      
+      for (let i = 0; i < count; i++) {
+        const t = i / count;
+        const y = (t - 0.5) * height;
+        const r = (1 - t) * radius + 0.5;
+        const angle = t * Math.PI * 2 * turns;
+        
+        target[i * 3] = r * Math.cos(angle);
+        target[i * 3 + 1] = y;
+        target[i * 3 + 2] = r * Math.sin(angle);
+        
+        const posC = randomVector3(height * 1.2);
+        chaos[i * 3] = posC.x;
+        chaos[i * 3 + 1] = posC.y;
+        chaos[i * 3 + 2] = posC.z;
+      }
+      
+      return { target, chaos };
+    };
+
+    const lerp = (start, end, t) => {
+      return start * (1 - t) + end * t;
+    };
+
+    // ============================================================================
+    // COMPONENT - Foliage (Tree leaves)
+    // ============================================================================
+    const vertexShader = `
+      precision highp float;
+      uniform float uTime;
+      uniform float uMix;
+      uniform float uSize;
+      
+      attribute vec3 aTargetPos;
+      attribute vec3 aChaosPos;
+      attribute float aRandom;
+      
+      varying vec3 vPos;
+      varying float vRandom;
+      varying float vIsSnow;
+
+      void main() {
+        vRandom = aRandom;
+        vIsSnow = step(0.85, aRandom);
+
+        vec3 pos = mix(aChaosPos, aTargetPos, uMix);
+        
+        float breath = sin(uTime + pos.y * 0.5) * 0.05 * uMix;
+        pos.x += pos.x * breath;
+        pos.z += pos.z * breath;
+
+        vPos = pos;
+
+        vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+        gl_Position = projectionMatrix * mvPosition;
+        
+        gl_PointSize = uSize * (20.0 / -mvPosition.z) * (0.6 + 0.8 * aRandom);
+      }
+    `;
+
+    const fragmentShader = `
+      precision highp float;
+      uniform vec3 uColorBottom;
+      uniform vec3 uColorTop;
+      
+      varying vec3 vPos;
+      varying float vRandom;
+      varying float vIsSnow;
+
+      void main() {
+        float h = (vPos.y + 9.0) / 18.0;
+        h = clamp(h, 0.0, 1.0);
+        
+        vec3 color = mix(uColorBottom, uColorTop, h);
+        color *= 0.6 + 0.6 * vRandom;
+
+        vec3 snowColor = vec3(0.95, 0.98, 1.0);
+        color = mix(color, snowColor, vIsSnow * 0.9);
+
+        float dist = length(gl_PointCoord - vec2(0.5));
+        if (dist > 0.5) discard;
+        
+        float alpha = 1.0 - smoothstep(0.3, 0.5, dist);
+
+        gl_FragColor = vec4(color, alpha);
+      }
+    `;
+
+    const Foliage = ({ mixFactor, colors }) => {
+      const count = 75000;
+      const materialRef = useRef(null);
+      const currentMixRef = useRef(1);
+      const { target, chaos, randoms } = useMemo(() => generateFoliageData(count, 18, 7.5), [count]);
+      
+      const uniforms = useMemo(() => ({
+        uTime: { value: 0 },
+        uMix: { value: 1 },
+        uSize: { value: 4.0 },
+        uColorBottom: { value: new THREE.Color(colors.bottom) },
+        uColorTop: { value: new THREE.Color(colors.top) }
+      }), []);
+      
+      useFrame((state, delta) => {
+        if (materialRef.current) {
+          const speed = 2.0 * delta;
+          currentMixRef.current = lerp(currentMixRef.current, mixFactor, speed);
+          materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+          materialRef.current.uniforms.uMix.value = currentMixRef.current;
+          materialRef.current.uniforms.uColorBottom.value.set(colors.bottom);
+          materialRef.current.uniforms.uColorTop.value.set(colors.top);
+        }
+      });
+      
+      return _jsxs("points", { 
+        children: [
+          _jsxs("bufferGeometry", { 
+            children: [
+              _jsx("bufferAttribute", { attach: "attributes-position", count: count, array: target, itemSize: 3 }),
+              _jsx("bufferAttribute", { attach: "attributes-aTargetPos", count: count, array: target, itemSize: 3 }),
+              _jsx("bufferAttribute", { attach: "attributes-aChaosPos", count: count, array: chaos, itemSize: 3 }),
+              _jsx("bufferAttribute", { attach: "attributes-aRandom", count: count, array: randoms, itemSize: 1 })
+            ] 
+          }),
+          _jsx("shaderMaterial", { 
+            ref: materialRef, 
+            vertexShader: vertexShader, 
+            fragmentShader: fragmentShader, 
+            uniforms: uniforms, 
+            transparent: true, 
+            depthWrite: false 
+          })
+        ] 
+      });
+    };
+
+    // ============================================================================
+    // COMPONENT - Ornaments (Balls, Stars, Candy Canes, etc.)
+    // ============================================================================
+    const createCandyCaneGeometry = () => {
+      const path = new THREE.CatmullRomCurve3([
         new THREE.Vector3(0, -1.0, 0),
         new THREE.Vector3(0, 0.5, 0),
         new THREE.Vector3(0.1, 0.8, 0),
         new THREE.Vector3(0.4, 0.9, 0),
         new THREE.Vector3(0.6, 0.6, 0)
-    ]);
-    // Tube
-    const geometry = new THREE.TubeGeometry(path, 32, 0.12, 8, false);
-    geometry.center(); // Crucial for rotation
-    return geometry;
-};
-const createStarGeometry = (points, outerRadius, innerRadius, depth) => {
-    const shape = new THREE.Shape();
-    const step = (Math.PI * 2) / (points * 2);
-    shape.moveTo(0, outerRadius);
-    for (let i = 0; i < points * 2; i++) {
+      ]);
+      const geometry = new THREE.TubeGeometry(path, 32, 0.12, 8, false);
+      geometry.center();
+      return geometry;
+    };
+
+    const createStarGeometry = (points, outerRadius, innerRadius, depth) => {
+      const shape = new THREE.Shape();
+      const step = (Math.PI * 2) / (points * 2);
+      shape.moveTo(0, outerRadius);
+      
+      for (let i = 0; i < points * 2; i++) {
         const radius = (i % 2 === 0) ? outerRadius : innerRadius;
         const angle = i * step;
         shape.lineTo(Math.sin(angle) * radius, Math.cos(angle) * radius);
-    }
-    shape.closePath();
-    const geometry = new THREE.ExtrudeGeometry(shape, {
+      }
+      shape.closePath();
+      
+      const geometry = new THREE.ExtrudeGeometry(shape, {
         depth: depth,
         bevelEnabled: true,
         bevelThickness: 0.05,
         bevelSize: 0.05,
         bevelSegments: 2
-    });
-    geometry.center();
-    return geometry;
-};
-const generateCandyStripeTexture = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 128;
-    canvas.height = 128;
-    const ctx = canvas.getContext('2d');
-    if (!ctx)
-        return null;
-    // White background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, 128, 128);
-    // Red stripes
-    ctx.fillStyle = '#cc0000'; // Classic darker red
-    // Draw diagonal stripes
-    // To create a seamless spiral on the tube, we draw diagonal lines.
-    // 3 stripes per tile
-    for (let i = -128; i < 256; i += 42) {
+      });
+      geometry.center();
+      return geometry;
+    };
+
+    const generateCandyStripeTexture = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 128;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+      
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 128, 128);
+      ctx.fillStyle = '#cc0000';
+      
+      for (let i = -128; i < 256; i += 42) {
         ctx.beginPath();
         ctx.moveTo(i, 0);
         ctx.lineTo(i + 20, 0);
-        ctx.lineTo(i + 20 + 128, 128); // Slope of 1 (128x128)
+        ctx.lineTo(i + 20 + 128, 128);
         ctx.lineTo(i + 128, 128);
         ctx.closePath();
         ctx.fill();
-    }
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.wrapT = THREE.RepeatWrapping;
-    // Repeat along the length (U) to create multiple spiral turns.
-    // Repeat 4 times along the length, 1 time around the circumference.
-    tex.repeat.set(4, 1);
-    return tex;
-};
-const generateSignatureTexture = (text) => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 128;
-    const ctx = canvas.getContext('2d');
-    if (!ctx)
-        return null;
-    // Clear background (transparent)
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (!text)
-        return new THREE.CanvasTexture(canvas);
-    // Text Style
-    ctx.fillStyle = '#111111'; // Almost Black ink
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    // Use the loaded font
-    ctx.font = "bold 60px 'Monsieur La Doulaise', cursive";
-    // Draw
-    ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.needsUpdate = true;
-    return tex;
-};
-// --- Base Mesh Component for Photos ---
-const PhotoFrameMesh = ({ item, mixFactor, texture, signatureTexture }) => {
-    const groupRef = useRef(null);
-    const innerRef = useRef(null);
-    const photoMatRef = useRef(null);
-    const frameMatRef = useRef(null);
-    const currentMixRef = useRef(1);
-    const vecPos = useMemo(() => new THREE.Vector3(), []);
-    const vecScale = useMemo(() => new THREE.Vector3(), []);
-    const vecWorld = useMemo(() => new THREE.Vector3(), []);
-    const { frameArgs, photoArgs, photoPos, textPos, textArgs } = useMemo(() => {
+      }
+      
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(4, 1);
+      return tex;
+    };
+
+    const generateSignatureTexture = (text) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!text) return new THREE.CanvasTexture(canvas);
+      
+      ctx.fillStyle = '#111111';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = "bold 60px 'Monsieur La Doulaise', cursive";
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+      
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.needsUpdate = true;
+      return tex;
+    };
+
+    const generateCardTexture = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 320;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, 256, 320);
+      }
+      return new THREE.CanvasTexture(canvas);
+    };
+
+    const PhotoFrameMesh = ({ item, mixFactor, texture, signatureTexture }) => {
+      const groupRef = useRef(null);
+      const innerRef = useRef(null);
+      const photoMatRef = useRef(null);
+      const frameMatRef = useRef(null);
+      const currentMixRef = useRef(1);
+      const vecPos = useMemo(() => new THREE.Vector3(), []);
+      const vecScale = useMemo(() => new THREE.Vector3(), []);
+      const vecWorld = useMemo(() => new THREE.Vector3(), []);
+      
+      const { frameArgs, photoArgs, photoPos, textPos, textArgs } = useMemo(() => {
         const img = texture.image;
         const width = img?.width || 1;
         const height = img?.height || 1;
         const aspect = width / height;
         const maxSize = 0.85;
         let pw, ph;
+        
         if (aspect >= 1) {
-            pw = maxSize;
-            ph = maxSize / aspect;
+          pw = maxSize;
+          ph = maxSize / aspect;
+        } else {
+          ph = maxSize;
+          pw = maxSize * aspect;
         }
-        else {
-            ph = maxSize;
-            pw = maxSize * aspect;
-        }
+        
         const mSide = 0.08;
         const mTop = 0.08;
         const mBottom = 0.20;
         const fw = pw + mSide * 2;
         const fh = ph + mTop + mBottom;
         const py = (fh / 2) - mTop - (ph / 2);
-        // Text Position: Bottom whitespace center
-        // Frame goes from -fh/2 to fh/2
-        // Bottom edge is -fh/2
-        // Text center should be -fh/2 + mBottom/2
         const ty = -(fh / 2) + (mBottom / 2);
+        
         return {
-            frameArgs: [fw, fh, 0.05],
-            photoArgs: [pw, ph],
-            photoPos: [0, py, 0.03],
-            textPos: [0, ty, 0.03],
-            textArgs: [fw, mBottom]
+          frameArgs: [fw, fh, 0.05],
+          photoArgs: [pw, ph],
+          photoPos: [0, py, 0.03],
+          textPos: [0, ty, 0.03],
+          textArgs: [fw, mBottom]
         };
-    }, [texture]);
-    useFrame((state, delta) => {
-        if (!groupRef.current || !innerRef.current)
-            return;
+      }, [texture]);
+      
+      useFrame((state, delta) => {
+        if (!groupRef.current || !innerRef.current) return;
+        
         const speed = 2.0 * delta;
         currentMixRef.current = lerp(currentMixRef.current, mixFactor, speed);
         const t = currentMixRef.current;
+        
         vecPos.lerpVectors(item.chaosPos, item.targetPos, t);
         groupRef.current.position.copy(vecPos);
         vecScale.lerpVectors(item.chaosScale, item.targetScale, t);
-        // --- Responsive Scaling Logic ---
-        // Get the current viewport width from state (in 3D units at z=0)
+        
         const { width } = state.viewport;
-        // Determine if screen is "small" (mobile/tablet portrait)
         const isSmallScreen = width < 22;
-        // Scale down photos on small screens to fit better
         const responsiveBaseScale = isSmallScreen ? 0.6 : 1.0;
         vecScale.multiplyScalar(responsiveBaseScale);
-        // --------------------------------
+        
         const effectStrength = (1.0 - t);
         if (t < 0.99) {
-            groupRef.current.getWorldPosition(vecWorld);
-            const distToCamera = vecWorld.distanceTo(state.camera.position);
-            // Dynamic zoom adjustment:
-            // On mobile, reduce the max zoom when close to avoid overwhelming the screen
-            const maxZoom = isSmallScreen ? 1.1 : 1.5;
-            const minZoom = 0.6;
-            const perspectiveFactor = THREE.MathUtils.mapLinear(distToCamera, 10, 60, maxZoom, minZoom);
-            const dynamicScale = lerp(1.0, perspectiveFactor, effectStrength);
-            vecScale.multiplyScalar(dynamicScale);
-            if (photoMatRef.current) {
-                const brightness = THREE.MathUtils.mapLinear(distToCamera, 12, 50, 0.9, 0.2);
-                photoMatRef.current.emissiveIntensity = Math.max(0.2, brightness) * effectStrength;
-            }
+          groupRef.current.getWorldPosition(vecWorld);
+          const distToCamera = vecWorld.distanceTo(state.camera.position);
+          const maxZoom = isSmallScreen ? 1.1 : 1.5;
+          const minZoom = 0.6;
+          const perspectiveFactor = THREE.MathUtils.mapLinear(distToCamera, 10, 60, maxZoom, minZoom);
+          const dynamicScale = lerp(1.0, perspectiveFactor, effectStrength);
+          vecScale.multiplyScalar(dynamicScale);
+          
+          if (photoMatRef.current) {
+            const brightness = THREE.MathUtils.mapLinear(distToCamera, 12, 50, 0.9, 0.2);
+            photoMatRef.current.emissiveIntensity = Math.max(0.2, brightness) * effectStrength;
+          }
+        } else {
+          if (photoMatRef.current) photoMatRef.current.emissiveIntensity = 0.25;
         }
-        else {
-            if (photoMatRef.current)
-                photoMatRef.current.emissiveIntensity = 0.25;
-        }
+        
         groupRef.current.scale.copy(vecScale);
+        
         if (t > 0.8) {
-            groupRef.current.lookAt(0, groupRef.current.position.y, 0);
-            groupRef.current.rotateY(Math.PI);
-            innerRef.current.rotation.z = lerp(innerRef.current.rotation.z, 0, speed);
+          groupRef.current.lookAt(0, groupRef.current.position.y, 0);
+          groupRef.current.rotateY(Math.PI);
+          innerRef.current.rotation.z = lerp(innerRef.current.rotation.z, 0, speed);
+        } else {
+          groupRef.current.lookAt(state.camera.position);
+          innerRef.current.rotation.z = lerp(innerRef.current.rotation.z, item.chaosTilt, speed);
         }
-        else {
-            groupRef.current.lookAt(state.camera.position);
-            innerRef.current.rotation.z = lerp(innerRef.current.rotation.z, item.chaosTilt, speed);
-        }
-    });
-    return (_jsx("group", { ref: groupRef, children: _jsxs("group", { ref: innerRef, children: [_jsxs("mesh", { children: [_jsx("boxGeometry", { args: frameArgs }), _jsx("meshStandardMaterial", { ref: frameMatRef, color: "#ffffff", roughness: 1.0, metalness: 0.0, emissive: "#ffffff", emissiveIntensity: 0.6, toneMapped: false })] }), _jsxs("mesh", { position: photoPos, children: [_jsx("planeGeometry", { args: photoArgs }), _jsx("meshStandardMaterial", { ref: photoMatRef, map: texture, emissiveMap: texture, roughness: 0.4, metalness: 0.0, color: "white", emissive: "white", emissiveIntensity: 0.25, toneMapped: false })] }), signatureTexture && (_jsxs("mesh", { position: textPos, children: [_jsx("planeGeometry", { args: textArgs }), _jsx("meshBasicMaterial", { map: signatureTexture, transparent: true, opacity: 0.85, depthWrite: false })] }))] }) }));
-};
-// --- Procedural Gift Box Component ---
-const GiftBoxMesh = ({ item, mixFactor }) => {
-    const groupRef = useRef(null);
-    const currentMixRef = useRef(1);
-    const vecPos = useMemo(() => new THREE.Vector3(), []);
-    const vecScale = useMemo(() => new THREE.Vector3(), []);
-    // Auto-detect ribbon color for contrast
-    const { ribbonColor, ribbonMaterial } = useMemo(() => {
+      });
+      
+      return _jsx("group", { 
+        ref: groupRef, 
+        children: _jsxs("group", { 
+          ref: innerRef, 
+          children: [
+            _jsxs("mesh", { 
+              children: [
+                _jsx("boxGeometry", { args: frameArgs }),
+                _jsx("meshStandardMaterial", { 
+                  ref: frameMatRef, 
+                  color: "#ffffff", 
+                  roughness: 1.0, 
+                  metalness: 0.0, 
+                  emissive: "#ffffff", 
+                  emissiveIntensity: 0.6, 
+                  toneMapped: false 
+                })
+              ] 
+            }),
+            _jsxs("mesh", { 
+              position: photoPos, 
+              children: [
+                _jsx("planeGeometry", { args: photoArgs }),
+                _jsx("meshStandardMaterial", { 
+                  ref: photoMatRef, 
+                  map: texture, 
+                  emissiveMap: texture, 
+                  roughness: 0.4, 
+                  metalness: 0.0, 
+                  color: "white", 
+                  emissive: "white", 
+                  emissiveIntensity: 0.25, 
+                  toneMapped: false 
+                })
+              ] 
+            }),
+            signatureTexture && _jsxs("mesh", { 
+              position: textPos, 
+              children: [
+                _jsx("planeGeometry", { args: textArgs }),
+                _jsx("meshBasicMaterial", { 
+                  map: signatureTexture, 
+                  transparent: true, 
+                  opacity: 0.85, 
+                  depthWrite: false 
+                })
+              ] 
+            })
+          ] 
+        }) 
+      });
+    };
+
+    const GiftBoxMesh = ({ item, mixFactor }) => {
+      const groupRef = useRef(null);
+      const currentMixRef = useRef(1);
+      const vecPos = useMemo(() => new THREE.Vector3(), []);
+      const vecScale = useMemo(() => new THREE.Vector3(), []);
+      
+      const { ribbonColor, ribbonMaterial } = useMemo(() => {
         const c = item.color;
         const luminance = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
-        let ribColorStr = "#FFD700"; // Default Gold
-        // Logic for ribbon color selection:
-        // If box is very blue/cool, use Silver ribbon.
-        // If box is bright/white/gold, use Red ribbon.
-        // Otherwise (Dark Red/Green), use Gold ribbon.
+        let ribColorStr = "#FFD700";
+        
         if (c.b > c.r + 0.2 && c.b > c.g + 0.2) {
-            ribColorStr = "#E0E0E0"; // Silver
+          ribColorStr = "#E0E0E0";
+        } else if (luminance > 0.6) {
+          ribColorStr = "#AA0000";
         }
-        else if (luminance > 0.6) {
-            ribColorStr = "#AA0000"; // Red
-        }
+        
         return {
-            ribbonColor: new THREE.Color(ribColorStr),
-            ribbonMaterial: new THREE.MeshStandardMaterial({
-                color: ribColorStr,
-                roughness: 0.2,
-                metalness: 0.8,
-                emissive: ribColorStr,
-                emissiveIntensity: 0.2
-            })
+          ribbonColor: new THREE.Color(ribColorStr),
+          ribbonMaterial: new THREE.MeshStandardMaterial({
+            color: ribColorStr,
+            roughness: 0.2,
+            metalness: 0.8,
+            emissive: ribColorStr,
+            emissiveIntensity: 0.2
+          })
         };
-    }, [item.color]);
-    useFrame((state, delta) => {
-        if (!groupRef.current)
-            return;
+      }, [item.color]);
+      
+      useFrame((state, delta) => {
+        if (!groupRef.current) return;
+        
         const speed = 2.0 * delta;
         currentMixRef.current = lerp(currentMixRef.current, mixFactor, speed);
         const t = currentMixRef.current;
+        
         vecPos.lerpVectors(item.chaosPos, item.targetPos, t);
         groupRef.current.position.copy(vecPos);
         vecScale.lerpVectors(item.chaosScale, item.targetScale, t);
         groupRef.current.scale.copy(vecScale);
         groupRef.current.rotation.copy(item.rotation);
+        
         if (t < 0.5) {
-            groupRef.current.rotation.x += delta * 0.5;
-            groupRef.current.rotation.y += delta * 0.5;
+          groupRef.current.rotation.x += delta * 0.5;
+          groupRef.current.rotation.y += delta * 0.5;
         }
-    });
-    return (_jsxs("group", { ref: groupRef, children: [_jsxs("mesh", { castShadow: true, receiveShadow: true, children: [_jsx("boxGeometry", { args: [1, 1, 1] }), _jsx("meshStandardMaterial", { color: item.color, roughness: 0.4, metalness: 0.1 })] }), _jsx("mesh", { scale: [0.2, 1.01, 1.01], material: ribbonMaterial, children: _jsx("boxGeometry", { args: [1, 1, 1] }) }), _jsx("mesh", { scale: [1.01, 1.01, 0.2], material: ribbonMaterial, children: _jsx("boxGeometry", { args: [1, 1, 1] }) }), _jsx("mesh", { position: [0, 0.5, 0], rotation: [0, Math.PI / 4, 0], material: ribbonMaterial, scale: [0.35, 0.35, 0.35], children: _jsx("torusKnotGeometry", { args: [0.6, 0.15, 64, 8, 2, 3] }) })] }));
-};
-const generateCardTexture = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 320;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(0, 0, 256, 320);
-    }
-    return new THREE.CanvasTexture(canvas);
-};
-const UserPhotoOrnament = ({ item, mixFactor, url, signatureTexture }) => {
-    const texture = useLoader(THREE.TextureLoader, url);
-    return _jsx(PhotoFrameMesh, { item: item, mixFactor: mixFactor, texture: texture, signatureTexture: signatureTexture });
-};
-const SuspensePhotoOrnament = (props) => {
-    return (_jsx(React.Suspense, { fallback: _jsx("group", { position: props.item.targetPos, children: _jsxs("mesh", { scale: props.item.targetScale, children: [_jsx("boxGeometry", { args: [1, 1.2, 0.05] }), _jsx("meshStandardMaterial", { color: "#eee" })] }) }), children: _jsx(UserPhotoOrnament, { ...props }) }));
-};
-// Defines phase offsets for different ornament types to prevent overlap
-const getTypeOffsetIndex = (type) => {
-    switch (type) {
+      });
+      
+      return _jsxs("group", { 
+        ref: groupRef, 
+        children: [
+          _jsxs("mesh", { 
+            castShadow: true, 
+            receiveShadow: true, 
+            children: [
+              _jsx("boxGeometry", { args: [1, 1, 1] }),
+              _jsx("meshStandardMaterial", { 
+                color: item.color, 
+                roughness: 0.4, 
+                metalness: 0.1 
+              })
+            ] 
+          }),
+          _jsx("mesh", { 
+            scale: [0.2, 1.01, 1.01], 
+            material: ribbonMaterial, 
+            children: _jsx("boxGeometry", { args: [1, 1, 1] }) 
+          }),
+          _jsx("mesh", { 
+            scale: [1.01, 1.01, 0.2], 
+            material: ribbonMaterial, 
+            children: _jsx("boxGeometry", { args: [1, 1, 1] }) 
+          }),
+          _jsx("mesh", { 
+            position: [0, 0.5, 0], 
+            rotation: [0, Math.PI / 4, 0], 
+            material: ribbonMaterial, 
+            scale: [0.35, 0.35, 0.35], 
+            children: _jsx("torusKnotGeometry", { args: [0.6, 0.15, 64, 8, 2, 3] }) 
+          })
+        ] 
+      });
+    };
+
+    const UserPhotoOrnament = ({ item, mixFactor, url, signatureTexture }) => {
+      const texture = useLoader(THREE.TextureLoader, url);
+      return _jsx(PhotoFrameMesh, { 
+        item: item, 
+        mixFactor: mixFactor, 
+        texture: texture, 
+        signatureTexture: signatureTexture 
+      });
+    };
+
+    const SuspensePhotoOrnament = (props) => {
+      return _jsx(React.Suspense, { 
+        fallback: _jsx("group", { 
+          position: props.item.targetPos, 
+          children: _jsxs("mesh", { 
+            scale: props.item.targetScale, 
+            children: [
+              _jsx("boxGeometry", { args: [1, 1.2, 0.05] }),
+              _jsx("meshStandardMaterial", { color: "#eee" })
+            ] 
+          }) 
+        }), 
+        children: _jsx(UserPhotoOrnament, { ...props }) 
+      });
+    };
+
+    const getTypeOffsetIndex = (type) => {
+      switch (type) {
         case 'BALL': return 0;
         case 'BOX': return 1;
         case 'STAR': return 2;
@@ -494,1003 +629,1207 @@ const getTypeOffsetIndex = (type) => {
         case 'CRYSTAL': return 4;
         case 'PHOTO': return 5;
         default: return 0;
-    }
-};
-const Ornaments = ({ mixFactor, type, count, colors, scale = 1, userImages = [], signatureText }) => {
-    const meshRef = useRef(null);
-    const dummy = useMemo(() => new THREE.Object3D(), []);
-    const currentMixRef = useRef(1);
-    const candyTexture = useMemo(() => {
-        if (type === 'CANDY')
-            return generateCandyStripeTexture();
+      }
+    };
+
+    const Ornaments = ({ mixFactor, type, count, colors, scale = 1, userImages = [], signatureText }) => {
+      const meshRef = useRef(null);
+      const dummy = useMemo(() => new THREE.Object3D(), []);
+      const currentMixRef = useRef(1);
+      
+      const candyTexture = useMemo(() => {
+        if (type === 'CANDY') return generateCandyStripeTexture();
         return null;
-    }, [type]);
-    // Generate signature texture
-    // Only generate if type is PHOTO and we have text
-    const signatureTexture = useMemo(() => {
+      }, [type]);
+      
+      const signatureTexture = useMemo(() => {
         if (type === 'PHOTO' && signatureText) {
-            return generateSignatureTexture(signatureText);
+          return generateSignatureTexture(signatureText);
         }
         return null;
-    }, [type, signatureText]);
-    // Generate specific geometry based on type
-    const geometry = useMemo(() => {
+      }, [type, signatureText]);
+      
+      const geometry = useMemo(() => {
         switch (type) {
-            case 'CANDY':
-                return createCandyCaneGeometry();
-            case 'CRYSTAL': // Snowflake
-                return createStarGeometry(6, 1.0, 0.3, 0.1);
-            case 'STAR':
-                return createStarGeometry(5, 1.0, 0.5, 0.2);
-            case 'BALL':
-                return new THREE.SphereGeometry(1, 16, 16);
-            case 'BOX':
-            default:
-                return new THREE.BoxGeometry(1, 1, 1);
+          case 'CANDY':
+            return createCandyCaneGeometry();
+          case 'CRYSTAL':
+            return createStarGeometry(6, 1.0, 0.3, 0.1);
+          case 'STAR':
+            return createStarGeometry(5, 1.0, 0.5, 0.2);
+          case 'BALL':
+            return new THREE.SphereGeometry(1, 16, 16);
+          case 'BOX':
+          default:
+            return new THREE.BoxGeometry(1, 1, 1);
         }
-    }, [type]);
-    const data = useMemo(() => {
+      }, [type]);
+      
+      const data = useMemo(() => {
         const items = [];
-        // Golden Spiral Constants
-        const goldenAngle = Math.PI * (3 - Math.sqrt(5)); // ~2.399 rads
+        const goldenAngle = Math.PI * (3 - Math.sqrt(5));
         const treeHeight = 18;
         const treeRadiusBase = 7.5;
-        const apexY = 9; // Top of the foliage volume
-        // Phase offset per type to avoid different ornaments overlapping
+        const apexY = 9;
         const typeIndex = getTypeOffsetIndex(type);
-        const angleOffset = typeIndex * (Math.PI * 2 / 6); // Spread 6 types over 360 deg
+        const angleOffset = typeIndex * (Math.PI * 2 / 6);
+        
         for (let i = 0; i < count; i++) {
-            // --- Deterministic Golden Spiral Position ---
-            // Vertical distribution:
-            // We want uniform density on the conical surface.
-            // Surface area of cone slice at distance d from apex is proportional to d^2.
-            // So cumulative distribution function CDF(d) ~ d^2.
-            // Inverse CDF for uniform variable u [0,1] is d ~ sqrt(u).
-            // This means we need more points near the bottom (max d).
-            // Use (i+1)/count to avoid 0 radius at exact apex
-            // Limit to 0.9 (90%) so ornaments don't hang below the tree bottom
-            const progress = Math.sqrt((i + 1) / count) * 0.9; // 0 (Top) -> 0.9 (Near Bottom)
-            const r = progress * treeRadiusBase;
-            const y = apexY - progress * treeHeight;
-            const theta = i * goldenAngle + angleOffset;
-            // Convert polar to Cartesian
-            const x = r * Math.cos(theta);
-            const z = r * Math.sin(theta);
-            const tPos = new THREE.Vector3(x, y, z);
-            // Push out slightly to sit on surface
-            const pushOut = (type === 'STAR' || type === 'PHOTO') ? 1.15 : 1.08;
-            tPos.multiplyScalar(pushOut);
-            // --- Chaos Position (Random) ---
-            let cPos;
-            let chaosTilt = 0;
-            if (type === 'PHOTO') {
-                // Special chaos arrangement for photos
-                const chaosRadius = 18;
-                const chaosHeightRange = 12;
-                const chaosY = ((i / count) - 0.5) * chaosHeightRange;
-                // Use simple spiral for chaos too, just wider
-                const chaosTheta = i * goldenAngle;
-                cPos = new THREE.Vector3(chaosRadius * Math.cos(chaosTheta), chaosY, chaosRadius * Math.sin(chaosTheta));
-                chaosTilt = ((i % 5) - 2) * 0.15;
-            }
-            else {
-                cPos = randomVector3(25);
-            }
-            const colorHex = colors ? colors[Math.floor(Math.random() * colors.length)] : '#ffffff';
-            const baseScaleVec = new THREE.Vector3(1, 1, 1);
-            const randScale = Math.random() * 0.4 + 0.8;
-            if (type === 'CANDY') {
-                baseScaleVec.setScalar(0.7);
-            }
-            else if (type === 'CRYSTAL') {
-                baseScaleVec.setScalar(0.6); // Snowflakes
-            }
-            else if (type === 'STAR') {
-                baseScaleVec.setScalar(0.7);
-            }
-            else if (type === 'BOX') {
-                // Randomized aspect ratio for gift boxes
-                baseScaleVec.set(1.0 + Math.random() * 0.3, 0.7 + Math.random() * 0.4, 1.0 + Math.random() * 0.3);
-            }
-            const targetScale = baseScaleVec.clone().multiplyScalar(scale * randScale);
-            let chaosScale = targetScale.clone();
-            if (type === 'PHOTO') {
-                const photoScale = 3.5 + Math.random() * 1.5;
-                chaosScale.multiplyScalar(photoScale);
-            }
-            items.push({
-                chaosPos: cPos,
-                targetPos: tPos,
-                rotation: new THREE.Euler(Math.random() * Math.PI, Math.random() * Math.PI, 0),
-                color: new THREE.Color(colorHex),
-                targetScale: targetScale,
-                chaosScale: chaosScale,
-                chaosTilt: chaosTilt
-            });
+          const progress = Math.sqrt((i + 1) / count) * 0.9;
+          const r = progress * treeRadiusBase;
+          const y = apexY - progress * treeHeight;
+          const theta = i * goldenAngle + angleOffset;
+          const x = r * Math.cos(theta);
+          const z = r * Math.sin(theta);
+          const tPos = new THREE.Vector3(x, y, z);
+          const pushOut = (type === 'STAR' || type === 'PHOTO') ? 1.15 : 1.08;
+          tPos.multiplyScalar(pushOut);
+          
+          let cPos;
+          let chaosTilt = 0;
+          
+          if (type === 'PHOTO') {
+            const chaosRadius = 18;
+            const chaosHeightRange = 12;
+            const chaosY = ((i / count) - 0.5) * chaosHeightRange;
+            const chaosTheta = i * goldenAngle;
+            cPos = new THREE.Vector3(
+              chaosRadius * Math.cos(chaosTheta), 
+              chaosY, 
+              chaosRadius * Math.sin(chaosTheta)
+            );
+            chaosTilt = ((i % 5) - 2) * 0.15;
+          } else {
+            cPos = randomVector3(25);
+          }
+          
+          const colorHex = colors ? colors[Math.floor(Math.random() * colors.length)] : '#ffffff';
+          const baseScaleVec = new THREE.Vector3(1, 1, 1);
+          const randScale = Math.random() * 0.4 + 0.8;
+          
+          if (type === 'CANDY') {
+            baseScaleVec.setScalar(0.7);
+          } else if (type === 'CRYSTAL') {
+            baseScaleVec.setScalar(0.6);
+          } else if (type === 'STAR') {
+            baseScaleVec.setScalar(0.7);
+          } else if (type === 'BOX') {
+            baseScaleVec.set(
+              1.0 + Math.random() * 0.3, 
+              0.7 + Math.random() * 0.4, 
+              1.0 + Math.random() * 0.3
+            );
+          }
+          
+          const targetScale = baseScaleVec.clone().multiplyScalar(scale * randScale);
+          let chaosScale = targetScale.clone();
+          
+          if (type === 'PHOTO') {
+            const photoScale = 3.5 + Math.random() * 1.5;
+            chaosScale.multiplyScalar(photoScale);
+          }
+          
+          items.push({
+            chaosPos: cPos,
+            targetPos: tPos,
+            rotation: new THREE.Euler(Math.random() * Math.PI, Math.random() * Math.PI, 0),
+            color: new THREE.Color(colorHex),
+            targetScale: targetScale,
+            chaosScale: chaosScale,
+            chaosTilt: chaosTilt
+          });
         }
+        
         return items;
-    }, [count, type, colors, scale]);
-    const fallbackTextures = useMemo(() => {
-        if (type !== 'PHOTO')
-            return [];
+      }, [count, type, colors, scale]);
+      
+      const fallbackTextures = useMemo(() => {
+        if (type !== 'PHOTO') return [];
         return [generateCardTexture()];
-    }, [type]);
-    useLayoutEffect(() => {
-        // Skip instanced logic for types that use individual meshes
-        if (!meshRef.current || type === 'PHOTO' || type === 'BOX')
-            return;
+      }, [type]);
+      
+      useLayoutEffect(() => {
+        if (!meshRef.current || type === 'PHOTO' || type === 'BOX') return;
+        
         data.forEach((item, i) => {
-            // If Candy, we force white so texture renders correctly.
-            // If other types, we use the random assigned color.
-            const color = type === 'CANDY' ? new THREE.Color('#ffffff') : item.color;
-            meshRef.current.setColorAt(i, color);
-            dummy.position.copy(item.targetPos);
-            dummy.scale.copy(item.targetScale);
-            dummy.rotation.copy(item.rotation);
-            dummy.updateMatrix();
-            meshRef.current.setMatrixAt(i, dummy.matrix);
+          const color = type === 'CANDY' ? new THREE.Color('#ffffff') : item.color;
+          meshRef.current.setColorAt(i, color);
+          dummy.position.copy(item.targetPos);
+          dummy.scale.copy(item.targetScale);
+          dummy.rotation.copy(item.rotation);
+          dummy.updateMatrix();
+          meshRef.current.setMatrixAt(i, dummy.matrix);
         });
+        
         if (meshRef.current.instanceColor) {
-            meshRef.current.instanceColor.needsUpdate = true;
+          meshRef.current.instanceColor.needsUpdate = true;
         }
         meshRef.current.instanceMatrix.needsUpdate = true;
-    }, [data, type, dummy]);
-    useFrame((state, delta) => {
-        // Skip instanced update for complex types
-        if (!meshRef.current || type === 'PHOTO' || type === 'BOX')
-            return;
+      }, [data, type, dummy]);
+      
+      useFrame((state, delta) => {
+        if (!meshRef.current || type === 'PHOTO' || type === 'BOX') return;
+        
         const speed = 2.0 * delta;
         currentMixRef.current = lerp(currentMixRef.current, mixFactor, speed);
         const t = currentMixRef.current;
         const currentPos = new THREE.Vector3();
         const currentScale = new THREE.Vector3();
+        
         data.forEach((item, i) => {
-            currentPos.lerpVectors(item.chaosPos, item.targetPos, t);
-            dummy.position.copy(currentPos);
-            if (type === 'STAR' && t > 0.8) {
-                dummy.lookAt(0, currentPos.y, 0);
-                dummy.rotateZ(Math.PI / 2); // Orient star to face out
+          currentPos.lerpVectors(item.chaosPos, item.targetPos, t);
+          dummy.position.copy(currentPos);
+          
+          if (type === 'STAR' && t > 0.8) {
+            dummy.lookAt(0, currentPos.y, 0);
+            dummy.rotateZ(Math.PI / 2);
+          } else if (type === 'CRYSTAL' && t > 0.8) {
+            dummy.lookAt(0, currentPos.y, 0);
+          } else {
+            dummy.rotation.copy(item.rotation);
+            if (t < 0.5) {
+              dummy.rotation.x += delta * 0.5;
+              dummy.rotation.y += delta * 0.5;
             }
-            else if (type === 'CRYSTAL' && t > 0.8) {
-                dummy.lookAt(0, currentPos.y, 0);
-            }
-            else {
-                dummy.rotation.copy(item.rotation);
-                // Spin the ornaments in chaos mode
-                if (t < 0.5) {
-                    dummy.rotation.x += delta * 0.5;
-                    dummy.rotation.y += delta * 0.5;
-                }
-            }
-            currentScale.lerpVectors(item.chaosScale, item.targetScale, t);
-            dummy.scale.copy(currentScale);
-            dummy.updateMatrix();
-            meshRef.current.setMatrixAt(i, dummy.matrix);
+          }
+          
+          currentScale.lerpVectors(item.chaosScale, item.targetScale, t);
+          dummy.scale.copy(currentScale);
+          dummy.updateMatrix();
+          meshRef.current.setMatrixAt(i, dummy.matrix);
         });
+        
         meshRef.current.instanceMatrix.needsUpdate = true;
-    });
-    if (type === 'PHOTO') {
-        return (_jsx("group", { children: data.map((item, i) => {
-                let imgSrc = undefined;
-                if (userImages && userImages.length > 0) {
-                    if (i < userImages.length) {
-                        imgSrc = userImages[i];
-                    }
-                }
-                const fallback = fallbackTextures[i % fallbackTextures.length];
-                if (imgSrc) {
-                    return _jsx(SuspensePhotoOrnament, { item: item, mixFactor: mixFactor, url: imgSrc, signatureTexture: signatureTexture }, i);
-                }
-                else {
-                    return _jsx(PhotoFrameMesh, { item: item, mixFactor: mixFactor, texture: fallback, signatureTexture: signatureTexture }, i);
-                }
-            }) }));
-    }
-    // Use Detailed GiftBox Mesh
-    if (type === 'BOX') {
-        return (_jsx("group", { children: data.map((item, i) => (_jsx(GiftBoxMesh, { item: item, mixFactor: mixFactor }, i))) }));
-    }
-    return (_jsx("instancedMesh", { ref: meshRef, args: [geometry, undefined, count], children: _jsx("meshStandardMaterial", { map: candyTexture, roughness: type === 'CANDY' ? 0.2 : 0.15, metalness: type === 'CRYSTAL' ? 0.9 : 0.5, emissive: type === 'CRYSTAL' ? "#112244" : "#000000", emissiveIntensity: 0.2 }) }));
-};
-export default Ornaments;
+      });
+      
+      if (type === 'PHOTO') {
+        return _jsx("group", { 
+          children: data.map((item, i) => {
+            let imgSrc = undefined;
+            if (userImages && userImages.length > 0) {
+              if (i < userImages.length) {
+                imgSrc = userImages[i];
+              }
+            }
+            const fallback = fallbackTextures[i % fallbackTextures.length];
+            
+            if (imgSrc) {
+              return _jsx(SuspensePhotoOrnament, { 
+                item: item, 
+                mixFactor: mixFactor, 
+                url: imgSrc, 
+                signatureTexture: signatureTexture 
+              }, i);
+            } else {
+              return _jsx(PhotoFrameMesh, { 
+                item: item, 
+                mixFactor: mixFactor, 
+                texture: fallback, 
+                signatureTexture: signatureTexture 
+              }, i);
+            }
+          }) 
+        });
+      }
+      
+      if (type === 'BOX') {
+        return _jsx("group", { 
+          children: data.map((item, i) => (
+            _jsx(GiftBoxMesh, { item: item, mixFactor: mixFactor }, i)
+          )) 
+        });
+      }
+      
+      return _jsx("instancedMesh", { 
+        ref: meshRef, 
+        args: [geometry, undefined, count], 
+        children: _jsx("meshStandardMaterial", { 
+          map: candyTexture, 
+          roughness: type === 'CANDY' ? 0.2 : 0.15, 
+          metalness: type === 'CRYSTAL' ? 0.9 : 0.5, 
+          emissive: type === 'CRYSTAL' ? "#112244" : "#000000", 
+          emissiveIntensity: 0.2 
+        }) 
+      });
+    };
 
-    ",
-    "@/components/GestureController":"
-      import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { useEffect, useRef, useState, useCallback } from 'react';
-import Webcam from 'react-webcam';
-import * as tf from '@tensorflow/tfjs';
-import * as handpose from '@tensorflow-models/handpose';
-const GestureController = ({ onGesture, isGuiVisible }) => {
-    const webcamRef = useRef(null);
-    const [model, setModel] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [cameraError, setCameraError] = useState(false);
-    const [debugState, setDebugState] = useState("-");
-    const [loadingMessage, setLoadingMessage] = useState("Initializing AI Engine...");
-    const onGestureRef = useRef(onGesture);
-    useEffect(() => {
+    // ============================================================================
+    // COMPONENT - GestureController (Hand tracking)
+    // ============================================================================
+    const GestureController = ({ onGesture, isGuiVisible }) => {
+      const webcamRef = useRef(null);
+      const [model, setModel] = useState(null);
+      const [loading, setLoading] = useState(true);
+      const [cameraError, setCameraError] = useState(false);
+      const [debugState, setDebugState] = useState("-");
+      const [loadingMessage, setLoadingMessage] = useState("Initializing AI Engine...");
+      const onGestureRef = useRef(onGesture);
+      
+      useEffect(() => {
         onGestureRef.current = onGesture;
-    }, [onGesture]);
-    const lastDetectionTime = useRef(0);
-    // STABILIZATION REFS
-    const ratioHistory = useRef([]); // Store last N ratios for smoothing
-    const posHistory = useRef([]); // Store last N positions for smoothing
-    const isCurrentlyOpen = useRef(false); // Track internal state for hysteresis
-    const missedFrames = useRef(0); // Debounce for tracking loss
-    // Load Model
-    useEffect(() => {
+      }, [onGesture]);
+      
+      const lastDetectionTime = useRef(0);
+      const ratioHistory = useRef([]);
+      const posHistory = useRef([]);
+      const isCurrentlyOpen = useRef(false);
+      const missedFrames = useRef(0);
+      
+      useEffect(() => {
         let isMounted = true;
+        
         const loadModel = async () => {
-            try {
-                setLoadingMessage("Connecting to GPU...");
-                await tf.ready();
-                if (isMounted)
-                    setLoadingMessage("Loading Local AI Model...");
-                const LOCAL_MODEL_URL = 'public/models/handpose/model.json';
-                // Fix: Cast configuration to any to bypass type check for modelUrl support
-                const net = await handpose.load({
-                    modelUrl: LOCAL_MODEL_URL
-                });
-                if (isMounted) {
-                    setModel(net);
-                    setLoading(false);
-                }
+          try {
+            setLoadingMessage("Connecting to GPU...");
+            await tf.ready();
+            if (isMounted) setLoadingMessage("Loading Local AI Model...");
+            
+            const LOCAL_MODEL_URL = 'public/models/handpose/model.json';
+            const net = await handpose.load({ modelUrl: LOCAL_MODEL_URL });
+            
+            if (isMounted) {
+              setModel(net);
+              setLoading(false);
             }
-            catch (err) {
-                console.error("Failed to load handpose model:", err);
-                if (isMounted) {
-                    setLoadingMessage("Network Error: Check Connection");
-                }
+          } catch (err) {
+            console.error("Failed to load handpose model:", err);
+            if (isMounted) {
+              setLoadingMessage("Network Error: Check Connection");
             }
+          }
         };
+        
         const timeoutId = setTimeout(() => {
-            if (loading && isMounted) {
-                setLoadingMessage("Downloading (First Run Takes Time)...");
-            }
+          if (loading && isMounted) {
+            setLoadingMessage("Downloading (First Run Takes Time)...");
+          }
         }, 5000);
+        
         loadModel();
+        
         return () => {
-            isMounted = false;
-            clearTimeout(timeoutId);
+          isMounted = false;
+          clearTimeout(timeoutId);
         };
-    }, []);
-    // Loop
-    const runDetection = useCallback(async () => {
+      }, []);
+      
+      const runDetection = useCallback(async () => {
         if (model && webcamRef.current && webcamRef.current.video && webcamRef.current.video.readyState === 4) {
-            const now = Date.now();
-            // Throttle detection to every 100ms (~10 FPS) to free up GPU for 3D rendering
-            if (now - lastDetectionTime.current < 100) {
+          const now = Date.now();
+          
+          if (now - lastDetectionTime.current < 100) {
+            requestAnimationFrame(runDetection);
+            return;
+          }
+          
+          lastDetectionTime.current = now;
+          const video = webcamRef.current.video;
+          
+          if (video.videoWidth === 0 || video.videoHeight === 0) {
+            requestAnimationFrame(runDetection);
+            return;
+          }
+          
+          try {
+            const predictions = await model.estimateHands(video);
+            
+            if (predictions.length > 0) {
+              missedFrames.current = 0;
+              const hand = predictions[0];
+              const landmarks = hand.landmarks;
+              const wrist = landmarks[0];
+              
+              if (!wrist || !Number.isFinite(wrist[0]) || !Number.isFinite(wrist[1])) {
                 requestAnimationFrame(runDetection);
                 return;
-            }
-            lastDetectionTime.current = now;
-            const video = webcamRef.current.video;
-            // Safety Check: Video Dimensions
-            if (video.videoWidth === 0 || video.videoHeight === 0) {
-                requestAnimationFrame(runDetection);
-                return;
-            }
-            try {
-                const predictions = await model.estimateHands(video);
-                if (predictions.length > 0) {
-                    missedFrames.current = 0;
-                    const hand = predictions[0];
-                    const landmarks = hand.landmarks;
-                    const wrist = landmarks[0];
-                    if (!wrist || !Number.isFinite(wrist[0]) || !Number.isFinite(wrist[1])) {
-                        requestAnimationFrame(runDetection);
-                        return;
-                    }
-                    // --- 1. Position Calculation ---
-                    const rawX = -1 * ((wrist[0] / video.videoWidth) * 2 - 1);
-                    const rawY = -1 * ((wrist[1] / video.videoHeight) * 2 - 1);
-                    posHistory.current.push({ x: rawX, y: rawY });
-                    if (posHistory.current.length > 8)
-                        posHistory.current.shift();
-                    const avgPos = posHistory.current.reduce((acc, curr) => ({ x: acc.x + curr.x, y: acc.y + curr.y }), { x: 0, y: 0 });
-                    const count = posHistory.current.length;
-                    const x = avgPos.x / count;
-                    const y = avgPos.y / count;
-                    // --- 2. Gesture Detection ---
-                    const tips = [8, 12, 16, 20];
-                    const bases = [5, 9, 13, 17];
-                    const getDist = (p1, p2) => {
-                        return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2));
-                    };
-                    let totalBaseDist = 0;
-                    let totalTipDist = 0;
-                    for (let i = 0; i < 4; i++) {
-                        totalBaseDist += getDist(wrist, landmarks[bases[i]]);
-                        totalTipDist += getDist(wrist, landmarks[tips[i]]);
-                    }
-                    const avgBaseDist = totalBaseDist / 4;
-                    const avgTipDist = totalTipDist / 4;
-                    const rawRatio = avgTipDist / (avgBaseDist || 1);
-                    ratioHistory.current.push(rawRatio);
-                    if (ratioHistory.current.length > 5)
-                        ratioHistory.current.shift();
-                    const smoothedRatio = ratioHistory.current.reduce((a, b) => a + b, 0) / ratioHistory.current.length;
-                    if (!isCurrentlyOpen.current && smoothedRatio > 1.6) {
-                        isCurrentlyOpen.current = true;
-                    }
-                    else if (isCurrentlyOpen.current && smoothedRatio < 1.2) {
-                        isCurrentlyOpen.current = false;
-                    }
-                    const isOpen = isCurrentlyOpen.current;
-                    const stateLabel = isOpen ? `OPEN` : `CLOSED`;
-                    setDebugState(stateLabel);
-                    if (onGestureRef.current) {
-                        onGestureRef.current({ isOpen, position: { x, y }, isDetected: true });
-                    }
+              }
+              
+              const rawX = -1 * ((wrist[0] / video.videoWidth) * 2 - 1);
+              const rawY = -1 * ((wrist[1] / video.videoHeight) * 2 - 1);
+              posHistory.current.push({ x: rawX, y: rawY });
+              if (posHistory.current.length > 8) posHistory.current.shift();
+              
+              const avgPos = posHistory.current.reduce(
+                (acc, curr) => ({ x: acc.x + curr.x, y: acc.y + curr.y }), 
+                { x: 0, y: 0 }
+              );
+              const count = posHistory.current.length;
+              const x = avgPos.x / count;
+              const y = avgPos.y / count;
+              
+              const tips = [8, 12, 16, 20];
+              const bases = [5, 9, 13, 17];
+              const getDist = (p1, p2) => {
+                return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2));
+              };
+              
+              let totalBaseDist = 0;
+              let totalTipDist = 0;
+              for (let i = 0; i < 4; i++) {
+                totalBaseDist += getDist(wrist, landmarks[bases[i]]);
+                totalTipDist += getDist(wrist, landmarks[tips[i]]);
+              }
+              
+              const avgBaseDist = totalBaseDist / 4;
+              const avgTipDist = totalTipDist / 4;
+              const rawRatio = avgTipDist / (avgBaseDist || 1);
+              ratioHistory.current.push(rawRatio);
+              if (ratioHistory.current.length > 5) ratioHistory.current.shift();
+              
+              const smoothedRatio = ratioHistory.current.reduce((a, b) => a + b, 0) / ratioHistory.current.length;
+              
+              if (!isCurrentlyOpen.current && smoothedRatio > 1.6) {
+                isCurrentlyOpen.current = true;
+              } else if (isCurrentlyOpen.current && smoothedRatio < 1.2) {
+                isCurrentlyOpen.current = false;
+              }
+              
+              const isOpen = isCurrentlyOpen.current;
+              const stateLabel = isOpen ? `OPEN` : `CLOSED`;
+              setDebugState(stateLabel);
+              
+              if (onGestureRef.current) {
+                onGestureRef.current({ isOpen, position: { x, y }, isDetected: true });
+              }
+            } else {
+              missedFrames.current++;
+              if (missedFrames.current > 5) {
+                isCurrentlyOpen.current = false;
+                ratioHistory.current = [];
+                posHistory.current = [];
+                setDebugState("NO HAND");
+                if (onGestureRef.current) {
+                  onGestureRef.current({ isOpen: false, position: { x: 0, y: 0 }, isDetected: false });
                 }
-                else {
-                    missedFrames.current++;
-                    if (missedFrames.current > 5) {
-                        isCurrentlyOpen.current = false;
-                        ratioHistory.current = [];
-                        posHistory.current = [];
-                        setDebugState("NO HAND");
-                        if (onGestureRef.current) {
-                            onGestureRef.current({ isOpen: false, position: { x: 0, y: 0 }, isDetected: false });
-                        }
-                    }
-                }
+              }
             }
-            catch (err) {
-                // Suppress ephemeral errors
-            }
+          } catch (err) {
+            // Suppress ephemeral errors
+          }
         }
         requestAnimationFrame(runDetection);
-    }, [model]);
-    useEffect(() => {
+      }, [model]);
+      
+      useEffect(() => {
         if (model && !loading) {
-            const timer = requestAnimationFrame(runDetection);
-            return () => cancelAnimationFrame(timer);
+          const timer = requestAnimationFrame(runDetection);
+          return () => cancelAnimationFrame(timer);
         }
-    }, [model, loading, runDetection]);
-    // Constrain mobile size strictly to w-28 h-36 (Portrait) 
-    // IMPORTANT: Do NOT add w-full h-full to the inner div, it will cause the video to expand to intrinsic size.
-    const boxStyle = "w-28 h-36 md:w-48 md:h-36 rounded-lg border-[#d4af37]/50 bg-black/90 border overflow-hidden shadow-[0_0_20px_rgba(212,175,55,0.2)]";
-    return (_jsxs("div", { className: `fixed bottom-4 right-4 z-50 transition-all duration-500 ease-in-out ${isGuiVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`, children: [_jsxs("div", { className: `relative ${boxStyle}`, children: [cameraError ? (_jsxs("div", { className: "flex flex-col items-center justify-center h-full text-[#d4af37] p-2 text-center gap-2", children: [_jsx("span", { className: "text-xl", children: "\uD83D\uDCF7" }), _jsx("span", { className: "text-[10px] font-luxury uppercase tracking-widest", children: "Camera Unavailable" }), _jsx("span", { className: "text-[9px] text-white/50", children: "Use mouse instead" })] })) : (_jsxs(_Fragment, { children: [_jsx(Webcam, { ref: webcamRef, mirrored: true, videoConstraints: { facingMode: "user" }, className: `w-full h-full object-cover transition-opacity duration-500 ${loading ? 'opacity-20' : 'opacity-80'}`, onUserMediaError: () => setCameraError(true) }), !loading && _jsx("div", { className: "absolute inset-0 bg-gradient-to-b from-transparent via-[#d4af37]/10 to-transparent animate-scan pointer-events-none" })] })), loading && !cameraError && (_jsxs("div", { className: "absolute inset-0 flex flex-col items-center justify-center text-[#d4af37] gap-2 p-4 bg-black/80 backdrop-blur-sm", children: [_jsx("div", { className: "w-5 h-5 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" }), _jsx("span", { className: "text-[9px] font-luxury uppercase tracking-widest text-center animate-pulse", children: loadingMessage })] })), _jsxs("div", { className: "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/90 to-transparent pt-6 pb-2 px-3 flex flex-col md:flex-row justify-end md:justify-between items-start md:items-end gap-0 md:gap-0", children: [_jsx("span", { className: "text-[9px] md:text-[8px] text-[#d4af37]/80 font-luxury tracking-widest uppercase mb-0.5 md:mb-0", children: "Sensors" }), _jsx("span", { className: `text-[11px] md:text-[9px] font-mono font-bold ${debugState.includes("OPEN") ? "text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]" : "text-[#d4af37]"}`, children: debugState })] })] }), _jsx("style", { children: `
-        @keyframes scan {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-        .animate-scan {
-            animation: scan 3s linear infinite;
-        }
-      ` })] }));
-};
-export default GestureController;
+      }, [model, loading, runDetection]);
+      
+      const boxStyle = "w-28 h-36 md:w-48 md:h-36 rounded-lg border-[#d4af37]/50 bg-black/90 border overflow-hidden shadow-[0_0_20px_rgba(212,175,55,0.2)]";
+      
+      return _jsxs("div", { 
+        className: `fixed bottom-4 right-4 z-50 transition-all duration-500 ease-in-out ${isGuiVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'}`, 
+        children: [
+          _jsxs("div", { 
+            className: `relative ${boxStyle}`, 
+            children: [
+              cameraError ? (
+                _jsxs("div", { 
+                  className: "flex flex-col items-center justify-center h-full text-[#d4af37] p-2 text-center gap-2", 
+                  children: [
+                    _jsx("span", { className: "text-xl", children: "📷" }),
+                    _jsx("span", { className: "text-[10px] font-luxury uppercase tracking-widest", children: "Camera Unavailable" }),
+                    _jsx("span", { className: "text-[9px] text-white/50", children: "Use mouse instead" })
+                  ] 
+                })
+              ) : (
+                _jsxs(_Fragment, { 
+                  children: [
+                    _jsx(Webcam, { 
+                      ref: webcamRef, 
+                      mirrored: true, 
+                      videoConstraints: { facingMode: "user" }, 
+                      className: `w-full h-full object-cover transition-opacity duration-500 ${loading ? 'opacity-20' : 'opacity-80'}`, 
+                      onUserMediaError: () => setCameraError(true) 
+                    }),
+                    !loading && _jsx("div", { 
+                      className: "absolute inset-0 bg-gradient-to-b from-transparent via-[#d4af37]/10 to-transparent animate-scan pointer-events-none" 
+                    })
+                  ] 
+                })
+              ),
+              loading && !cameraError && (
+                _jsxs("div", { 
+                  className: "absolute inset-0 flex flex-col items-center justify-center text-[#d4af37] gap-2 p-4 bg-black/80 backdrop-blur-sm", 
+                  children: [
+                    _jsx("div", { className: "w-5 h-5 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" }),
+                    _jsx("span", { className: "text-[9px] font-luxury uppercase tracking-widest text-center animate-pulse", children: loadingMessage })
+                  ] 
+                })
+              ),
+              _jsxs("div", { 
+                className: "absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/90 to-transparent pt-6 pb-2 px-3 flex flex-col md:flex-row justify-end md:justify-between items-start md:items-end gap-0 md:gap-0", 
+                children: [
+                  _jsx("span", { className: "text-[9px] md:text-[8px] text-[#d4af37]/80 font-luxury tracking-widest uppercase mb-0.5 md:mb-0", children: "Sensors" }),
+                  _jsx("span", { className: `text-[11px] md:text-[9px] font-mono font-bold ${debugState.includes("OPEN") ? "text-white drop-shadow-[0_0_5px_rgba(255,255,255,0.8)]" : "text-[#d4af37]"}`, children: debugState })
+                ] 
+              })
+            ] 
+          }),
+          _jsx("style", { 
+            children: `
+              @keyframes scan {
+                0% { transform: translateY(-100%); }
+                100% { transform: translateY(100%); }
+              }
+              .animate-scan {
+                animation: scan 3s linear infinite;
+              }
+            ` 
+          })
+        ] 
+      });
+    };
 
-    ",
-    "@/components/Experience":"
-      import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { useRef, useEffect, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, Stars } from '@react-three/drei';
-import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
-import * as THREE from 'three';
-import Foliage from '@/components/Foliage';
-import Ornaments from '@/components/Ornaments';
-import SpiralLights from '@/components/SpiralLights';
-import Snow from '@/components/Snow';
-import TopStar from '@/components/TopStar';
-// COLORS FOR REALISTIC OBJECTS
-const BALL_COLORS = [
-    '#8B0000', // Dark Red
-    '#D32F2F', // Bright Red
-    '#1B5E20', // Dark Green
-    '#D4AF37', // Gold 
-    '#C0C0C0', // Silver
-    '#191970' // Midnight Blue
-];
-const BOX_COLORS = [
-    '#800000', // Maroon
-    '#1B5E20', // Forest Green
-    '#D4AF37', // Gold
-    '#FFFFFF', // White
-    '#4B0082', // Indigo/Deep Purple
-    '#2F4F4F', // Dark Slate Gray
-    '#008080', // Teal
-    '#8B4513', // Bronze/SaddleBrown
-    '#DC143C' // Crimson
-];
-const STAR_COLORS = ['#FFD700', '#FDB931']; // Gold variations
-const CRYSTAL_COLORS = ['#F0F8FF', '#E0FFFF', '#B0E0E6']; // Ice Blues and Whites for Snowflakes
-// Set Candy base to white, as stripes are handled via texture in Ornaments.tsx
-const CANDY_COLORS = ['#FFFFFF'];
-// Handles Camera Parallax, Tree Rotation (Drag) and Zoom (Wheel + Pinch)
-const SceneController = ({ inputRef, groupRef }) => {
-    const { camera, gl } = useThree();
-    const vec = useMemo(() => new THREE.Vector3(), []);
-    // Interaction State
-    const zoomTarget = useRef(32);
-    const isDragging = useRef(false);
-    const lastPointerX = useRef(0);
-    // Touch Pinch State
-    const lastTouchDistance = useRef(null);
-    // Physics State
-    const rotationVelocity = useRef(0.002); // Start with slow auto-spin
-    // Hand Control State
-    const wasDetected = useRef(false); // To detect the "grab" frame
-    const grabOffset = useRef(0); // The rotation offset when grabbed
-    // Smooth Input State (for Parallax)
-    const currentInput = useRef({ x: 0, y: 0 });
-    useEffect(() => {
+    // ============================================================================
+    // COMPONENT - SpiralLights
+    // ============================================================================
+    const SpiralLights = ({ mixFactor }) => {
+      const count = 300;
+      const meshRef = useRef(null);
+      const dummy = useMemo(() => new THREE.Object3D(), []);
+      const currentMixRef = useRef(1);
+      const { target, chaos } = useMemo(() => generateSpiralData(count, 19, 7.5, 9), []);
+      
+      useLayoutEffect(() => {
+        if (!meshRef.current) return;
+        
+        const color = new THREE.Color("#fffae0");
+        for (let i = 0; i < count; i++) {
+          meshRef.current.setColorAt(i, color);
+          dummy.position.set(target[i * 3], target[i * 3 + 1], target[i * 3 + 2]);
+          dummy.scale.setScalar(0.15);
+          dummy.updateMatrix();
+          meshRef.current.setMatrixAt(i, dummy.matrix);
+        }
+        
+        if (meshRef.current.instanceColor) meshRef.current.instanceColor.needsUpdate = true;
+        meshRef.current.instanceMatrix.needsUpdate = true;
+      }, [target, dummy]);
+      
+      useFrame((state, delta) => {
+        if (!meshRef.current) return;
+        
+        const speed = 2.0 * delta;
+        currentMixRef.current = lerp(currentMixRef.current, mixFactor, speed);
+        const t = currentMixRef.current;
+        const time = state.clock.elapsedTime;
+        
+        for (let i = 0; i < count; i++) {
+          const tx = target[i * 3];
+          const ty = target[i * 3 + 1];
+          const tz = target[i * 3 + 2];
+          const cx = chaos[i * 3];
+          const cy = chaos[i * 3 + 1];
+          const cz = chaos[i * 3 + 2];
+          
+          const x = lerp(cx, tx, t);
+          const y = lerp(cy, ty, t);
+          const z = lerp(cz, tz, t);
+          
+          dummy.position.set(x, y, z);
+          const pulse = Math.sin(time * 3 + i * 0.1) * 0.05 + 0.15;
+          dummy.scale.setScalar(pulse);
+          dummy.updateMatrix();
+          meshRef.current.setMatrixAt(i, dummy.matrix);
+        }
+        
+        meshRef.current.instanceMatrix.needsUpdate = true;
+      });
+      
+      return _jsxs("instancedMesh", { 
+        ref: meshRef, 
+        args: [undefined, undefined, count], 
+        children: [
+          _jsx("sphereGeometry", { args: [1, 8, 8] }),
+          _jsx("meshBasicMaterial", { color: "#fffae0", toneMapped: false })
+        ] 
+      });
+    };
+
+    // ============================================================================
+    // COMPONENT - Snow
+    // ============================================================================
+    const snowVertexShader = `
+      precision highp float;
+      uniform float uTime;
+      uniform float uMix;
+      
+      attribute float aScale;
+      attribute vec3 aVelocity;
+      
+      varying float vAlpha;
+
+      void main() {
+        vec3 pos = position;
+        
+        float fallSpeed = aVelocity.y;
+        pos.y = mod(pos.y - uTime * fallSpeed + 15.0, 30.0) - 15.0;
+        
+        float drift = sin(uTime * aVelocity.x + pos.y) * (0.5 + (1.0 - uMix) * 2.0);
+        pos.x += drift;
+        pos.z += cos(uTime * aVelocity.z + pos.x) * 0.5;
+
+        vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+        gl_Position = projectionMatrix * mvPosition;
+        
+        gl_PointSize = aScale * (15.0 / -mvPosition.z);
+        vAlpha = 1.0 - smoothstep(12.0, 15.0, abs(pos.y));
+      }
+    `;
+
+    const snowFragmentShader = `
+      precision highp float;
+      varying float vAlpha;
+
+      void main() {
+        vec2 coord = gl_PointCoord - vec2(0.5);
+        float dist = length(coord);
+        if (dist > 0.5) discard;
+        
+        float alpha = (1.0 - smoothstep(0.3, 0.5, dist)) * vAlpha * 0.8;
+        gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
+      }
+    `;
+
+    const Snow = ({ mixFactor }) => {
+      const count = 3000;
+      const pointsRef = useRef(null);
+      const materialRef = useRef(null);
+      const currentMixRef = useRef(1);
+      const { camera } = useThree();
+      
+      const { positions, scales, velocities } = useMemo(() => {
+        const pos = new Float32Array(count * 3);
+        const sc = new Float32Array(count);
+        const vel = new Float32Array(count * 3);
+        
+        for (let i = 0; i < count; i++) {
+          pos[i * 3] = (Math.random() - 0.5) * 50;
+          pos[i * 3 + 1] = (Math.random() - 0.5) * 30;
+          pos[i * 3 + 2] = (Math.random() - 0.5) * 40;
+          sc[i] = Math.random() * 2 + 1;
+          vel[i * 3] = Math.random() * 0.5 + 0.2;
+          vel[i * 3 + 1] = Math.random() * 2.0 + 1.0;
+          vel[i * 3 + 2] = Math.random() * 0.5 + 0.2;
+        }
+        
+        return { positions: pos, scales: sc, velocities: vel };
+      }, [count]);
+      
+      const uniforms = useMemo(() => ({
+        uTime: { value: 0 },
+        uMix: { value: 1 }
+      }), []);
+      
+      useFrame((state, delta) => {
+        if (materialRef.current && pointsRef.current) {
+          currentMixRef.current = lerp(currentMixRef.current, mixFactor, delta * 2.0);
+          materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+          materialRef.current.uniforms.uMix.value = currentMixRef.current;
+          pointsRef.current.position.x = camera.position.x;
+          pointsRef.current.position.y = camera.position.y;
+        }
+      });
+      
+      return _jsxs("points", { 
+        ref: pointsRef, 
+        frustumCulled: false, 
+        children: [
+          _jsxs("bufferGeometry", { 
+            children: [
+              _jsx("bufferAttribute", { attach: "attributes-position", count: count, array: positions, itemSize: 3 }),
+              _jsx("bufferAttribute", { attach: "attributes-aScale", count: count, array: scales, itemSize: 1 }),
+              _jsx("bufferAttribute", { attach: "attributes-aVelocity", count: count, array: velocities, itemSize: 3 })
+            ] 
+          }),
+          _jsx("shaderMaterial", { 
+            ref: materialRef, 
+            vertexShader: snowVertexShader, 
+            fragmentShader: snowFragmentShader, 
+            uniforms: uniforms, 
+            transparent: true, 
+            depthWrite: false 
+          })
+        ] 
+      });
+    };
+
+    // ============================================================================
+    // COMPONENT - TopStar
+    // ============================================================================
+    const createStarShape = (outerRadius, innerRadius, points) => {
+      const shape = new THREE.Shape();
+      const step = (Math.PI * 2) / (points * 2);
+      shape.moveTo(0, outerRadius);
+      
+      for (let i = 0; i < points * 2; i++) {
+        const radius = (i % 2 === 0) ? outerRadius : innerRadius;
+        const angle = i * step;
+        const effectiveAngle = angle + Math.PI / 2;
+        shape.lineTo(Math.cos(effectiveAngle) * radius, Math.sin(effectiveAngle) * radius);
+      }
+      shape.closePath();
+      return shape;
+    };
+
+    const TopStar = ({ mixFactor }) => {
+      const groupRef = useRef(null);
+      const visualRef = useRef(null);
+      const starMeshRef = useRef(null);
+      const currentMixRef = useRef(1);
+      
+      const geometry = useMemo(() => {
+        const shape = createStarShape(1.2, 0.6, 5);
+        const geom = new THREE.ExtrudeGeometry(shape, {
+          depth: 0.4,
+          bevelEnabled: true,
+          bevelThickness: 0.1,
+          bevelSize: 0.1,
+          bevelSegments: 4
+        });
+        geom.center();
+        return geom;
+      }, []);
+      
+      useFrame((state, delta) => {
+        if (!groupRef.current || !visualRef.current || !starMeshRef.current) return;
+        
+        const speed = 2.0 * delta;
+        currentMixRef.current = lerp(currentMixRef.current, mixFactor, speed);
+        const t = currentMixRef.current;
+        
+        const targetY = 9.2;
+        const chaosY = 13.0;
+        const currentY = lerp(chaosY, targetY, t);
+        groupRef.current.position.set(0, currentY, 0);
+        
+        starMeshRef.current.rotation.y += delta * 0.5;
+        
+        if (t < 0.9) {
+          const chaosTilt = (1 - t) * 0.5;
+          groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime) * chaosTilt;
+          groupRef.current.rotation.x = Math.cos(state.clock.elapsedTime * 0.8) * chaosTilt;
+        } else {
+          groupRef.current.rotation.z = lerp(groupRef.current.rotation.z, 0, speed);
+          groupRef.current.rotation.x = lerp(groupRef.current.rotation.x, 0, speed);
+        }
+        
+        visualRef.current.scale.setScalar(1.0);
+      });
+      
+      return _jsxs("group", { 
+        ref: groupRef, 
+        children: [
+          _jsx("group", { 
+            ref: visualRef, 
+            children: _jsx("mesh", { 
+              ref: starMeshRef, 
+              geometry: geometry, 
+              children: _jsx("meshStandardMaterial", { 
+                color: "#FFD700", 
+                emissive: "#FFD700", 
+                emissiveIntensity: 2.0, 
+                roughness: 0.1, 
+                metalness: 0.9, 
+                toneMapped: false 
+              }) 
+            }) 
+          }),
+          _jsx("pointLight", { color: "#ffeebf", intensity: 3.0, distance: 15, decay: 2 })
+        ] 
+      });
+    };
+
+    // ============================================================================
+    // COMPONENT - Experience (Main 3D Scene)
+    // ============================================================================
+    const BALL_COLORS = ['#8B0000', '#D32F2F', '#1B5E20', '#D4AF37', '#C0C0C0', '#191970'];
+    const BOX_COLORS = ['#800000', '#1B5E20', '#D4AF37', '#FFFFFF', '#4B0082', '#2F4F4F', '#008080', '#8B4513', '#DC143C'];
+    const STAR_COLORS = ['#FFD700', '#FDB931'];
+    const CRYSTAL_COLORS = ['#F0F8FF', '#E0FFFF', '#B0E0E6'];
+    const CANDY_COLORS = ['#FFFFFF'];
+
+    const SceneController = ({ inputRef, groupRef }) => {
+      const { camera, gl } = useThree();
+      const vec = useMemo(() => new THREE.Vector3(), []);
+      const zoomTarget = useRef(32);
+      const isDragging = useRef(false);
+      const lastPointerX = useRef(0);
+      const lastTouchDistance = useRef(null);
+      const rotationVelocity = useRef(0.002);
+      const wasDetected = useRef(false);
+      const grabOffset = useRef(0);
+      const currentInput = useRef({ x: 0, y: 0 });
+      
+      useEffect(() => {
         const canvas = gl.domElement;
         canvas.style.touchAction = 'none';
+        
         const onWheel = (e) => {
-            e.preventDefault();
-            zoomTarget.current += e.deltaY * 0.02;
-            zoomTarget.current = THREE.MathUtils.clamp(zoomTarget.current, 12, 55);
+          e.preventDefault();
+          zoomTarget.current += e.deltaY * 0.02;
+          zoomTarget.current = THREE.MathUtils.clamp(zoomTarget.current, 12, 55);
         };
+        
         const onPointerDown = (e) => {
-            // Allow primary pointer (mouse or first touch) to start dragging
-            if (e.isPrimary && e.button === 0) {
-                isDragging.current = true;
-                lastPointerX.current = e.clientX;
-                canvas.setPointerCapture(e.pointerId);
-                rotationVelocity.current = 0; // Stop auto-spin on grab
-            }
+          if (e.isPrimary && e.button === 0) {
+            isDragging.current = true;
+            lastPointerX.current = e.clientX;
+            canvas.setPointerCapture(e.pointerId);
+            rotationVelocity.current = 0;
+          }
         };
+        
         const onPointerUp = (e) => {
-            if (e.isPrimary) {
-                isDragging.current = false;
-                canvas.releasePointerCapture(e.pointerId);
-            }
+          if (e.isPrimary) {
+            isDragging.current = false;
+            canvas.releasePointerCapture(e.pointerId);
+          }
         };
+        
         const onPointerMove = (e) => {
-            // Only rotate if primary pointer and NOT currently pinching
-            if (e.isPrimary && isDragging.current && groupRef.current && lastTouchDistance.current === null) {
-                const deltaX = e.clientX - lastPointerX.current;
-                lastPointerX.current = e.clientX;
-                // Mouse still uses impulse/velocity logic
-                const rotationAmount = deltaX * 0.005;
-                groupRef.current.rotation.y += rotationAmount;
-                rotationVelocity.current = rotationAmount;
-            }
+          if (e.isPrimary && isDragging.current && groupRef.current && lastTouchDistance.current === null) {
+            const deltaX = e.clientX - lastPointerX.current;
+            lastPointerX.current = e.clientX;
+            const rotationAmount = deltaX * 0.005;
+            groupRef.current.rotation.y += rotationAmount;
+            rotationVelocity.current = rotationAmount;
+          }
         };
-        // --- Touch Pinch Logic ---
+        
         const onTouchStart = (e) => {
-            if (e.touches.length === 2) {
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                lastTouchDistance.current = Math.sqrt(dx * dx + dy * dy);
-            }
+          if (e.touches.length === 2) {
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            lastTouchDistance.current = Math.sqrt(dx * dx + dy * dy);
+          }
         };
+        
         const onTouchMove = (e) => {
-            if (e.touches.length === 2) {
-                if (e.cancelable)
-                    e.preventDefault(); // Stop browser zoom/scroll
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (lastTouchDistance.current !== null) {
-                    const diff = lastTouchDistance.current - distance;
-                    // Diff > 0: Pinched In -> Zoom Out (Increase Z)
-                    // Diff < 0: Pinched Out -> Zoom In (Decrease Z)
-                    const sensitivity = 0.15; // Zoom speed multiplier
-                    zoomTarget.current += diff * sensitivity;
-                    zoomTarget.current = THREE.MathUtils.clamp(zoomTarget.current, 12, 55);
-                }
-                lastTouchDistance.current = distance;
+          if (e.touches.length === 2) {
+            if (e.cancelable) e.preventDefault();
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (lastTouchDistance.current !== null) {
+              const diff = lastTouchDistance.current - distance;
+              const sensitivity = 0.15;
+              zoomTarget.current += diff * sensitivity;
+              zoomTarget.current = THREE.MathUtils.clamp(zoomTarget.current, 12, 55);
             }
+            lastTouchDistance.current = distance;
+          }
         };
+        
         const onTouchEnd = () => {
-            lastTouchDistance.current = null;
+          lastTouchDistance.current = null;
         };
+        
         canvas.addEventListener('wheel', onWheel, { passive: false });
         canvas.addEventListener('pointerdown', onPointerDown);
         canvas.addEventListener('pointerup', onPointerUp);
         canvas.addEventListener('pointermove', onPointerMove);
         canvas.addEventListener('pointerleave', onPointerUp);
         canvas.addEventListener('pointercancel', onPointerUp);
-        // Touch Listeners
         canvas.addEventListener('touchstart', onTouchStart, { passive: false });
         canvas.addEventListener('touchmove', onTouchMove, { passive: false });
         canvas.addEventListener('touchend', onTouchEnd);
         canvas.addEventListener('touchcancel', onTouchEnd);
+        
         return () => {
-            canvas.removeEventListener('wheel', onWheel);
-            canvas.removeEventListener('pointerdown', onPointerDown);
-            canvas.removeEventListener('pointerup', onPointerUp);
-            canvas.removeEventListener('pointermove', onPointerMove);
-            canvas.removeEventListener('pointerleave', onPointerUp);
-            canvas.removeEventListener('pointercancel', onPointerUp);
-            canvas.removeEventListener('touchstart', onTouchStart);
-            canvas.removeEventListener('touchmove', onTouchMove);
-            canvas.removeEventListener('touchend', onTouchEnd);
-            canvas.removeEventListener('touchcancel', onTouchEnd);
+          canvas.removeEventListener('wheel', onWheel);
+          canvas.removeEventListener('pointerdown', onPointerDown);
+          canvas.removeEventListener('pointerup', onPointerUp);
+          canvas.removeEventListener('pointermove', onPointerMove);
+          canvas.removeEventListener('pointerleave', onPointerUp);
+          canvas.removeEventListener('pointercancel', onPointerUp);
+          canvas.removeEventListener('touchstart', onTouchStart);
+          canvas.removeEventListener('touchmove', onTouchMove);
+          canvas.removeEventListener('touchend', onTouchEnd);
+          canvas.removeEventListener('touchcancel', onTouchEnd);
         };
-    }, [gl, groupRef]);
-    useFrame((state, delta) => {
+      }, [gl, groupRef]);
+      
+      useFrame((state, delta) => {
         const safeDelta = Math.min(delta, 0.1);
-        // 1. Smooth Input Interpolation (Parallax Logic)
         const targetX = inputRef.current.x;
         const targetY = inputRef.current.y;
         const isHandDetected = !!inputRef.current.isDetected;
-        // Slower smoothing for parallax (hides jitter from AI)
+        
         const inputSmoothing = 4.0 * safeDelta;
         currentInput.current.x = THREE.MathUtils.lerp(currentInput.current.x, targetX, inputSmoothing);
         currentInput.current.y = THREE.MathUtils.lerp(currentInput.current.y, targetY, inputSmoothing);
-        // 2. Camera Update
+        
         const camX = currentInput.current.x * 4;
         const camY = currentInput.current.y * 2;
         const camZ = zoomTarget.current + Math.abs(currentInput.current.x) * 2;
-        camera.position.lerp(vec.set(camX, camY, camZ), 4.0 * safeDelta); // Slightly faster camera catchup
+        camera.position.lerp(vec.set(camX, camY, camZ), 4.0 * safeDelta);
         camera.lookAt(0, 0, 0);
-        // 3. Tree Rotation Physics
+        
         if (groupRef.current) {
-            if (isHandDetected) {
-                // --- HAND CONTROL (GRAB MODE) ---
-                const HAND_ROTATION_FACTOR = Math.PI * 1.2;
-                const targetHandRotation = currentInput.current.x * HAND_ROTATION_FACTOR;
-                if (!wasDetected.current) {
-                    grabOffset.current = groupRef.current.rotation.y - targetHandRotation;
-                    rotationVelocity.current = 0;
-                }
-                const targetAngle = targetHandRotation + grabOffset.current;
-                const smoothFactor = 6.0 * safeDelta;
-                const prevRot = groupRef.current.rotation.y;
-                groupRef.current.rotation.y = THREE.MathUtils.lerp(prevRot, targetAngle, smoothFactor);
-                rotationVelocity.current = (groupRef.current.rotation.y - prevRot);
-                wasDetected.current = true;
+          if (isHandDetected) {
+            const HAND_ROTATION_FACTOR = Math.PI * 1.2;
+            const targetHandRotation = currentInput.current.x * HAND_ROTATION_FACTOR;
+            
+            if (!wasDetected.current) {
+              grabOffset.current = groupRef.current.rotation.y - targetHandRotation;
+              rotationVelocity.current = 0;
             }
-            else {
-                // --- IDLE / MOUSE CONTROL (INERTIA MODE) ---
-                if (wasDetected.current) {
-                    if (Math.abs(rotationVelocity.current) < 0.0001) {
-                        rotationVelocity.current = 0.002;
-                    }
-                    wasDetected.current = false;
-                }
-                // Apply velocity if NOT dragging manually
-                if (!isDragging.current) {
-                    groupRef.current.rotation.y += rotationVelocity.current;
-                    const baseSpeed = 0.002;
-                    rotationVelocity.current = THREE.MathUtils.lerp(rotationVelocity.current, baseSpeed, safeDelta * 0.5);
-                }
+            
+            const targetAngle = targetHandRotation + grabOffset.current;
+            const smoothFactor = 6.0 * safeDelta;
+            const prevRot = groupRef.current.rotation.y;
+            groupRef.current.rotation.y = THREE.MathUtils.lerp(prevRot, targetAngle, smoothFactor);
+            rotationVelocity.current = (groupRef.current.rotation.y - prevRot);
+            wasDetected.current = true;
+          } else {
+            if (wasDetected.current) {
+              if (Math.abs(rotationVelocity.current) < 0.0001) {
+                rotationVelocity.current = 0.002;
+              }
+              wasDetected.current = false;
             }
+            
+            if (!isDragging.current) {
+              groupRef.current.rotation.y += rotationVelocity.current;
+              const baseSpeed = 0.002;
+              rotationVelocity.current = THREE.MathUtils.lerp(rotationVelocity.current, baseSpeed, safeDelta * 0.5);
+            }
+          }
         }
-    });
-    return null;
-};
-const SceneContent = ({ mixFactor, colors, inputRef, userImages, signatureText }) => {
-    const groupRef = useRef(null);
-    const photoCount = (userImages && userImages.length > 0) ? userImages.length : 10;
-    return (_jsxs(_Fragment, { children: [_jsx(SceneController, { inputRef: inputRef, groupRef: groupRef }), _jsx("ambientLight", { intensity: 0.4 }), _jsx("spotLight", { position: [20, 20, 20], angle: 0.4, penumbra: 1, intensity: 2.0, color: "#fff5d0", castShadow: true }), _jsx("pointLight", { position: [-10, 5, -10], intensity: 1.2, color: "#00ff00" }), _jsx("pointLight", { position: [10, -5, 10], intensity: 1.2, color: "#ff0000" }), _jsx("pointLight", { position: [0, 10, 10], intensity: 0.5, color: "#ffffff" }), _jsx(Environment, { files: 'public/hdri/potsdamer_platz_1k.hdr', background: false }), _jsx(Stars, { radius: 100, depth: 50, count: 3000, factor: 4, saturation: 0, fade: true, speed: 1 }), _jsx(Snow, { mixFactor: mixFactor }), _jsxs("group", { ref: groupRef, position: [0, 0, 0], children: [_jsx(TopStar, { mixFactor: mixFactor }), _jsx(Foliage, { mixFactor: mixFactor, colors: colors }), _jsx(SpiralLights, { mixFactor: mixFactor }), _jsx(Ornaments, { mixFactor: mixFactor, type: "BALL", count: 60, scale: 0.5, colors: BALL_COLORS }), _jsx(Ornaments, { mixFactor: mixFactor, type: "BOX", count: 30, scale: 0.6, colors: BOX_COLORS }), _jsx(Ornaments, { mixFactor: mixFactor, type: "STAR", count: 25, scale: 0.5, colors: STAR_COLORS }), _jsx(Ornaments, { mixFactor: mixFactor, type: "CRYSTAL", count: 40, scale: 0.4, colors: CRYSTAL_COLORS }), _jsx(Ornaments, { mixFactor: mixFactor, type: "CANDY", count: 40, scale: 0.8, colors: CANDY_COLORS }), _jsx(Ornaments, { mixFactor: mixFactor, type: "PHOTO", count: photoCount, userImages: userImages, signatureText: signatureText })] }), _jsxs(EffectComposer, { enableNormalPass: false, multisampling: 0, children: [_jsx(Bloom, { luminanceThreshold: 0.9, mipmapBlur: true, intensity: 1.2, radius: 0.6 }), _jsx(Vignette, { eskil: false, offset: 0.1, darkness: 1.1 })] })] }));
-};
-const Experience = (props) => {
-    return (_jsx(Canvas, { dpr: [1, 1.25], 
-        // OPTIMIZATION: Tighten near/far planes to increase depth buffer precision on mobile.
-        // 5-80 covers the tree nicely (centered at 0, camera at 32).
-        camera: { position: [0, 0, 32], fov: 45, near: 5, far: 80 }, gl: { antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }, shadows: true, style: { touchAction: 'none' }, children: _jsx(SceneContent, { ...props }) }));
-};
-export default Experience;
+      });
+      
+      return null;
+    };
 
-    ",
-    "@/App":"
-      import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useState, useCallback, useRef } from 'react';
-import Experience from '@/components/Experience';
-import GestureController from '@/components/GestureController';
-const App = () => {
-    // 1 = Formed, 0 = Chaos.
-    const [targetMix, setTargetMix] = useState(1);
-    // Default colors kept, UI control removed
-    const [colors] = useState({ bottom: '#022b1c', top: '#217a46' });
-    // inputRef now tracks detection state for physics switching
-    const inputRef = useRef({ x: 0, y: 0, isDetected: false });
-    // Image Upload State
-    const [userImages, setUserImages] = useState([]);
-    const [isProcessing, setIsProcessing] = useState(false);
-    const fileInputRef = useRef(null);
-    // Signature Modal State
-    const [isSignatureOpen, setIsSignatureOpen] = useState(false);
-    const [signatureText, setSignatureText] = useState("");
-    const [activePhotoUrl, setActivePhotoUrl] = useState(null);
-    // Camera Gui Visibility
-    const [showCamera, setShowCamera] = useState(true);
-    // Wrap in useCallback to prevent new function creation on every render
-    const handleGesture = useCallback((data) => {
+    const SceneContent = ({ mixFactor, colors, inputRef, userImages, signatureText }) => {
+      const groupRef = useRef(null);
+      const photoCount = (userImages && userImages.length > 0) ? userImages.length : 10;
+      
+      return _jsxs(_Fragment, { 
+        children: [
+          _jsx(SceneController, { inputRef: inputRef, groupRef: groupRef }),
+          _jsx("ambientLight", { intensity: 0.4 }),
+          _jsx("spotLight", { position: [20, 20, 20], angle: 0.4, penumbra: 1, intensity: 2.0, color: "#fff5d0", castShadow: true }),
+          _jsx("pointLight", { position: [-10, 5, -10], intensity: 1.2, color: "#00ff00" }),
+          _jsx("pointLight", { position: [10, -5, 10], intensity: 1.2, color: "#ff0000" }),
+          _jsx("pointLight", { position: [0, 10, 10], intensity: 0.5, color: "#ffffff" }),
+          _jsx(Environment, { files: 'public/hdri/potsdamer_platz_1k.hdr', background: false }),
+          _jsx(Stars, { radius: 100, depth: 50, count: 3000, factor: 4, saturation: 0, fade: true, speed: 1 }),
+          _jsx(Snow, { mixFactor: mixFactor }),
+          _jsxs("group", { 
+            ref: groupRef, 
+            position: [0, 0, 0], 
+            children: [
+              _jsx(TopStar, { mixFactor: mixFactor }),
+              _jsx(Foliage, { mixFactor: mixFactor, colors: colors }),
+              _jsx(SpiralLights, { mixFactor: mixFactor }),
+              _jsx(Ornaments, { mixFactor: mixFactor, type: "BALL", count: 60, scale: 0.5, colors: BALL_COLORS }),
+              _jsx(Ornaments, { mixFactor: mixFactor, type: "BOX", count: 30, scale: 0.6, colors: BOX_COLORS }),
+              _jsx(Ornaments, { mixFactor: mixFactor, type: "STAR", count: 25, scale: 0.5, colors: STAR_COLORS }),
+              _jsx(Ornaments, { mixFactor: mixFactor, type: "CRYSTAL", count: 40, scale: 0.4, colors: CRYSTAL_COLORS }),
+              _jsx(Ornaments, { mixFactor: mixFactor, type: "CANDY", count: 40, scale: 0.8, colors: CANDY_COLORS }),
+              _jsx(Ornaments, { mixFactor: mixFactor, type: "PHOTO", count: photoCount, userImages: userImages, signatureText: signatureText })
+            ] 
+          }),
+          _jsxs(EffectComposer, { 
+            enableNormalPass: false, 
+            multisampling: 0, 
+            children: [
+              _jsx(Bloom, { luminanceThreshold: 0.9, mipmapBlur: true, intensity: 1.2, radius: 0.6 }),
+              _jsx(Vignette, { eskil: false, offset: 0.1, darkness: 1.1 })
+            ] 
+          })
+        ] 
+      });
+    };
+
+    const Experience = (props) => {
+      return _jsx(Canvas, { 
+        dpr: [1, 1.25],
+        camera: { position: [0, 0, 32], fov: 45, near: 5, far: 80 }, 
+        gl: { antialias: false, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }, 
+        shadows: true, 
+        style: { touchAction: 'none' }, 
+        children: _jsx(SceneContent, { ...props }) 
+      });
+    };
+
+    // ============================================================================
+    // COMPONENT - App (Main Application)
+    // ============================================================================
+    const App = () => {
+      const [targetMix, setTargetMix] = useState(1);
+      const [colors] = useState({ bottom: '#022b1c', top: '#217a46' });
+      const inputRef = useRef({ x: 0, y: 0, isDetected: false });
+      const [userImages, setUserImages] = useState([]);
+      const [isProcessing, setIsProcessing] = useState(false);
+      const fileInputRef = useRef(null);
+      const [isSignatureOpen, setIsSignatureOpen] = useState(false);
+      const [signatureText, setSignatureText] = useState("");
+      const [activePhotoUrl, setActivePhotoUrl] = useState(null);
+      const [showCamera, setShowCamera] = useState(true);
+      
+      const handleGesture = useCallback((data) => {
         if (data.isDetected) {
-            const newTarget = data.isOpen ? 0 : 1;
-            setTargetMix(prev => {
-                if (prev !== newTarget)
-                    return newTarget;
-                return prev;
-            });
-            inputRef.current = {
-                x: data.position.x * 1.2,
-                y: data.position.y,
-                isDetected: true
-            };
+          const newTarget = data.isOpen ? 0 : 1;
+          setTargetMix(prev => {
+            if (prev !== newTarget) return newTarget;
+            return prev;
+          });
+          inputRef.current = {
+            x: data.position.x * 1.2,
+            y: data.position.y,
+            isDetected: true
+          };
+        } else {
+          inputRef.current.isDetected = false;
         }
-        else {
-            // Mark as not detected, keep last position to avoid jumps before fade out
-            inputRef.current.isDetected = false;
-        }
-    }, []);
-    const toggleState = () => {
+      }, []);
+      
+      const toggleState = () => {
         setTargetMix(prev => prev === 1 ? 0 : 1);
-    };
-    const handleUploadClick = () => {
+      };
+      
+      const handleUploadClick = () => {
         fileInputRef.current?.click();
-    };
-    const handleSignatureClick = () => {
-        // Pick a random photo if available, else null (placeholder)
+      };
+      
+      const handleSignatureClick = () => {
         if (userImages.length > 0) {
-            const randomImg = userImages[Math.floor(Math.random() * userImages.length)];
-            setActivePhotoUrl(randomImg);
-        }
-        else {
-            setActivePhotoUrl(null);
+          const randomImg = userImages[Math.floor(Math.random() * userImages.length)];
+          setActivePhotoUrl(randomImg);
+        } else {
+          setActivePhotoUrl(null);
         }
         setIsSignatureOpen(true);
-    };
-    const handleFileChange = (e) => {
+      };
+      
+      const handleFileChange = (e) => {
         if (e.target.files && e.target.files.length > 0) {
-            setIsProcessing(true);
-            // 1. Immediately disperse the tree (Chaos State) behind the loading screen
-            setTargetMix(0);
-            // Defer processing to next tick to allow React to render the loading screen first
+          setIsProcessing(true);
+          setTargetMix(0);
+          
+          setTimeout(() => {
+            const files = Array.from(e.target.files).slice(0, 30);
+            const urls = files.map(file => URL.createObjectURL(file));
+            setUserImages(prev => {
+              prev.forEach(url => URL.revokeObjectURL(url));
+              return urls;
+            });
+            
+            if (fileInputRef.current) fileInputRef.current.value = '';
+            
             setTimeout(() => {
-                const files = Array.from(e.target.files).slice(0, 30); // Limit to 30
-                const urls = files.map(file => URL.createObjectURL(file));
-                setUserImages(prev => {
-                    // Revoke old URLs to prevent memory leaks
-                    prev.forEach(url => URL.revokeObjectURL(url));
-                    return urls;
-                });
-                // Reset input
-                if (fileInputRef.current)
-                    fileInputRef.current.value = '';
-                // Keep loader visible for a moment to cover the texture upload stutter
-                setTimeout(() => {
-                    setIsProcessing(false);
-                    // 2. Trigger the "Ritual" Assembly Animation
-                    // Wait a brief moment after loader vanishes so user sees the scattered photos,
-                    // then fly them into position.
-                    setTimeout(() => {
-                        setTargetMix(1);
-                    }, 800);
-                }, 1200);
-            }, 50);
+              setIsProcessing(false);
+              setTimeout(() => {
+                setTargetMix(1);
+              }, 800);
+            }, 1200);
+          }, 50);
         }
-    };
-    // Unified Icon Button Style - Premium Silver Glassmorphism (Circular)
-    const iconButtonClass = `
-    group relative 
-    w-10 h-10 md:w-12 md:h-12
-    rounded-full 
-    bg-black/30 backdrop-blur-md 
-    border border-white/20 
-    text-slate-300 
-    transition-all duration-500 ease-out 
-    hover:border-white/60 hover:text-white hover:bg-white/10 
-    hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] 
-    active:scale-90 active:bg-white/20
-    flex justify-center items-center cursor-pointer
-  `;
-    // Standard Text Button for Modal
-    const textButtonClass = `
-    group relative 
-    w-auto px-8 h-10
-    overflow-hidden rounded-sm 
-    bg-black/80 backdrop-blur-md 
-    border border-white/40 
-    text-slate-300 font-luxury text-[11px] uppercase tracking-[0.25em] 
-    transition-all duration-500 ease-out 
-    hover:border-white/80 hover:text-black hover:bg-white 
-    hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] 
-    active:scale-95
-    flex justify-center items-center cursor-pointer
-  `;
-    return (_jsxs("div", { className: "relative w-full h-screen bg-black overflow-hidden", children: [_jsx("input", { type: "file", ref: fileInputRef, onChange: handleFileChange, accept: "image/*", multiple: true, className: "hidden" }), isProcessing && (_jsxs("div", { className: "absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md transition-all duration-500 animate-in fade-in", children: [_jsxs("div", { className: "relative w-16 h-16 mb-6", children: [_jsx("div", { className: "absolute inset-0 border-2 border-t-[#d4af37] border-r-transparent border-b-[#d4af37] border-l-transparent rounded-full animate-spin" }), _jsx("div", { className: "absolute inset-2 border-2 border-t-transparent border-r-white/30 border-b-transparent border-l-white/30 rounded-full animate-spin-reverse" }), _jsx("div", { className: "absolute inset-0 flex items-center justify-center text-[#d4af37] text-xl animate-pulse", children: "\u2726" })] }), _jsx("div", { className: "text-[#d4af37] font-luxury tracking-[0.25em] text-xs uppercase animate-pulse", children: "\u5723\u8BDE\u6811\u88C5\u9970\u4E2D..." }), _jsx("style", { children: `
-                @keyframes spin-reverse {
+      };
+      
+      const iconButtonClass = `
+        group relative 
+        w-10 h-10 md:w-12 md:h-12
+        rounded-full 
+        bg-black/30 backdrop-blur-md 
+        border border-white/20 
+        text-slate-300 
+        transition-all duration-500 ease-out 
+        hover:border-white/60 hover:text-white hover:bg-white/10 
+        hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] 
+        active:scale-90 active:bg-white/20
+        flex justify-center items-center cursor-pointer
+      `;
+      
+      const textButtonClass = `
+        group relative 
+        w-auto px-8 h-10
+        overflow-hidden rounded-sm 
+        bg-black/80 backdrop-blur-md 
+        border border-white/40 
+        text-slate-300 font-luxury text-[11px] uppercase tracking-[0.25em] 
+        transition-all duration-500 ease-out 
+        hover:border-white/80 hover:text-black hover:bg-white 
+        hover:shadow-[0_0_25px_rgba(255,255,255,0.2)] 
+        active:scale-95
+        flex justify-center items-center cursor-pointer
+      `;
+      
+      return _jsxs("div", { 
+        className: "relative w-full h-screen bg-black overflow-hidden", 
+        children: [
+          _jsx("input", { 
+            type: "file", 
+            ref: fileInputRef, 
+            onChange: handleFileChange, 
+            accept: "image/*", 
+            multiple: true, 
+            className: "hidden" 
+          }),
+          isProcessing && _jsxs("div", { 
+            className: "absolute inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 backdrop-blur-md transition-all duration-500 animate-in fade-in", 
+            children: [
+              _jsxs("div", { 
+                className: "relative w-16 h-16 mb-6", 
+                children: [
+                  _jsx("div", { className: "absolute inset-0 border-2 border-t-[#d4af37] border-r-transparent border-b-[#d4af37] border-l-transparent rounded-full animate-spin" }),
+                  _jsx("div", { className: "absolute inset-2 border-2 border-t-transparent border-r-white/30 border-b-transparent border-l-white/30 rounded-full animate-spin-reverse" }),
+                  _jsx("div", { className: "absolute inset-0 flex items-center justify-center text-[#d4af37] text-xl animate-pulse", children: "✦" })
+                ] 
+              }),
+              _jsx("div", { className: "text-[#d4af37] font-luxury tracking-[0.25em] text-xs uppercase animate-pulse", children: "圣诞树装饰中..." }),
+              _jsx("style", { 
+                children: `
+                  @keyframes spin-reverse {
                     from { transform: rotate(360deg); }
                     to { transform: rotate(0deg); }
-                }
-                .animate-spin-reverse {
+                  }
+                  .animate-spin-reverse {
                     animation: spin-reverse 2s linear infinite;
-                }
-              ` })] })), _jsx("div", { className: `absolute top-[5%] left-0 w-full flex justify-center pointer-events-none z-0 transition-opacity duration-700 ${isSignatureOpen ? 'opacity-0' : 'opacity-100'}`, children: _jsx("h1", { className: "font-script text-6xl md:text-9xl text-center leading-[1.5] py-10", style: {
-                        // Silver Metallic Gradient
-                        background: 'linear-gradient(to bottom, #ffffff 20%, #e8e8e8 50%, #b0b0b0 90%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        // 3D Depth Shadows + Glow
-                        filter: 'drop-shadow(0px 5px 5px rgba(0,0,0,0.8)) drop-shadow(0px 0px 20px rgba(255,255,255,0.4))'
-                    }, children: "Merry Christmas" }) }), _jsx("div", { className: `absolute inset-0 z-10 transition-all duration-700 ${isSignatureOpen ? 'blur-sm scale-95 opacity-50' : 'blur-0 scale-100 opacity-100'}`, children: _jsx(Experience, { mixFactor: targetMix, colors: colors, inputRef: inputRef, userImages: userImages, signatureText: signatureText }) }), isSignatureOpen && (_jsxs("div", { className: "absolute inset-0 z-40 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-opacity duration-500 animate-in fade-in", children: [_jsxs("div", { className: "relative bg-[#f8f8f8] p-4 pb-12 shadow-[0_0_50px_rgba(255,255,255,0.2)] transform transition-transform duration-700 scale-100 rotate-[-2deg]", style: { width: 'min(80vw, 320px)', aspectRatio: '3.5/4.2' }, children: [_jsx("button", { onClick: () => setIsSignatureOpen(false), className: "absolute -top-4 -right-4 w-8 h-8 rounded-full bg-black border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-black transition-colors z-50", children: "\u00D7" }), _jsxs("div", { className: "w-full h-[75%] bg-[#1a1a1a] overflow-hidden relative shadow-inner", children: [activePhotoUrl ? (_jsx("img", { src: activePhotoUrl, alt: "Memory", className: "w-full h-full object-cover" })) : (_jsx("div", { className: "w-full h-full flex items-center justify-center text-white/40 font-body text-lg italic tracking-widest text-center px-4", children: "\u6211~\u4E00\u76F4\u90FD\u60F3\u5BF9\u4F60\u8BF4~" })), _jsx("div", { className: "absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/20 pointer-events-none" })] }), _jsx("div", { className: "absolute bottom-0 left-0 w-full h-[25%] flex items-center justify-center px-4", children: _jsx("input", { autoFocus: true, type: "text", placeholder: "Sign here...", value: signatureText, onChange: (e) => setSignatureText(e.target.value), className: "w-full text-center bg-transparent border-none outline-none font-script text-3xl md:text-4xl text-[#1a1a1a] placeholder:text-gray-300/50", style: { transform: 'translateY(-5px) rotate(-1deg)' }, maxLength: 20 }) })] }), _jsx("div", { className: "absolute bottom-10 left-0 w-full flex justify-center", children: _jsx("button", { onClick: () => setIsSignatureOpen(false), className: textButtonClass, children: "\u5B8C\u6210\u7B7E\u540D" }) })] })), _jsxs("div", { className: `absolute top-6 right-6 md:top-10 md:right-10 z-30 pointer-events-auto flex flex-row md:flex-col items-center md:items-end gap-3 md:gap-4 transition-opacity duration-500 ${isSignatureOpen || isProcessing ? 'opacity-0 pointer-events-none' : 'opacity-100'}`, children: [_jsx("button", { onClick: () => setShowCamera(prev => !prev), className: `${iconButtonClass} ${showCamera ? 'text-white border-white/60 bg-white/10' : 'text-slate-300'}`, title: showCamera ? "隐藏摄像头" : "显示摄像头", children: showCamera ? (
-                        // Camera On Icon
-                        _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" }) })) : (
-                        // Camera Off Icon (Slash)
-                        _jsxs("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: [_jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M12 18.75H4.5a2.25 2.25 0 01-2.25-2.25V9m12.841 9.091L16.5 19.5m-1.409-1.409c.407-.407.659-.97.659-1.591v-9a2.25 2.25 0 00-2.25-2.25h-9c-.621 0-1.184.252-1.591.659m3.75-3.75l3.75-3.75" }), _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M3 3l18 18" })] })) }), _jsx("button", { onClick: handleUploadClick, className: iconButtonClass, title: "\u4E0A\u4F20\u7167\u7247", children: _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" }) }) }), _jsx("button", { onClick: handleSignatureClick, className: iconButtonClass, title: "\u62CD\u7ACB\u5F97\u7B7E\u540D", children: _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" }) }) }), _jsx("button", { onClick: toggleState, className: iconButtonClass, title: targetMix === 1 ? "散开" : "聚拢", children: targetMix === 1 ? (
-                        // Icon: Disperse (Explosion out)
-                        _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" }) })) : (
-                        // Icon: Assemble (Implosion in)
-                        _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" }) })) })] }), _jsx("div", { className: `absolute bottom-6 left-6 z-20 pointer-events-none transition-opacity duration-500 ${isSignatureOpen ? 'opacity-0' : 'opacity-100'}`, children: _jsxs("div", { className: "text-white/20 text-[10px] uppercase tracking-widest font-luxury", children: [_jsx("div", { children: "\u4E00\u9897\u7F8E\u4E3D\u7684\u5723\u8BDE\u6811" }), _jsx("div", { className: "text-slate-500", children: "Made by Southpl" })] }) }), _jsx(GestureController, { onGesture: handleGesture, isGuiVisible: showCamera })] }));
-};
-export default App;
-
-    ",
-    "@/components/SpiralLights":"
-      import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useMemo, useRef, useLayoutEffect } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-import { generateSpiralData, lerp } from '@/utils/math';
-const SpiralLights = ({ mixFactor }) => {
-    const count = 300;
-    const meshRef = useRef(null);
-    const dummy = useMemo(() => new THREE.Object3D(), []);
-    const currentMixRef = useRef(1);
-    // Generate spiral positions
-    const { target, chaos } = useMemo(() => generateSpiralData(count, 19, 7.5, 9), []);
-    useLayoutEffect(() => {
-        if (!meshRef.current)
-            return;
-        const color = new THREE.Color("#fffae0"); // Warm White
-        for (let i = 0; i < count; i++) {
-            meshRef.current.setColorAt(i, color);
-            dummy.position.set(target[i * 3], target[i * 3 + 1], target[i * 3 + 2]);
-            dummy.scale.setScalar(0.15);
-            dummy.updateMatrix();
-            meshRef.current.setMatrixAt(i, dummy.matrix);
-        }
-        if (meshRef.current.instanceColor)
-            meshRef.current.instanceColor.needsUpdate = true;
-        meshRef.current.instanceMatrix.needsUpdate = true;
-    }, [target, dummy]);
-    useFrame((state, delta) => {
-        if (!meshRef.current)
-            return;
-        const speed = 2.0 * delta;
-        currentMixRef.current = lerp(currentMixRef.current, mixFactor, speed);
-        const t = currentMixRef.current;
-        // Animate glow/brightness via scale pulse
-        const time = state.clock.elapsedTime;
-        for (let i = 0; i < count; i++) {
-            const tx = target[i * 3];
-            const ty = target[i * 3 + 1];
-            const tz = target[i * 3 + 2];
-            const cx = chaos[i * 3];
-            const cy = chaos[i * 3 + 1];
-            const cz = chaos[i * 3 + 2];
-            const x = lerp(cx, tx, t);
-            const y = lerp(cy, ty, t);
-            const z = lerp(cz, tz, t);
-            dummy.position.set(x, y, z);
-            // Pulse effect
-            const pulse = Math.sin(time * 3 + i * 0.1) * 0.05 + 0.15;
-            dummy.scale.setScalar(pulse);
-            dummy.updateMatrix();
-            meshRef.current.setMatrixAt(i, dummy.matrix);
-        }
-        meshRef.current.instanceMatrix.needsUpdate = true;
-    });
-    return (_jsxs("instancedMesh", { ref: meshRef, args: [undefined, undefined, count], children: [_jsx("sphereGeometry", { args: [1, 8, 8] }), _jsx("meshBasicMaterial", { color: "#fffae0", toneMapped: false })] }));
-};
-export default SpiralLights;
-
-    ",
-    "@/components/Snow":"
-      import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useMemo, useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
-import { lerp } from '@/utils/math';
-const snowVertexShader = `
-  precision highp float;
-  uniform float uTime; // Global Time
-  uniform float uMix;  // Still used for drift amplitude
-  
-  attribute float aScale;
-  attribute vec3 aVelocity;
-  
-  varying float vAlpha;
-
-  void main() {
-    vec3 pos = position;
-    
-    // Physics
-    // Fall down based on Global Time.
-    float fallSpeed = aVelocity.y; 
-    
-    pos.y = mod(pos.y - uTime * fallSpeed + 15.0, 30.0) - 15.0; // Wrap Y (-15 to 15)
-    
-    // Side drift
-    // uMix still controls the Amplitude of the drift (Chaos = wider drift)
-    float drift = sin(uTime * aVelocity.x + pos.y) * (0.5 + (1.0 - uMix) * 2.0);
-    pos.x += drift;
-    pos.z += cos(uTime * aVelocity.z + pos.x) * 0.5;
-
-    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-    gl_Position = projectionMatrix * mvPosition;
-    
-    // Size
-    gl_PointSize = aScale * (15.0 / -mvPosition.z);
-    
-    // Fade at edges of box
-    vAlpha = 1.0 - smoothstep(12.0, 15.0, abs(pos.y));
-  }
-`;
-const snowFragmentShader = `
-  precision highp float;
-  varying float vAlpha;
-
-  void main() {
-    vec2 coord = gl_PointCoord - vec2(0.5);
-    float dist = length(coord);
-    if (dist > 0.5) discard;
-    
-    float alpha = (1.0 - smoothstep(0.3, 0.5, dist)) * vAlpha * 0.8;
-    gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);
-  }
-`;
-const Snow = ({ mixFactor }) => {
-    // RESTORED: Full snow count
-    const count = 3000;
-    const pointsRef = useRef(null);
-    const materialRef = useRef(null);
-    const currentMixRef = useRef(1);
-    const { camera } = useThree();
-    const { positions, scales, velocities } = useMemo(() => {
-        const pos = new Float32Array(count * 3);
-        const sc = new Float32Array(count);
-        const vel = new Float32Array(count * 3);
-        for (let i = 0; i < count; i++) {
-            // Random box -25 to 25 (Slightly larger to cover screen edges)
-            pos[i * 3] = (Math.random() - 0.5) * 50;
-            pos[i * 3 + 1] = (Math.random() - 0.5) * 30; // Y height
-            pos[i * 3 + 2] = (Math.random() - 0.5) * 40; // Z depth
-            sc[i] = Math.random() * 2 + 1;
-            vel[i * 3] = Math.random() * 0.5 + 0.2; // Drift freq
-            vel[i * 3 + 1] = Math.random() * 2.0 + 1.0; // Fall speed
-            vel[i * 3 + 2] = Math.random() * 0.5 + 0.2;
-        }
-        return { positions: pos, scales: sc, velocities: vel };
-    }, [count]);
-    const uniforms = useMemo(() => ({
-        uTime: { value: 0 },
-        uMix: { value: 1 }
-    }), []);
-    useFrame((state, delta) => {
-        if (materialRef.current && pointsRef.current) {
-            currentMixRef.current = lerp(currentMixRef.current, mixFactor, delta * 2.0);
-            materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-            materialRef.current.uniforms.uMix.value = currentMixRef.current;
-            pointsRef.current.position.x = camera.position.x;
-            pointsRef.current.position.y = camera.position.y;
-        }
-    });
-    return (_jsxs("points", { ref: pointsRef, frustumCulled: false, children: [_jsxs("bufferGeometry", { children: [_jsx("bufferAttribute", { attach: "attributes-position", count: count, array: positions, itemSize: 3 }), _jsx("bufferAttribute", { attach: "attributes-aScale", count: count, array: scales, itemSize: 1 }), _jsx("bufferAttribute", { attach: "attributes-aVelocity", count: count, array: velocities, itemSize: 3 })] }), _jsx("shaderMaterial", { ref: materialRef, vertexShader: snowVertexShader, fragmentShader: snowFragmentShader, uniforms: uniforms, transparent: true, depthWrite: false })] }));
-};
-export default Snow;
-
-    ",
-    "@/components/TopStar":"
-    import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three';
-import { lerp } from '@/utils/math';
-const createStarShape = (outerRadius, innerRadius, points) => {
-    const shape = new THREE.Shape();
-    const step = (Math.PI * 2) / (points * 2);
-    // Start at top
-    shape.moveTo(0, outerRadius);
-    for (let i = 0; i < points * 2; i++) {
-        const radius = (i % 2 === 0) ? outerRadius : innerRadius;
-        const angle = i * step;
-        // Standard angle starts at 3 o'clock. We want top point at 12 o'clock.
-        // Rotation offset = PI/2.
-        const effectiveAngle = angle + Math.PI / 2;
-        shape.lineTo(Math.cos(effectiveAngle) * radius, Math.sin(effectiveAngle) * radius);
-    }
-    shape.closePath();
-    return shape;
-};
-const TopStar = ({ mixFactor }) => {
-    const groupRef = useRef(null);
-    const visualRef = useRef(null);
-    const starMeshRef = useRef(null);
-    const currentMixRef = useRef(1);
-    // Create Geometry once
-    const geometry = useMemo(() => {
-        const shape = createStarShape(1.2, 0.6, 5);
-        const geom = new THREE.ExtrudeGeometry(shape, {
-            depth: 0.4,
-            bevelEnabled: true,
-            bevelThickness: 0.1,
-            bevelSize: 0.1,
-            bevelSegments: 4
-        });
-        geom.center();
-        return geom;
-    }, []);
-    useFrame((state, delta) => {
-        if (!groupRef.current || !visualRef.current || !starMeshRef.current)
-            return;
-        const speed = 2.0 * delta;
-        currentMixRef.current = lerp(currentMixRef.current, mixFactor, speed);
-        const t = currentMixRef.current;
-        // 1. Position Logic
-        // Formed: Top of tree (y=9.2)
-        // Chaos: Floating upwards (y=13)
-        const targetY = 9.2;
-        const chaosY = 13.0;
-        const currentY = lerp(chaosY, targetY, t);
-        groupRef.current.position.set(0, currentY, 0);
-        // 2. Rotation Logic
-        // Always slowly spin the mesh itself
-        starMeshRef.current.rotation.y += delta * 0.5;
-        // Apply chaos tilt to the main group
-        if (t < 0.9) {
-            const chaosTilt = (1 - t) * 0.5;
-            groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime) * chaosTilt;
-            groupRef.current.rotation.x = Math.cos(state.clock.elapsedTime * 0.8) * chaosTilt;
-        }
-        else {
-            groupRef.current.rotation.z = lerp(groupRef.current.rotation.z, 0, speed);
-            groupRef.current.rotation.x = lerp(groupRef.current.rotation.x, 0, speed);
-        }
-        // 3. Scale Logic
-        // Static scale to prevent flickering/pulsing artifacts
-        visualRef.current.scale.setScalar(1.0);
-    });
-    return (_jsxs("group", { ref: groupRef, children: [_jsx("group", { ref: visualRef, children: _jsx("mesh", { ref: starMeshRef, geometry: geometry, children: _jsx("meshStandardMaterial", { color: "#FFD700", emissive: "#FFD700", emissiveIntensity: 2.0, roughness: 0.1, metalness: 0.9, toneMapped: false }) }) }), _jsx("pointLight", { color: "#ffeebf", intensity: 3.0, distance: 15, decay: 2 })] }));
-};
-export default TopStar;
-
-"
-  }}
-</script>
-<script type="module">
-  const geminiUrl = window.location.origin + '/api-proxy';
-
-  window.API_KEY = 'UNUSED_PLACEHOLDER_FOR_API_KEY';
-  window.GEMINI_API_KEY = 'UNUSED_PLACEHOLDER_FOR_API_KEY';
-  window.process = window.process || {};
-  window.process.env = window.process.env || {};
-  window.process.env.API_KEY = window.API_KEY;
-  window.process.env.GEMINI_API_KEY = window.GEMINI_API_KEY;
-</script>
-
-<!DOCTYPE html>
-<html lang="en">
-  <head><script src="/public/websocket-interceptor.js" defer></script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load' , () => {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(registration => {
-        console.log('Service Worker registered successfully with scope:', registration.scope);
-      })
-      .catch(error => {
-        console.error('Service Worker registration failed:', error);
+                  }
+                ` 
+              })
+            ] 
+          }),
+          _jsx("div", { 
+            className: `absolute top-[5%] left-0 w-full flex justify-center pointer-events-none z-0 transition-opacity duration-700 ${isSignatureOpen ? 'opacity-0' : 'opacity-100'}`, 
+            children: _jsx("h1", { 
+              className: "font-script text-6xl md:text-9xl text-center leading-[1.5] py-10", 
+              style: {
+                background: 'linear-gradient(to bottom, #ffffff 20%, #e8e8e8 50%, #b0b0b0 90%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: 'drop-shadow(0px 5px 5px rgba(0,0,0,0.8)) drop-shadow(0px 0px 20px rgba(255,255,255,0.4))'
+              }, 
+              children: "Merry Christmas" 
+            }) 
+          }),
+          _jsx("div", { 
+            className: `absolute inset-0 z-10 transition-all duration-700 ${isSignatureOpen ? 'blur-sm scale-95 opacity-50' : 'blur-0 scale-100 opacity-100'}`, 
+            children: _jsx(Experience, { 
+              mixFactor: targetMix, 
+              colors: colors, 
+              inputRef: inputRef, 
+              userImages: userImages, 
+              signatureText: signatureText 
+            }) 
+          }),
+          isSignatureOpen && _jsxs("div", { 
+            className: "absolute inset-0 z-40 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md transition-opacity duration-500 animate-in fade-in", 
+            children: [
+              _jsxs("div", { 
+                className: "relative bg-[#f8f8f8] p-4 pb-12 shadow-[0_0_50px_rgba(255,255,255,0.2)] transform transition-transform duration-700 scale-100 rotate-[-2deg]", 
+                style: { width: 'min(80vw, 320px)', aspectRatio: '3.5/4.2' }, 
+                children: [
+                  _jsx("button", { 
+                    onClick: () => setIsSignatureOpen(false), 
+                    className: "absolute -top-4 -right-4 w-8 h-8 rounded-full bg-black border border-white/20 text-white flex items-center justify-center hover:bg-white hover:text-black transition-colors z-50", 
+                    children: "×" 
+                  }),
+                  _jsxs("div", { 
+                    className: "w-full h-[75%] bg-[#1a1a1a] overflow-hidden relative shadow-inner", 
+                    children: [
+                      activePhotoUrl ? (
+                        _jsx("img", { src: activePhotoUrl, alt: "Memory", className: "w-full h-full object-cover" })
+                      ) : (
+                        _jsx("div", { className: "w-full h-full flex items-center justify-center text-white/40 font-body text-lg italic tracking-widest text-center px-4", children: "我~一直都想对你说~" })
+                      ),
+                      _jsx("div", { className: "absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/20 pointer-events-none" })
+                    ] 
+                  }),
+                  _jsx("div", { 
+                    className: "absolute bottom-0 left-0 w-full h-[25%] flex items-center justify-center px-4", 
+                    children: _jsx("input", { 
+                      autoFocus: true, 
+                      type: "text", 
+                      placeholder: "Sign here...", 
+                      value: signatureText, 
+                      onChange: (e) => setSignatureText(e.target.value), 
+                      className: "w-full text-center bg-transparent border-none outline-none font-script text-3xl md:text-4xl text-[#1a1a1a] placeholder:text-gray-300/50", 
+                      style: { transform: 'translateY(-5px) rotate(-1deg)' }, 
+                      maxLength: 20 
+                    }) 
+                  })
+                ] 
+              }),
+              _jsx("div", { 
+                className: "absolute bottom-10 left-0 w-full flex justify-center", 
+                children: _jsx("button", { 
+                  onClick: () => setIsSignatureOpen(false), 
+                  className: textButtonClass, 
+                  children: "完成签名" 
+                }) 
+              })
+            ] 
+          }),
+          _jsxs("div", { 
+            className: `absolute top-6 right-6 md:top-10 md:right-10 z-30 pointer-events-auto flex flex-row md:flex-col items-center md:items-end gap-3 md:gap-4 transition-opacity duration-500 ${isSignatureOpen || isProcessing ? 'opacity-0 pointer-events-none' : 'opacity-100'}`, 
+            children: [
+              _jsx("button", { 
+                onClick: () => setShowCamera(prev => !prev), 
+                className: `${iconButtonClass} ${showCamera ? 'text-white border-white/60 bg-white/10' : 'text-slate-300'}`, 
+                title: showCamera ? "隐藏摄像头" : "显示摄像头", 
+                children: showCamera ? (
+                  _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" }) })
+                ) : (
+                  _jsxs("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: [_jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M12 18.75H4.5a2.25 2.25 0 01-2.25-2.25V9m12.841 9.091L16.5 19.5m-1.409-1.409c.407-.407.659-.97.659-1.591v-9a2.25 2.25 0 00-2.25-2.25h-9c-.621 0-1.184.252-1.591.659m3.75-3.75l3.75-3.75" }), _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M3 3l18 18" })] })
+                ) 
+              }),
+              _jsx("button", { 
+                onClick: handleUploadClick, 
+                className: iconButtonClass, 
+                title: "上传照片", 
+                children: _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" }) }) 
+              }),
+              _jsx("button", { 
+                onClick: handleSignatureClick, 
+                className: iconButtonClass, 
+                title: "拍立得签名", 
+                children: _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" }) }) 
+              }),
+              _jsx("button", { 
+                onClick: toggleState, 
+                className: iconButtonClass, 
+                title: targetMix === 1 ? "散开" : "聚拢", 
+                children: targetMix === 1 ? (
+                  _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" }) })
+                ) : (
+                  _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", strokeWidth: 1.2, stroke: "currentColor", className: "w-5 h-5 md:w-6 md:h-6", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", d: "M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25" }) })
+                ) 
+              })
+            ] 
+          }),
+          _jsx("div", { 
+            className: `absolute bottom-6 left-6 z-20 pointer-events-none transition-opacity duration-500 ${isSignatureOpen ? 'opacity-0' : 'opacity-100'}`, 
+            children: _jsxs("div", { 
+              className: "text-white/20 text-[10px] uppercase tracking-widest font-luxury", 
+              children: [
+                _jsx("div", { children: "一颗美丽的圣诞树" }),
+                _jsx("div", { className: "text-slate-500", children: "Made by Southpl" })
+              ] 
+            }) 
+          }),
+          _jsx(GestureController, { onGesture: handleGesture, isGuiVisible: showCamera })
+        ] 
       });
-  });
-} else {
-  console.log('Service workers are not supported in this browser.');
-}
-</script>
+    };
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Grand Luxury Christmas Tree</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Monsieur+La+Doulaise&display=swap" rel="stylesheet">
-    <style>
-      body { margin: 0; background-color: #010a05; overflow: hidden; }
-      .font-luxury { font-family: 'Cinzel', serif; }
-      .font-body { font-family: 'Playfair Display', serif; }
-      .font-script { font-family: 'Monsieur La Doulaise', cursive; }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+    // ============================================================================
+    // RENDER APPLICATION
+    // ============================================================================
+    const rootElement = document.getElementById('root');
+    if (!rootElement) {
+      throw new Error("Could not find root element to mount to");
+    }
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(_jsx(React.StrictMode, { children: _jsx(App, {}) }));
+  </script>
+</body>
 </html>
-<script type="module">import '@/index';</script>
