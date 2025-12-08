@@ -208,13 +208,13 @@ def get_dishes():
         }), 500
 
 
-@api_bp.route('/dishes/<int:dish_id>', methods=['GET'])
-def get_dish(dish_id):
+@api_bp.route('/dishes/detail', methods=['GET'])
+def get_dish():
     """
     Get details of a specific dish.
     
-    Args:
-        dish_id: Dish ID
+    Query Parameters:
+        - id: MongoDB ObjectId (required)
     
     Returns:
         JSON response with dish details
@@ -222,7 +222,14 @@ def get_dish(dish_id):
     try:
         dish_model, _, _ = get_models()
         
-        dish = dish_model.find_by_id(dish_id)
+        dish_id = request.args.get('id')
+        if not dish_id:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required parameter: id'
+            }), 400
+        
+        dish = dish_model.find_by_object_id(dish_id)
         
         if not dish:
             return jsonify({
@@ -242,16 +249,14 @@ def get_dish(dish_id):
         }), 500
 
 
-@api_bp.route('/dishes/<int:dish_id>/stock', methods=['PATCH'])
-def update_dish_stock(dish_id):
+@api_bp.route('/dishes/stock', methods=['PATCH'])
+def update_dish_stock():
     """
     Update dish stock quantity.
     
-    Args:
-        dish_id: Dish ID
-    
     Request Body:
         {
+            "id": "692b4bd239b02aae00984611",  // MongoDB ObjectId
             "quantity": -1  // Negative to decrease, positive to increase
         }
     
@@ -259,22 +264,34 @@ def update_dish_stock(dish_id):
         JSON response with updated dish
     """
     try:
+        from bson import ObjectId
         dish_model, _, _ = get_models()
         
         data = request.get_json()
-        quantity = data.get('quantity', 0)
         
-        dish = dish_model.update_stock(dish_id, quantity)
+        dish_id = data.get('id')
+        if not dish_id:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: id'
+            }), 400
         
+        # Get current dish to find dish_id
+        dish = dish_model.find_by_object_id(dish_id)
         if not dish:
             return jsonify({
                 'success': False,
                 'error': 'Dish not found'
             }), 404
         
+        quantity = data.get('quantity', 0)
+        
+        # Update stock using dish_id
+        updated_dish = dish_model.update_stock(dish['dish_id'], quantity)
+        
         return jsonify({
             'success': True,
-            'data': serialize_doc(dish)
+            'data': serialize_doc(updated_dish)
         }), 200
         
     except Exception as e:
@@ -414,16 +431,14 @@ def create_dish():
         }), 500
 
 
-@api_bp.route('/dishes/<int:dish_id>', methods=['PUT'])
-def update_dish(dish_id):
+@api_bp.route('/dishes/update', methods=['PUT'])
+def update_dish():
     """
     Update an existing dish.
     
-    Args:
-        dish_id: Dish ID
-    
     Request Body:
         {
+            "_id": "692b4bd239b02aae00984611",  // MongoDB ObjectId
             "name": "更新的菜品",
             "name_en": "Updated Dish",
             "price": 13.99,
@@ -446,17 +461,17 @@ def update_dish(dish_id):
         
         data = request.get_json()
         
-        # Validate required fields
-        required_fields = ['name', 'name_en', 'price', 'category']
-        is_valid, error_msg = validate_required_fields(data, required_fields)
-        if not is_valid:
+        dish_id = data.get('_id')
+        print("======= dish_id", dish_id)
+        if not dish_id:
             return jsonify({
                 'success': False,
-                'error': error_msg
+                'error': 'Missing required field: _id'
             }), 400
         
-        # Update dish
-        dish = dish_model.update(dish_id, data)
+        # Update dish using ObjectId
+        dish = dish_model.update_by_object_id(dish_id, data)
+        print("======= dish", dish)
         
         if not dish:
             return jsonify({
@@ -673,19 +688,26 @@ def get_orders():
         }), 500
 
 
-@api_bp.route('/orders/<order_number>', methods=['GET'])
-def get_order(order_number):
+@api_bp.route('/orders/detail', methods=['GET'])
+def get_order():
     """
     Get details of a specific order including items with dish images.
     
-    Args:
-        order_number: Order number
+    Query Parameters:
+        - order_number: Order number (required)
     
     Returns:
         JSON response with order details and items
     """
     try:
         dish_model, order_model, _ = get_models()
+        
+        order_number = request.args.get('order_number')
+        if not order_number:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required parameter: order_number'
+            }), 400
         
         order = order_model.find_by_order_number(order_number)
         
@@ -731,16 +753,14 @@ def get_order(order_number):
         }), 500
 
 
-@api_bp.route('/orders/<order_number>/status', methods=['PATCH'])
-def update_order_status(order_number):
+@api_bp.route('/orders/status', methods=['PATCH'])
+def update_order_status():
     """
     Update order status.
     
-    Args:
-        order_number: Order number
-    
     Request Body:
         {
+            "order_number": "ORD20241208123456",
             "status": "confirmed"
         }
     
@@ -751,6 +771,14 @@ def update_order_status(order_number):
         _, order_model, _ = get_models()
         
         data = request.get_json()
+        
+        order_number = data.get('order_number')
+        if not order_number:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: order_number'
+            }), 400
+        
         new_status = data.get('status')
         
         valid_statuses = ['pending', 'confirmed', 'preparing', 'delivering', 'completed', 'cancelled']
@@ -782,19 +810,30 @@ def update_order_status(order_number):
         }), 500
 
 
-@api_bp.route('/orders/<order_number>', methods=['DELETE'])
-def cancel_order(order_number):
+@api_bp.route('/orders/cancel', methods=['DELETE'])
+def cancel_order():
     """
     Cancel an order and restore stock.
     
-    Args:
-        order_number: Order number
+    Request Body:
+        {
+            "order_number": "ORD20241208123456"
+        }
     
     Returns:
         JSON response with cancellation status
     """
     try:
         dish_model, order_model, _ = get_models()
+        
+        data = request.get_json()
+        
+        order_number = data.get('order_number')
+        if not order_number:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: order_number'
+            }), 400
         
         items = order_model.cancel_order(order_number)
         

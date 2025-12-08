@@ -63,6 +63,29 @@ class DishModel:
         """
         return self.collection.find_one({'dish_id': dish_id})
     
+    def find_by_object_id(self, object_id):
+        """
+        Find a dish by its MongoDB _id (ObjectId).
+        
+        Args:
+            object_id (str or ObjectId): MongoDB ObjectId
+            
+        Returns:
+            dict: Dish document or None
+        """
+        try:
+            if isinstance(object_id, str):
+                object_id = ObjectId(object_id)
+            print(f"====== Searching for _id: {object_id}, type: {type(object_id)}")
+            result = self.collection.find_one({'_id': object_id})
+            print(f"====== Query result: {result}")
+            return result
+        except Exception as e:
+            print(f"====== Exception in find_by_object_id: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+    
     def update_stock(self, dish_id, quantity):
         """
         Update dish stock by adding/subtracting quantity.
@@ -208,6 +231,46 @@ class DishModel:
             return None
         
         return self.find_by_id(dish_id)
+    
+    def update_by_object_id(self, object_id, dish_data):
+        """
+        Update an existing dish by MongoDB _id.
+        
+        Args:
+            object_id (str or ObjectId): MongoDB ObjectId
+            dish_data (dict): Updated dish information
+            
+        Returns:
+            dict: Updated dish document or None
+        """
+        try:
+            if isinstance(object_id, str):
+                object_id = ObjectId(object_id)
+            
+            # Prepare update data
+            update_doc = {
+                'updated_at': datetime.now()
+            }
+            
+            # Add all fields from dish_data except _id, created_at, and updated_at
+            # These datetime fields should not be overwritten with string values
+            skip_fields = ['_id', 'created_at', 'updated_at']
+            
+            for key, value in dish_data.items():
+                if key not in skip_fields:
+                    update_doc[key] = value
+            result = self.collection.update_one(
+                {'_id': object_id},
+                {'$set': update_doc}
+            )
+            if result.matched_count == 0:
+                return None
+            
+            return self.find_by_object_id(object_id)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return None
 
 
 class OrderModel:

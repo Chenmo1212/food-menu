@@ -86,9 +86,14 @@ async function createDish(dishData) {
  */
 async function updateDish(dishId, dishData) {
   console.log("====", dishId)
-  return await apiRequest(`/dishes/${dishId}`, {
+  // Add _id to the request body as required by the new API
+  const updateData = {
+    _id: dishId,
+    ...dishData
+  };
+  return await apiRequest(`/dishes/update`, {
     method: 'PUT',
-    body: JSON.stringify(dishData),
+    body: JSON.stringify(updateData),
   });
 }
 
@@ -208,6 +213,20 @@ function extractNutrition(text) {
 }
 
 /**
+ * Map local category names to database-accepted values
+ */
+function mapCategory(localCategory) {
+  const categoryMap = {
+    'Vegetarian': 'Vegetables',
+    'Veggie': 'Vegetables',
+    'Veg': 'Vegetables',
+    // Add other mappings if needed
+  };
+  
+  return categoryMap[localCategory] || localCategory;
+}
+
+/**
  * Convert local dish data to API format
  * Note: dish_id is NOT included here as it should come from the database
  */
@@ -227,7 +246,7 @@ function convertToAPIFormat(localDish, dbDishId = null) {
     price: localDish.price,
     stock: localDish.stock || 0,
     order_count: localDish.orderCount || 0,
-    category: localDish.category,
+    category: mapCategory(localDish.category),
     image_url: imageUrl,
     description: localDish.description || '',
     description_en: localDish.descriptionEn || '',
@@ -246,30 +265,65 @@ function convertToAPIFormat(localDish, dbDishId = null) {
 }
 
 /**
+ * Deep compare two objects (order-independent)
+ */
+function deepCompareObjects(obj1, obj2) {
+  const keys1 = Object.keys(obj1 || {}).sort();
+  const keys2 = Object.keys(obj2 || {}).sort();
+  
+  if (keys1.length !== keys2.length) return false;
+  if (keys1.join(',') !== keys2.join(',')) return false;
+  
+  for (const key of keys1) {
+    if (String(obj1[key]) !== String(obj2[key])) {
+      return false;
+    }
+  }
+  
+  return true;
+}
+
+/**
  * Compare two dishes to check if they're different
  */
 function isDishDifferent(localDish, dbDish) {
   const fieldsToCompare = [
-    'name', 'name_en', 'price', 'category', 
-    'description', 'description_en', 'image_url'
+    'name', 'name_en', 'price', 'category',
+    'description', 'description_en', 'image_url', 'stock'
   ];
 
   for (const field of fieldsToCompare) {
-    if (localDish[field] !== dbDish[field]) {
+    // Handle potential type differences
+    const localValue = localDish[field];
+    const dbValue = dbDish[field];
+    
+    // Convert to string for comparison to handle number/string differences
+    if (String(localValue) !== String(dbValue)) {
+      console.log(`   📝 Field '${field}' changed: "${dbValue}" → "${localValue}"`);
       return true;
     }
   }
 
-  // Compare arrays
-  if (JSON.stringify(localDish.ingredients) !== JSON.stringify(dbDish.ingredients)) {
+  // Compare arrays (order matters)
+  const localIngredients = JSON.stringify(localDish.ingredients || []);
+  const dbIngredients = JSON.stringify(dbDish.ingredients || []);
+  if (localIngredients !== dbIngredients) {
+    console.log(`   📝 Field 'ingredients' changed`);
     return true;
   }
-  if (JSON.stringify(localDish.ingredients_en) !== JSON.stringify(dbDish.ingredients_en)) {
+  
+  const localIngredientsEn = JSON.stringify(localDish.ingredients_en || []);
+  const dbIngredientsEn = JSON.stringify(dbDish.ingredients_en || []);
+  if (localIngredientsEn !== dbIngredientsEn) {
+    console.log(`   📝 Field 'ingredients_en' changed`);
     return true;
   }
 
-  // Compare nutrition object
-  if (JSON.stringify(localDish.nutrition) !== JSON.stringify(dbDish.nutrition)) {
+  // Compare nutrition object (order-independent)
+  if (!deepCompareObjects(localDish.nutrition, dbDish.nutrition)) {
+    console.log(`   📝 Field 'nutrition' changed:`);
+    console.log(`      Local: ${JSON.stringify(localDish.nutrition || {})}`);
+    console.log(`      DB:    ${JSON.stringify(dbDish.nutrition || {})}`);
     return true;
   }
 
@@ -295,10 +349,14 @@ ${colors.reset}`);
     const dbDishes = await getDishesFromDB();
     console.log(`${colors.green}✓ Found ${dbDishes.length} dishes in database${colors.reset}\n`);
 
-    // Create a map of database dishes by name (Chinese name)
-    const dbDishMap = new Map();
+    // Create a map of database dishes by name (Chinese name) and by dish_id
+    const dbDishMapByName = new Map();
+    const dbDishMapById = new Map();
     dbDishes.forEach(dish => {
-      dbDishMap.set(dish.name, dish);
+      dbDishMapByName.set(dish.name, dish);
+      if (dish.dish_id) {
+        dbDishMapById.set(dish.dish_id, dish);
+      }
     });
 
     // Statistics
@@ -314,14 +372,20 @@ ${colors.reset}`);
     // Find the maximum dish_id in database for new dishes
     let maxDishId = 0;
     dbDishes.forEach(dish => {
-      if (dish.dish_id > maxDishId) {
+      if (dish.dish_id && dish.dish_id > maxDishId) {
         maxDishId = dish.dish_id;
       }
     });
 
     // Process each local dish
     for (const localDish of localDishes) {
-      const dbDish = dbDishMap.get(localDish.name);
+      // First try to match by local dish ID
+      let dbDish = dbDishMapById.get(localDish.id);
+      
+      // If not found by ID, try to match by name
+      if (!dbDish) {
+        dbDish = dbDishMapByName.get(localDish.name);
+      }
 
       try {
         if (!dbDish) {
@@ -337,9 +401,9 @@ ${colors.reset}`);
           const apiDish = convertToAPIFormat(localDish);
           
           if (isDishDifferent(apiDish, dbDish)) {
-            // Update it using database dish_id
-            console.log(`${colors.blue}🔄 Updating dish: ${localDish.name} (dish_id: ${dbDish.dish_id})${colors.reset}`);
-            await updateDish(dbDish.dish_id, apiDish);
+            // Update it using database _id (MongoDB ObjectId)
+            console.log(`${colors.blue}🔄 Updating dish: ${localDish.name} (_id: ${dbDish._id})${colors.reset}`);
+            await updateDish(dbDish._id, apiDish);
             stats.updated++;
             console.log(`${colors.green}   ✓ Updated successfully${colors.reset}`);
           } else {
