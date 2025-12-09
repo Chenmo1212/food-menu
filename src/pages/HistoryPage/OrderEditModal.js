@@ -486,8 +486,8 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
         <div className="p-6 border-t border-gray-200 flex flex-col gap-3">
           <button
             onClick={handleSave}
-            disabled={saving}
-            className="w-full px-6 py-3 bg-gradient-to-br from-orange-400 to-orange-500 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+            disabled={saving || !secretCode.trim()}
+            className="w-full px-6 py-3 bg-gradient-to-br from-orange-400 to-orange-500 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl font-semibold transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {saving ? (
               <>

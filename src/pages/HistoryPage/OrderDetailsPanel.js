@@ -83,6 +83,13 @@ export default function OrderDetailsPanel({
                 <span>{t('Restore Order', '恢复订单')}</span>
               )}
             </button>
+          ) : selectedOrder.status === 'completed' ? (
+            <button
+              onClick={() => onEdit(selectedOrder?.order_number)}
+              className="w-full bg-gradient-to-br from-orange-400 to-orange-500 hover:from-orange-600 hover:to-orange-700 text-white py-3 rounded-xl font-semibold transition-all shadow-md hover:shadow-lg"
+            >
+              {t('Edit Order', '编辑订单')}
+            </button>
           ) : (
             <>
               <button
