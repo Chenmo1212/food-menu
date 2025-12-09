@@ -7,6 +7,7 @@ This module defines all API routes and their handlers using Flask blueprints.
 
 from flask import Blueprint, request, jsonify, current_app
 from app.models import DishModel, OrderModel, StatsModel, serialize_doc
+from datetime import datetime
 import requests
 import json
 import os
@@ -805,6 +806,169 @@ def update_order():
             'success': True,
             'data': serialize_doc(order),
             'message': 'Order updated successfully'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@api_bp.route('/orders/items', methods=['PUT'])
+def update_order_items():
+    """
+    Update order items (add, update, or delete items).
+    
+    Request Body:
+        {
+            "order_number": "ORD20241208123456",
+            "items": [
+                {
+                    "dish_id": 1,
+                    "quantity": 2,
+                    "custom_notes": "No spicy"
+                }
+            ]
+        }
+    
+    Returns:
+        JSON response with updated order and items
+    """
+    try:
+        dish_model, order_model, _ = get_models()
+        
+        data = request.get_json()
+        
+        order_number = data.get('order_number')
+        if not order_number:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: order_number'
+            }), 400
+        
+        new_items = data.get('items', [])
+        if not new_items:
+            return jsonify({
+                'success': False,
+                'error': 'Items list cannot be empty'
+            }), 400
+        
+        # Get current order
+        order = order_model.find_by_order_number(order_number)
+        if not order:
+            return jsonify({
+                'success': False,
+                'error': 'Order not found'
+            }), 404
+        
+        # Check if order can be edited
+        if order['status'] in ['completed', 'cancelled']:
+            return jsonify({
+                'success': False,
+                'error': 'Cannot edit completed or cancelled orders'
+            }), 400
+        
+        # Get current items
+        current_items = order_model.find_items_by_order_number(order_number)
+        
+        # Restore stock for current items
+        for item in current_items:
+            dish_model.update_stock(item['dish_id'], item['quantity'])
+        
+        # Delete current items
+        order_model.items_collection.delete_many({'order_number': order_number})
+        
+        # Calculate new totals and prepare new items
+        total_amount = 0
+        total_items = 0
+        order_items = []
+        
+        for item in new_items:
+            dish_id = item['dish_id']
+            quantity = item['quantity']
+            
+            # Get dish information
+            dish = dish_model.find_by_id(dish_id)
+            if not dish:
+                # Rollback: restore old items
+                for old_item in current_items:
+                    old_item['created_at'] = datetime.now()
+                    order_model.items_collection.insert_one(old_item)
+                    dish_model.update_stock(old_item['dish_id'], -old_item['quantity'])
+                
+                return jsonify({
+                    'success': False,
+                    'error': f'Dish {dish_id} not found'
+                }), 404
+            
+            # Check stock
+            if dish['stock'] < quantity:
+                # Rollback: restore old items
+                for old_item in current_items:
+                    old_item['created_at'] = datetime.now()
+                    order_model.items_collection.insert_one(old_item)
+                    dish_model.update_stock(old_item['dish_id'], -old_item['quantity'])
+                
+                return jsonify({
+                    'success': False,
+                    'error': f'Insufficient stock for dish: {dish["name"]}'
+                }), 400
+            
+            subtotal = dish['price'] * quantity
+            total_amount += subtotal
+            total_items += quantity
+            
+            order_items.append({
+                'order_id': order['_id'],
+                'order_number': order_number,
+                'dish_id': dish_id,
+                'dish_name': dish['name'],
+                'dish_name_en': dish['name_en'],
+                'category': dish['category'],
+                'price': dish['price'],
+                'quantity': quantity,
+                'subtotal': subtotal,
+                'is_custom': item.get('is_custom', False),
+                'custom_notes': item.get('custom_notes', ''),
+                'created_at': datetime.now()
+            })
+        
+        # Insert new items
+        order_model.items_collection.insert_many(order_items)
+        
+        # Update order totals
+        order_model.update_order(order_number, {
+            'total_amount': round(total_amount, 2),
+            'total_items': total_items
+        })
+        
+        # Update stock for new items
+        for item in new_items:
+            dish_model.update_stock(item['dish_id'], -item['quantity'])
+        
+        # Get updated order and items
+        updated_order = order_model.find_by_order_number(order_number)
+        updated_items = order_model.find_items_by_order_number(order_number)
+        
+        # Enrich items with dish images
+        enriched_items = []
+        for item in updated_items:
+            item_data = serialize_doc(item)
+            dish = dish_model.find_by_id(item['dish_id'])
+            if dish:
+                item_data['dish_image'] = dish.get('image_url', '')
+            else:
+                item_data['dish_image'] = ''
+            enriched_items.append(item_data)
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'order': serialize_doc(updated_order),
+                'items': enriched_items
+            },
+            'message': 'Order items updated successfully'
         }), 200
         
     except Exception as e:

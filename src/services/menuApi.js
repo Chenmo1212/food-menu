@@ -195,6 +195,19 @@ export async function updateOrderStatus(orderNumber, status) {
 }
 
 /**
+ * Update order items
+ * @param {string} orderNumber - Order number
+ * @param {Array} items - Updated items list [{dish_id, quantity, custom_notes}]
+ * @returns {Promise<object>} Updated order with items
+ */
+export async function updateOrderItems(orderNumber, items) {
+  return apiRequest(`/orders/items`, {
+    method: 'PUT',
+    body: JSON.stringify({ order_number: orderNumber, items }),
+  });
+}
+
+/**
  * Cancel an order
  * @param {string} orderNumber - Order number
  * @returns {Promise<object>} Cancellation result

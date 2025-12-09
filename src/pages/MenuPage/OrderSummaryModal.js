@@ -141,7 +141,11 @@ export default function OrderSummaryModal({
               onClick={handleClose}
               className="w-8 h-8 sm:w-10 sm:h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
             >
-              <span className="text-xl sm:text-2xl">×</span>
+              <span className="text-xl sm:text-2xl">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </span>
             </button>
           </div>
 

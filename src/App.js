@@ -5,6 +5,7 @@ import Header from './components/Header';
 import MenuItemModal from './components/MenuItemModal';
 import Cart from './pages/MenuPage/Cart';
 import OrderDetailsPanel from './pages/HistoryPage/OrderDetailsPanel';
+import OrderEditModal from './pages/HistoryPage/OrderEditModal';
 import MenuPage from './pages/MenuPage';
 import HistoryPage from './pages/HistoryPage';
 import RankPage from './pages/RankPage';
@@ -36,6 +37,7 @@ function AppContent() {
   const [loadingOrderDetails, setLoadingOrderDetails] = useState(false);
   const [cancelingOrder, setCancelingOrder] = useState(false);
   const [restoringOrder, setRestoringOrder] = useState(false);
+  const [editingOrder, setEditingOrder] = useState(null);
 
   // Fetch dishes from API on component mount
   useEffect(() => {
@@ -248,6 +250,41 @@ function AppContent() {
     }
   };
 
+  // Handle edit order
+  const handleEditOrder = async (orderNumber) => {
+    try {
+      // Load order details if not already loaded
+      if (!selectedOrderDetails || selectedOrder?.order_number !== orderNumber) {
+        const response = await getOrderByNumber(orderNumber);
+        if (response.success && response.data) {
+          setSelectedOrder(response.data.order);
+          setSelectedOrderDetails(response.data);
+        }
+      }
+      setEditingOrder(selectedOrder);
+    } catch (error) {
+      console.error('❌ Failed to load order for editing:', error);
+      alert(t('Failed to load order details', '加载订单详情失败'));
+    }
+  };
+
+  // Handle save edited order
+  const handleSaveEditedOrder = async () => {
+    try {
+      // Refresh order details
+      const response = await getOrderByNumber(editingOrder.order_number);
+      if (response.success && response.data) {
+        setSelectedOrder(response.data.order);
+        setSelectedOrderDetails(response.data);
+      }
+      setEditingOrder(null);
+      alert(t('Order updated successfully', '订单更新成功'));
+    } catch (error) {
+      console.error('❌ Failed to refresh order:', error);
+      setEditingOrder(null);
+    }
+  };
+
   // Get status badge styling
   const getStatusBadge = (status) => {
     const statusConfig = {
@@ -372,10 +409,7 @@ function AppContent() {
           cancelingOrder={cancelingOrder}
           restoringOrder={restoringOrder}
           onClose={() => handleOrderSelect(null)}
-          onEdit={(orderNumber) => {
-            console.log('Edit order:', orderNumber);
-            alert(t('Edit functionality coming soon', '编辑功能即将推出'));
-          }}
+          onEdit={handleEditOrder}
           onDelete={handleDeleteOrder}
           onRestore={handleRestoreOrder}
           getStatusBadge={getStatusBadge}
@@ -390,6 +424,16 @@ function AppContent() {
           onClose={handleCloseModal}
           onAddToCart={addToCart}
           cardRect={cardRect}
+        />
+      )}
+
+      {/* Order Edit Modal */}
+      {editingOrder && selectedOrderDetails && (
+        <OrderEditModal
+          order={editingOrder}
+          orderDetails={selectedOrderDetails}
+          onClose={() => setEditingOrder(null)}
+          onSave={handleSaveEditedOrder}
         />
       )}
     </div>

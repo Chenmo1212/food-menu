@@ -4,6 +4,7 @@ import { getOrders } from '../../services/menuApi';
 import { ClockIcon, WarningIcon, PizzaIcon } from '../../utils/iconMapping';
 import soundManager from '../../utils/soundManager';
 import { resolveMealCover } from '../../utils/imageMapper';
+import OrderEditModal from './OrderEditModal';
 
 export default function HistoryPage({ onOrderSelect }) {
   const { t, language } = useLanguage();
