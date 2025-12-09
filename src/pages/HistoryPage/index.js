@@ -12,15 +12,16 @@ export default function HistoryPage({ onOrderSelect }) {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('on-process');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   // Fetch orders on component mount
   useEffect(() => {
     fetchOrders();
   }, []);
 
-  // Auto-switch to completed tab if on-process is empty
+  // Auto-switch to completed tab if on-process is empty (only on first load)
   useEffect(() => {
-    if (!loading && orders.length > 0) {
+    if (!loading && orders.length > 0 && !hasUserInteracted) {
       const onProcessOrders = orders.filter(order =>
         ['pending', 'confirmed', 'preparing'].includes(order.status)
       );
@@ -28,7 +29,7 @@ export default function HistoryPage({ onOrderSelect }) {
         setActiveTab('completed');
       }
     }
-  }, [orders, loading, activeTab]);
+  }, [orders, loading, activeTab, hasUserInteracted]);
 
   // Close details when switching tabs
   useEffect(() => {
@@ -74,11 +75,24 @@ export default function HistoryPage({ onOrderSelect }) {
       : order.created_at;
     
     const date = new Date(dateString);
-    return date.toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric'
-    });
+    
+    if (language === 'zh') {
+      // Chinese: 2025年12月9日 星期一
+      return date.toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long'
+      });
+    } else {
+      // English: Mon, Dec 9, 2025
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',  // Use abbreviated month
+        day: 'numeric',
+        weekday: 'short'  // Use abbreviated weekday
+      });
+    }
   };
 
   // Format time
@@ -157,6 +171,7 @@ export default function HistoryPage({ onOrderSelect }) {
           <button
             onClick={() => {
               soundManager.playTap();
+              setHasUserInteracted(true);
               setActiveTab('on-process');
             }}
             className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
@@ -170,6 +185,7 @@ export default function HistoryPage({ onOrderSelect }) {
           <button
             onClick={() => {
               soundManager.playTap();
+              setHasUserInteracted(true);
               setActiveTab('completed');
             }}
             className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
