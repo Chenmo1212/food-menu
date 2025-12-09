@@ -25,6 +25,7 @@ function AppContent() {
   const [cardRect, setCardRect] = useState(null);
   const [activeView, setActiveView] = useState('menu');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // API data states
   const [menuItems, setMenuItems] = useState(MENU_ITEMS);
@@ -314,6 +315,7 @@ function AppContent() {
             error={error}
             onAddToCart={addToCart}
             onItemClick={handleItemClick}
+            searchQuery={searchQuery}
           />
         );
       
@@ -379,8 +381,8 @@ function AppContent() {
         {/* Header */}
         <div className="lg:relative lg:p-6 lg:pt-8 sticky top-0 z-20 bg-gray-100 p-4">
           <Header
-            searchQuery=""
-            onSearchChange={() => {}}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
             onMenuClick={() => setIsMenuOpen(true)}
           />
         </div>

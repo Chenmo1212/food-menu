@@ -21,11 +21,11 @@ export default function MenuPage({
   loading,
   error,
   onAddToCart,
-  onItemClick
+  onItemClick,
+  searchQuery = ''
 }) {
   const { t, language } = useLanguage();
   const [activeCategory, setActiveCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
   const [showCustomDishModal, setShowCustomDishModal] = useState(false);
 
   // Filter items based on search query and active category
