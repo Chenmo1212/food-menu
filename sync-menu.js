@@ -287,19 +287,26 @@ function deepCompareObjects(obj1, obj2) {
  * Compare two dishes to check if they're different
  */
 function isDishDifferent(localDish, dbDish) {
-  const fieldsToCompare = [
-    'name', 'name_en', 'price', 'category',
-    'description', 'description_en', 'image_url', 'stock'
-  ];
+  // Map of local field names to database field names
+  const fieldMapping = {
+    'name': 'name',
+    'name_en': 'name_en',
+    'price': 'price',
+    'category': 'category',
+    'order_count': 'order_count',  // localDish already converted to order_count in convertToAPIFormat
+    'description': 'description',
+    'description_en': 'description_en',
+    'image_url': 'image_url',
+    'stock': 'stock'
+  };
 
-  for (const field of fieldsToCompare) {
-    // Handle potential type differences
-    const localValue = localDish[field];
-    const dbValue = dbDish[field];
+  for (const [localField, dbField] of Object.entries(fieldMapping)) {
+    const localValue = localDish[localField];
+    const dbValue = dbDish[dbField];
     
     // Convert to string for comparison to handle number/string differences
     if (String(localValue) !== String(dbValue)) {
-      console.log(`   📝 Field '${field}' changed: "${dbValue}" → "${localValue}"`);
+      console.log(`   📝 Field '${dbField}' changed: "${dbValue}" → "${localValue}"`);
       return true;
     }
   }
