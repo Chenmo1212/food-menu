@@ -53,7 +53,13 @@ export default function OrderDetailsPanel({
     <SidePanel
       isOpen={!!selectedOrder}
       onClose={onClose}
-      title={t('Order Details', '订单详情')}
+      title={
+        <div className="flex items-center gap-3">
+          <span>{t('Order Details', '订单详情')}</span>
+          {selectedOrder && getStatusBadge(selectedOrder.status)}
+        </div>
+      }
+      description={selectedOrder ? `${t('Order Number', '订单号')}: #${selectedOrder.order_number}` : null}
       width="w-full lg:w-96"
       closeOnClickOutside={false}
       closeOnEscape={false}
@@ -108,15 +114,6 @@ export default function OrderDetailsPanel({
     >
       {selectedOrder ? (
         <div className="p-6 space-y-4">
-          {/* Order Number and Status */}
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-600">{t('Order Number', '订单号')}</span>
-              {getStatusBadge(selectedOrder.status)}
-            </div>
-            <p className="font-bold text-lg text-gray-800">#{selectedOrder.order_number}</p>
-          </div>
-
           {/* Meal Cover for Completed Orders */}
           {mealCoverImage && (
             <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4">

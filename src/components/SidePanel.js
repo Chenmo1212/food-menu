@@ -7,6 +7,7 @@ import { TimesIcon } from '../utils/iconMapping';
  * @param {boolean} isOpen - Controls panel visibility
  * @param {function} onClose - Callback when panel closes
  * @param {string} title - Panel title
+ * @param {string} description - Optional description text below title
  * @param {React.ReactNode} children - Main content area
  * @param {React.ReactNode} footer - Footer content (buttons, etc.)
  * @param {string} width - Panel width class (default: 'w-full sm:w-96')
@@ -20,6 +21,7 @@ export default function SidePanel({
   isOpen = false,
   onClose,
   title,
+  description,
   children,
   footer,
   width = 'w-full sm:w-96',
@@ -94,18 +96,25 @@ export default function SidePanel({
       >
         {/* Header */}
         {title && (
-          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="text-xl font-bold text-gray-800">
-              {title}
-            </h3>
-            {showCloseButton && (
-              <button
-                onClick={onClose}
-                className="lg:hidden w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
-                aria-label="Close panel"
-              >
-                <TimesIcon />
-              </button>
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-800">
+                {title}
+              </h3>
+              {showCloseButton && (
+                <button
+                  onClick={onClose}
+                  className="lg:hidden w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+                  aria-label="Close panel"
+                >
+                  <TimesIcon />
+                </button>
+              )}
+            </div>
+            {description && (
+              <p className="text-sm text-gray-600 mt-2">
+                {description}
+              </p>
             )}
           </div>
         )}
