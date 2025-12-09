@@ -241,22 +241,24 @@ export default function HistoryPage({ onOrderSelect }) {
                       : 'border-gray-100 hover:border-orange-200'
                   }`}
                 >
-                  <div className="p-5 flex items-center gap-4">
+                  <div className="p-4 flex items-center gap-2">
                     {/* Left: Date and Status */}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-lg text-gray-800 mb-1">
                         {formatDateTitle(order)}
                       </h3>
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-                          {order.status}
-                        </span>
+                      <div className="flex items-center gap-3 flex-wrap mb-2">
                         <span className="text-sm text-gray-500">
                           {formatTime(order.created_at)}
                         </span>
                         <span className="text-sm text-gray-500 flex items-center gap-1">
                           <PizzaIcon size="sm" />
                           {order.total_items} {t('items', '项')}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                          {order.status}
                         </span>
                       </div>
                     </div>
