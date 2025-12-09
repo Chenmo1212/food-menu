@@ -50,7 +50,7 @@ function AppContent() {
         
         if (response.success && response.data) {
           const transformedData = response.data.map(dish => ({
-            id: dish.dish_id,
+            id: dish._id,
             name: dish.name,
             nameEn: dish.name_en,
             price: dish.price,
@@ -105,7 +105,7 @@ function AppContent() {
     if (existing) {
       setCart(cart.map((c) => (c.cartItemId === cartItemId ? { ...c, qty: c.qty + 1 } : c)));
     } else {
-      setCart([...cart, { ...item, qty: 1, specialInstructions, cartItemId }]);
+    setCart([...cart, { ...item, qty: 1, specialInstructions, cartItemId }]);
     }
   };
 

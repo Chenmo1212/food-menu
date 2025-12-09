@@ -51,18 +51,6 @@ class DishModel:
         
         return dishes, total
     
-    def find_by_id(self, dish_id):
-        """
-        Find a dish by its dish_id.
-        
-        Args:
-            dish_id (int): Dish ID
-            
-        Returns:
-            dict: Dish document or None
-        """
-        return self.collection.find_one({'dish_id': dish_id})
-    
     def find_by_object_id(self, object_id):
         """
         Find a dish by its MongoDB _id (ObjectId).
@@ -76,12 +64,9 @@ class DishModel:
         try:
             if isinstance(object_id, str):
                 object_id = ObjectId(object_id)
-            print(f"====== Searching for _id: {object_id}, type: {type(object_id)}")
             result = self.collection.find_one({'_id': object_id})
-            print(f"====== Query result: {result}")
             return result
         except Exception as e:
-            print(f"====== Exception in find_by_object_id: {e}")
             import traceback
             traceback.print_exc()
             return None
@@ -108,7 +93,7 @@ class DishModel:
         if result.matched_count == 0:
             return None
         
-        return self.find_by_id(dish_id)
+        return self.find_by_object_id(dish_id)
     
     def find_popular(self, limit=10):
         """
@@ -229,7 +214,7 @@ class DishModel:
         if result.matched_count == 0:
             return None
         
-        return self.find_by_id(dish_id)
+        return self.find_by_object_id(dish_id)
     
     def update_by_object_id(self, object_id, dish_data):
         """
@@ -338,15 +323,24 @@ class OrderModel:
         order_id = order_result.inserted_id
         
         # Prepare order items
+        self.insert_order_items(order_id, order_number, items_data)
+        
+        return order_id, order_number
+
+    def insert_order_items(self, order_id, order_number, items_data):
+        """
+        Insert order items into the database.
+        """
+        # Prepare order items
         for item in items_data:
             item['order_id'] = order_id
             item['order_number'] = order_number
             item['created_at'] = datetime.now()
+            if isinstance(item['dish_id'], str):
+                item['dish_id'] = ObjectId(item['dish_id'])
         
         # Insert order items
         self.items_collection.insert_many(items_data)
-        
-        return order_id, order_number
     
     def find_all(self, query=None, limit=50, skip=0):
         """

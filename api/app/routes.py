@@ -5,6 +5,7 @@ Food Menu System API
 This module defines all API routes and their handlers using Flask blueprints.
 """
 
+from typing import Any
 from flask import Blueprint, request, jsonify, current_app
 from app.models import DishModel, OrderModel, StatsModel, serialize_doc
 from datetime import datetime
@@ -266,7 +267,6 @@ def update_dish_stock():
         JSON response with updated dish
     """
     try:
-        from bson import ObjectId
         dish_model, _, _ = get_models()
         
         data = request.get_json()
@@ -550,7 +550,7 @@ def create_order():
             quantity = item['quantity']
             
             # Get dish information
-            dish = dish_model.find_by_id(dish_id)
+            dish = dish_model.find_by_object_id(dish_id)
             if not dish:
                 return jsonify({
                     'success': False,
@@ -725,7 +725,7 @@ def get_order():
             item_data = serialize_doc(item)
             
             # Fetch the dish details using dish_id (business key, not _id)
-            dish = dish_model.find_by_id(item['dish_id'])
+            dish = dish_model.find_by_object_id(item['dish_id'])
             
             # Add dish image if dish exists
             if dish:
@@ -858,14 +858,7 @@ def update_order_items():
                 'success': False,
                 'error': 'Order not found'
             }), 404
-        
-        # Check if order can be edited
-        if order['status'] in ['completed', 'cancelled']:
-            return jsonify({
-                'success': False,
-                'error': 'Cannot edit completed or cancelled orders'
-            }), 400
-        
+
         # Get current items
         current_items = order_model.find_items_by_order_number(order_number)
         
@@ -882,11 +875,13 @@ def update_order_items():
         order_items = []
         
         for item in new_items:
-            dish_id = item['dish_id']  # This is now MongoDB _id (ObjectId)
+            dish_id = item['dish_id']
             quantity = item['quantity']
+            print("===== dish_id", dish_id)
             
             # Get dish information using ObjectId
             dish = dish_model.find_by_object_id(dish_id)
+            print("===== dish", dish)
             if not dish:
                 # Rollback: restore old items
                 for old_item in current_items:
@@ -898,20 +893,7 @@ def update_order_items():
                     'success': False,
                     'error': f'Dish with _id {dish_id} not found'
                 }), 404
-            
-            # Check stock
-            if dish['stock'] < quantity:
-                # Rollback: restore old items
-                for old_item in current_items:
-                    old_item['created_at'] = datetime.now()
-                    order_model.items_collection.insert_one(old_item)
-                    dish_model.update_stock(old_item['dish_id'], -old_item['quantity'])
-                
-                return jsonify({
-                    'success': False,
-                    'error': f'Insufficient stock for dish: {dish["name"]}'
-                }), 400
-            
+
             subtotal = dish['price'] * quantity
             total_amount += subtotal
             total_items += quantity
@@ -919,7 +901,7 @@ def update_order_items():
             order_items.append({
                 'order_id': order['_id'],
                 'order_number': order_number,
-                'dish_id': dish['dish_id'],  # Store business dish_id, not _id
+                'dish_id': dish['_id'],
                 'dish_name': dish['name'],
                 'dish_name_en': dish['name_en'],
                 'category': dish['category'],
@@ -931,8 +913,10 @@ def update_order_items():
                 'created_at': datetime.now()
             })
         
+        print("===== order_items", order_items)
+
         # Insert new items
-        order_model.items_collection.insert_many(order_items)
+        order_model.insert_order_items(order['_id'], order_number, order_items)
         
         # Update order totals
         order_model.update_order(order_number, {
@@ -940,26 +924,22 @@ def update_order_items():
             'total_items': total_items
         })
         
-        # Update stock for new items (need to get dish_id from the dish object)
-        for item in new_items:
-            dish = dish_model.find_by_object_id(item['dish_id'])
-            if dish:
-                dish_model.update_stock(dish['dish_id'], -item['quantity'])
-        
         # Get updated order and items
         updated_order = order_model.find_by_order_number(order_number)
         updated_items = order_model.find_items_by_order_number(order_number)
+        print("===== order_items", updated_items)
         
         # Enrich items with dish images
         enriched_items = []
         for item in updated_items:
-            item_data = serialize_doc(item)
-            dish = dish_model.find_by_id(item['dish_id'])
+            item_data: list[list[list[Any] | Any | dict[Any, Any] | None] | Any | dict[Any, Any] | None] | Any | dict[Any, Any] | None = serialize_doc(item)
+            dish = dish_model.find_by_object_id(item['dish_id'])
             if dish:
                 item_data['dish_image'] = dish.get('image_url', '')
             else:
                 item_data['dish_image'] = ''
             enriched_items.append(item_data)
+        print("===== enriched_items", enriched_items)
         
         return jsonify({
             'success': True,

@@ -80,7 +80,7 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
       
       // Initialize items from orderDetails
       const initialItems = orderDetails.items.map(item => ({
-        dish_id: item._id,
+        dish_id: item.dish_id, // Order items, use dish_id instead of _id
         dish_name: item.dish_name,
         dish_image: item.dish_image,
         quantity: item.quantity,
@@ -124,7 +124,6 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
       newItems[existingIndex].quantity += 1;
       setItems(newItems);
     } else {
-      // Add new dish (store _id as dish_id)
       setItems([...items, {
         dish_id: dish._id,  // Store MongoDB _id
         dish_name: dish.name,
@@ -177,6 +176,7 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
         setSaving(false);
         return;
       }
+      console.log("====== items: ", items);
 
       // Update order basic info
       await updateOrder(order.order_number, {
@@ -186,14 +186,14 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
         notes: notes
       });
 
-      console.log("====== items", items);
-
       // Update order items
       const itemsData = items.map(item => ({
         dish_id: item.dish_id,
         quantity: item.quantity,
         custom_notes: item.custom_notes
       }));
+
+      console.log("===== itemsData", itemsData)
 
       await updateOrderItems(order.order_number, itemsData);
 
