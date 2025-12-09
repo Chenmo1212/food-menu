@@ -3,6 +3,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { getOrders } from '../../services/menuApi';
 import { ClockIcon, WarningIcon, PizzaIcon } from '../../utils/iconMapping';
 import soundManager from '../../utils/soundManager';
+import { resolveMealCover } from '../../utils/imageMapper';
 
 export default function HistoryPage({ onOrderSelect }) {
   const { t, language } = useLanguage();
@@ -65,8 +66,13 @@ export default function HistoryPage({ onOrderSelect }) {
     }
   };
 
-  // Format date for title
-  const formatDateTitle = (dateString) => {
+  // Format date for title (completed orders show delivery date)
+  const formatDateTitle = (order) => {
+    // For completed orders, use delivery_date; for others, use created_at
+    const dateString = (order.status === 'completed' && order.delivery_date)
+      ? order.delivery_date
+      : order.created_at;
+    
     const date = new Date(dateString);
     return date.toLocaleDateString(language === 'zh' ? 'zh-CN' : 'en-US', {
       weekday: 'long',
@@ -93,11 +99,18 @@ export default function HistoryPage({ onOrderSelect }) {
     }
   });
 
-  // Get first dish image from order items
+  // Get order image - use meal cover for completed orders, dish image for others
   const getOrderImage = (order) => {
+    // For completed orders, use meal cover based on delivery date
+    if (order.status === 'completed' && order.delivery_date) {
+      return resolveMealCover(order.delivery_date);
+    }
+    
+    // For other orders, use first dish image
     if (order.items && order.items.length > 0 && order.items[0].dish_image) {
       return order.items[0].dish_image;
     }
+    
     return null;
   };
 
@@ -216,7 +229,7 @@ export default function HistoryPage({ onOrderSelect }) {
                     {/* Left: Date and Status */}
                     <div className="flex-1 min-w-0">
                       <h3 className="font-bold text-lg text-gray-800 mb-1">
-                        {formatDateTitle(order.delivery_date || order.created_at)}
+                        {formatDateTitle(order)}
                       </h3>
                       <div className="flex items-center gap-3 flex-wrap">
                         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">

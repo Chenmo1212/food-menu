@@ -3,18 +3,28 @@
 
 // Use Webpack's require.context to dynamically import all images
 // This automatically includes any new images added to the directory
-const imageContext = require.context('../assets/dishCovers', false, /\.(png|jpe?g|svg|webp)$/);
+const dishImageContext = require.context('../assets/dishCovers', false, /\.(png|jpe?g|svg|webp)$/);
+const mealImageContext = require.context('../assets/mealCovers', false, /\.(png|jpe?g|svg|webp)$/);
 
-// Build image map dynamically
+// Build dish image map dynamically
 const IMAGE_MAP = {};
-imageContext.keys().forEach((key) => {
+dishImageContext.keys().forEach((key) => {
   // Extract filename from './filename.png' format
   const filename = key.replace('./', '');
-  IMAGE_MAP[filename] = imageContext(key);
+  IMAGE_MAP[filename] = dishImageContext(key);
+});
+
+// Build meal cover image map dynamically
+const MEAL_COVER_MAP = {};
+mealImageContext.keys().forEach((key) => {
+  // Extract filename from './filename.png' format
+  const filename = key.replace('./', '');
+  MEAL_COVER_MAP[filename] = mealImageContext(key);
 });
 
 // Default fallback image
 const DEFAULT_IMAGE = IMAGE_MAP['mapo_tofu.png'] || Object.values(IMAGE_MAP)[0];
+const DEFAULT_MEAL_COVER = Object.values(MEAL_COVER_MAP)[0] || DEFAULT_IMAGE;
 
 /**
  * Resolve image URL to actual imported asset
@@ -62,11 +72,51 @@ export function resolveImageUrl(imageUrl) {
 }
 
 /**
- * Get all available images
+ * Resolve meal cover image by date
+ * @param {string} date - Date in YYYYMMDD format or YYYY-MM-DD format
+ * @returns {string} Resolved meal cover image path
+ */
+export function resolveMealCover(date) {
+  if (!date) {
+    return DEFAULT_MEAL_COVER;
+  }
+
+  // Convert date to YYYYMMDD format if it's in YYYY-MM-DD format
+  const dateStr = date.replace(/-/g, '');
+  
+  // Try to find exact match
+  const filename = `${dateStr}.png`;
+  if (MEAL_COVER_MAP[filename]) {
+    return MEAL_COVER_MAP[filename];
+  }
+
+  // Try other extensions
+  const extensions = ['jpg', 'jpeg', 'webp', 'svg'];
+  for (const ext of extensions) {
+    const altFilename = `${dateStr}.${ext}`;
+    if (MEAL_COVER_MAP[altFilename]) {
+      return MEAL_COVER_MAP[altFilename];
+    }
+  }
+
+  // Fallback to default
+  return DEFAULT_MEAL_COVER;
+}
+
+/**
+ * Get all available dish images
  * @returns {Object} Image map object
  */
 export function getAllImages() {
   return IMAGE_MAP;
+}
+
+/**
+ * Get all available meal cover images
+ * @returns {Object} Meal cover map object
+ */
+export function getAllMealCovers() {
+  return MEAL_COVER_MAP;
 }
 
 // Made with Bob

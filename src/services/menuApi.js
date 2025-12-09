@@ -56,11 +56,11 @@ export async function getDishes(params = {}) {
 
 /**
  * Get a specific dish by ID
- * @param {number} dishId - Dish ID
+ * @param {string} dishId - Dish MongoDB ObjectId
  * @returns {Promise<object>} Dish details
  */
 export async function getDishById(dishId) {
-  return apiRequest(`/dishes/${dishId}`);
+  return apiRequest(`/dishes/detail?id=${dishId}`);
 }
 
 /**
@@ -83,14 +83,14 @@ export async function searchDishes(keyword) {
 
 /**
  * Update dish stock
- * @param {number} dishId - Dish ID
+ * @param {string} dishId - Dish MongoDB ObjectId
  * @param {number} quantity - Quantity to add/subtract (negative to decrease)
  * @returns {Promise<object>} Updated dish
  */
 export async function updateDishStock(dishId, quantity) {
-  return apiRequest(`/dishes/${dishId}/stock`, {
+  return apiRequest(`/dishes/stock`, {
     method: 'PATCH',
-    body: JSON.stringify({ quantity }),
+    body: JSON.stringify({ id: dishId, quantity }),
   });
 }
 
@@ -108,14 +108,14 @@ export async function createDish(dishData) {
 
 /**
  * Update an existing dish
- * @param {number} dishId - Dish ID
+ * @param {string} dishId - Dish MongoDB ObjectId
  * @param {object} dishData - Updated dish data
  * @returns {Promise<object>} Updated dish
  */
 export async function updateDish(dishId, dishData) {
-  return apiRequest(`/dishes/${dishId}`, {
+  return apiRequest(`/dishes/update`, {
     method: 'PUT',
-    body: JSON.stringify(dishData),
+    body: JSON.stringify({ _id: dishId, ...dishData }),
   });
 }
 
@@ -165,7 +165,20 @@ export async function getOrders(params = {}) {
  * @returns {Promise<object>} Order details with items
  */
 export async function getOrderByNumber(orderNumber) {
-  return apiRequest(`/orders/${orderNumber}`);
+  return apiRequest(`/orders/detail?order_number=${orderNumber}`);
+}
+
+/**
+ * Update order fields
+ * @param {string} orderNumber - Order number
+ * @param {object} updateData - Fields to update
+ * @returns {Promise<object>} Updated order
+ */
+export async function updateOrder(orderNumber, updateData) {
+  return apiRequest(`/orders/update`, {
+    method: 'PUT',
+    body: JSON.stringify({ order_number: orderNumber, ...updateData }),
+  });
 }
 
 /**
@@ -175,9 +188,9 @@ export async function getOrderByNumber(orderNumber) {
  * @returns {Promise<object>} Updated order
  */
 export async function updateOrderStatus(orderNumber, status) {
-  return apiRequest(`/orders/${orderNumber}/status`, {
+  return apiRequest(`/orders/status`, {
     method: 'PATCH',
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ order_number: orderNumber, status }),
   });
 }
 
@@ -187,8 +200,9 @@ export async function updateOrderStatus(orderNumber, status) {
  * @returns {Promise<object>} Cancellation result
  */
 export async function cancelOrder(orderNumber) {
-  return apiRequest(`/orders/${orderNumber}`, {
+  return apiRequest(`/orders/cancel`, {
     method: 'DELETE',
+    body: JSON.stringify({ order_number: orderNumber }),
   });
 }
 
