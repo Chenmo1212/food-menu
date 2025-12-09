@@ -49,9 +49,9 @@ export default function OrderSummaryModal({
     
     let markdown = `# Order Summary\n\n`;
     markdown += `**Date:** ${formattedDate}\n`;
-    markdown += `**Time:** ${formattedTime}\n\n`;
-    markdown += `---\n\n`;
-    markdown += `## Items\n\n`;
+    markdown += `**Time:** ${formattedTime}\n`;
+    markdown += `---\n`;
+    markdown += `## Items\n`;
     
     cart.forEach((item, index) => {
       markdown += `${index + 1}. **${item.name}** (x${item.qty})`;
@@ -62,10 +62,9 @@ export default function OrderSummaryModal({
       if (item.specialInstructions) {
         markdown += `   - *Special Instructions:* ${item.specialInstructions}\n`;
       }
-      markdown += `\n`;
     });
     
-    markdown += `---\n\n`;
+    markdown += `---\n`;
     markdown += `**Total Items:** ${cart.length}\n`;
     markdown += `**Total Quantity:** ${cart.reduce((sum, item) => sum + item.qty, 0)}\n`;
     
