@@ -79,7 +79,7 @@ def send_wechat_notification(markdown_content, delivery_info='', order_number=''
             error_msg = token_data.get('errmsg', 'Unknown error')
             print(f'❌ Failed to get access token: {error_msg}')
             return {'error': f'Failed to get access token: {error_msg}', 'status': 500}
-        
+
         # Step 2: Send message
         send_msg_url = f'https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={access_token}'
         
@@ -91,8 +91,9 @@ def send_wechat_notification(markdown_content, delivery_info='', order_number=''
             "agentid": AGENTID,
             "msgtype": "textcard",
             "textcard": {
-                "title": f"🍕 New Food Order - {order_number}",
+                "title": f"🍕 New Food Order From Jing Er",
                 "description": content,
+                "url": 'https://menu.chenmo1212.cn',
                 "btntxt": "View Details"
             },
             "enable_id_trans": 0,
