@@ -376,7 +376,6 @@ def create_dish():
     
     Request Body:
         {
-            "dish_id": 100,
             "name": "新菜品",
             "name_en": "New Dish",
             "price": 12.99,
@@ -401,7 +400,7 @@ def create_dish():
         data = request.get_json()
         
         # Validate required fields
-        required_fields = ['dish_id', 'name', 'name_en', 'price', 'category']
+        required_fields = ['name', 'name_en', 'price', 'category']
         is_valid, error_msg = validate_required_fields(data, required_fields)
         if not is_valid:
             return jsonify({
@@ -409,15 +408,15 @@ def create_dish():
                 'error': error_msg
             }), 400
         
-        # Check if dish_id already exists
-        existing_dish = dish_model.find_by_id(data['dish_id'])
+        # Check if dish with same name already exists
+        existing_dish = dish_model.collection.find_one({'name': data['name']})
         if existing_dish:
             return jsonify({
                 'success': False,
-                'error': f'Dish with ID {data["dish_id"]} already exists'
+                'error': f'Dish with name "{data["name"]}" already exists'
             }), 400
         
-        # Create dish
+        # Create dish (MongoDB will auto-generate _id)
         dish = dish_model.create(data)
         
         return jsonify({
@@ -464,7 +463,6 @@ def update_dish():
         data = request.get_json()
         
         dish_id = data.get('_id')
-        print("======= dish_id", dish_id)
         if not dish_id:
             return jsonify({
                 'success': False,
@@ -473,7 +471,6 @@ def update_dish():
         
         # Update dish using ObjectId
         dish = dish_model.update_by_object_id(dish_id, data)
-        print("======= dish", dish)
         
         if not dish:
             return jsonify({
@@ -885,11 +882,11 @@ def update_order_items():
         order_items = []
         
         for item in new_items:
-            dish_id = item['dish_id']
+            dish_id = item['dish_id']  # This is now MongoDB _id (ObjectId)
             quantity = item['quantity']
             
-            # Get dish information
-            dish = dish_model.find_by_id(dish_id)
+            # Get dish information using ObjectId
+            dish = dish_model.find_by_object_id(dish_id)
             if not dish:
                 # Rollback: restore old items
                 for old_item in current_items:
@@ -899,7 +896,7 @@ def update_order_items():
                 
                 return jsonify({
                     'success': False,
-                    'error': f'Dish {dish_id} not found'
+                    'error': f'Dish with _id {dish_id} not found'
                 }), 404
             
             # Check stock
@@ -922,7 +919,7 @@ def update_order_items():
             order_items.append({
                 'order_id': order['_id'],
                 'order_number': order_number,
-                'dish_id': dish_id,
+                'dish_id': dish['dish_id'],  # Store business dish_id, not _id
                 'dish_name': dish['name'],
                 'dish_name_en': dish['name_en'],
                 'category': dish['category'],
@@ -943,9 +940,11 @@ def update_order_items():
             'total_items': total_items
         })
         
-        # Update stock for new items
+        # Update stock for new items (need to get dish_id from the dish object)
         for item in new_items:
-            dish_model.update_stock(item['dish_id'], -item['quantity'])
+            dish = dish_model.find_by_object_id(item['dish_id'])
+            if dish:
+                dish_model.update_stock(dish['dish_id'], -item['quantity'])
         
         # Get updated order and items
         updated_order = order_model.find_by_order_number(order_number)

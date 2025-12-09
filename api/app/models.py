@@ -166,7 +166,6 @@ class DishModel:
         """
         # Prepare dish document
         dish_doc = {
-            'dish_id': dish_data['dish_id'],
             'name': dish_data['name'],
             'name_en': dish_data['name_en'],
             'price': dish_data['price'],
@@ -184,7 +183,7 @@ class DishModel:
             'updated_at': datetime.now()
         }
         
-        # Insert dish
+        # Insert dish (MongoDB will auto-generate _id)
         result = self.collection.insert_one(dish_doc)
         
         # Return created dish

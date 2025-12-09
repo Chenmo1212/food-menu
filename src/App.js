@@ -271,19 +271,14 @@ function AppContent() {
 
   // Handle save edited order
   const handleSaveEditedOrder = async () => {
-    try {
-      // Refresh order details
-      const response = await getOrderByNumber(editingOrder.order_number);
-      if (response.success && response.data) {
-        setSelectedOrder(response.data.order);
-        setSelectedOrderDetails(response.data);
-      }
-      setEditingOrder(null);
-      alert(t('Order updated successfully', '订单更新成功'));
-    } catch (error) {
-      console.error('❌ Failed to refresh order:', error);
-      setEditingOrder(null);
-    }
+    // Close the edit modal
+    setEditingOrder(null);
+    
+    // Clear the selected order to force refresh when user clicks on it again
+    setSelectedOrder(null);
+    setSelectedOrderDetails(null);
+    
+    alert(t('Order updated successfully', '订单更新成功'));
   };
 
   // Get status badge styling

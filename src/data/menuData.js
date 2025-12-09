@@ -1,6 +1,5 @@
 export const MENU_ITEMS = [
   {
-    id: 1,
     name: '麻婆豆腐',
     nameEn: 'Mapo Tofu',
     price: 12.99,
@@ -20,7 +19,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 2,
     name: '番茄炒蛋',
     nameEn: 'Tomato Egg Stir Fry',
     price: 9.99,
@@ -40,7 +38,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 3,
     name: '肉末炒豆腐',
     nameEn: 'Minced Meat Fried Tofu',
     price: 13.99,
@@ -60,7 +57,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 4,
     name: '家常花菜',
     nameEn: 'Home Style Cauliflower',
     price: 10.99,
@@ -80,7 +76,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 5,
     name: '白灼西兰花',
     nameEn: 'Blanched Broccoli',
     price: 8.99,
@@ -100,7 +95,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 6,
     name: '香辣排骨',
     nameEn: 'Spicy Pork Ribs',
     price: 16.99,
@@ -120,7 +114,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 7,
     name: '小炒鸡肉',
     nameEn: 'Stir Fried Chicken Breast',
     price: 14.99,
@@ -140,7 +133,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 8,
     name: '炸鸡排',
     nameEn: 'Fried Chicken Cutlet',
     price: 13.99,
@@ -160,7 +152,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 9,
     name: '红烧肉',
     nameEn: 'Braised Pork Belly',
     price: 17.99,
@@ -180,7 +171,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 10,
     name: '豆豉鲮鱼油麦菜',
     nameEn: 'Black Bean Sardines with Lettuce',
     price: 15.99,
@@ -200,7 +190,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 11,
     name: '西兰花虾仁',
     nameEn: 'Broccoli Shrimp',
     price: 16.99,
@@ -220,7 +209,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 12,
     name: '皮蛋茄子擂辣椒',
     nameEn: 'Century Egg Eggplant Chili',
     price: 11.99,
@@ -240,7 +228,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 13,
     name: '干煸四季豆',
     nameEn: 'Dry Fried Green Beans',
     price: 10.99,
@@ -260,7 +247,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 14,
     name: '鱼香肉丝',
     nameEn: 'Fish Flavored Pork',
     price: 14.99,
@@ -280,7 +266,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 15,
     name: '柠檬鸡丝',
     nameEn: 'Lemon Shredded Chicken',
     price: 13.99,
@@ -300,7 +285,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 16,
     name: '麦片鸡',
     nameEn: 'Oat Crusted Chicken',
     price: 14.99,
@@ -320,7 +304,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 17,
     name: '咸蛋虾',
     nameEn: 'Salted Egg Shrimp',
     price: 18.99,
@@ -340,7 +323,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 18,
     name: '酸菜鱼',
     nameEn: 'Sour Cabbage Fish',
     price: 19.99,
@@ -360,7 +342,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 19,
     name: '香辣鸡翅根',
     nameEn: 'Spicy Chicken Wings',
     price: 12.99,
@@ -380,7 +361,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 20,
     name: '香辣鸡翅',
     nameEn: 'Spicy Chicken Wings 2',
     price: 12.99,
@@ -400,7 +380,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 21,
     name: '香辣杏鲍菇',
     nameEn: 'Spicy King Oyster Mushroom',
     price: 11.99,
@@ -420,7 +399,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 22,
     name: '香辣藕片',
     nameEn: 'Spicy Lotus Root',
     price: 10.99,
@@ -440,7 +418,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 23,
     name: '香辣平菇',
     nameEn: 'Spicy Oyster Mushroom',
     price: 10.99,
@@ -460,7 +437,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 24,
     name: '香辣鱿鱼圈',
     nameEn: 'Spicy Squid Rings',
     price: 15.99,
@@ -480,7 +456,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 25,
     name: '酿青椒',
     nameEn: 'Stuffed Bell Peppers',
     price: 13.99,
@@ -500,7 +475,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 26,
     name: '豆腐干虾米葱',
     nameEn: 'Tofu Dried Shrimp Scallions',
     price: 11.99,
@@ -520,7 +494,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 27,
     name: '回锅肉',
     nameEn: 'Twice Cooked Pork',
     price: 15.99,
@@ -540,7 +513,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 28,
     name: '马来西亚柠檬鸡',
     nameEn: 'Malaysian Lemon Chicken',
     price: 15.99,
@@ -560,7 +532,6 @@ export const MENU_ITEMS = [
     }
   },
   {
-    id: 29,
     name: '万能肉酱',
     nameEn: 'Sichuan Style Meat Sauce',
     price: 15.99,
@@ -580,85 +551,81 @@ export const MENU_ITEMS = [
     }
   },
   {
-  id: 30,
-  name: '葱烧豆腐',
-  nameEn: 'Braised Tofu with Scallions',
-  price: 10.99,
-  stock: 20,
-  orderCount: 0,
-  category: 'Vegetables',
-  image: require('../assets/dishCovers/braised_tofu_scallions.png'),
-  description: '嫩滑豆腐配上香葱，用酱油和糖调味，口感软嫩，葱香浓郁。',
-  descriptionEn: 'Silky tofu braised with fragrant scallions in savory-sweet sauce. Tender texture with rich onion aroma.',
-  ingredients: ['豆腐', '香葱', '生抽', '老抽', '糖', '蒜'],
-  ingredientsEn: ['Tofu', 'Scallions', 'Light Soy Sauce', 'Dark Soy Sauce', 'Sugar', 'Garlic'],
-  nutrition: {
-    calories: 95,
-    protein: '8g',
-    fat: '5g',
-    carbs: '6g'
+    name: '葱烧豆腐',
+    nameEn: 'Braised Tofu with Scallions',
+    price: 10.99,
+    stock: 20,
+    orderCount: 0,
+    category: 'Vegetables',
+    image: require('../assets/dishCovers/braised_tofu_scallions.png'),
+    description: '嫩滑豆腐配上香葱，用酱油和糖调味，口感软嫩，葱香浓郁。',
+    descriptionEn: 'Silky tofu braised with fragrant scallions in savory-sweet sauce. Tender texture with rich onion aroma.',
+    ingredients: ['豆腐', '香葱', '生抽', '老抽', '糖', '蒜'],
+    ingredientsEn: ['Tofu', 'Scallions', 'Light Soy Sauce', 'Dark Soy Sauce', 'Sugar', 'Garlic'],
+    nutrition: {
+      calories: 95,
+      protein: '8g',
+      fat: '5g',
+      carbs: '6g'
+    }
+  },
+  {
+    name: '西兰花炒香菇',
+    nameEn: 'Stir-Fried Broccoli with Shiitake Mushrooms',
+    price: 11.99,
+    stock: 18,
+    orderCount: 0,
+    category: 'Vegetables',
+    image: require('../assets/dishCovers/broccoli_shiitake_mushrooms.png'),
+    description: '新鲜西兰花与香菇快炒，口感爽脆，营养丰富，清淡健康。',
+    descriptionEn: 'Fresh broccoli stir-fried with shiitake mushrooms. Crisp texture, nutritious and light.',
+    ingredients: ['西兰花', '香菇', '蒜', '蚝油', '盐'],
+    ingredientsEn: ['Broccoli', 'Shiitake Mushrooms', 'Garlic', 'Oyster Sauce', 'Salt'],
+    nutrition: {
+      calories: 68,
+      protein: '5g',
+      fat: '2g',
+      carbs: '10g'
+    }
+  },
+  {
+    name: '三色炒虾仁',
+    nameEn: 'Stir-Fried Shrimp with Three Vegetables',
+    price: 16.99,
+    stock: 12,
+    orderCount: 0,
+    category: 'Seafood',
+    image: require('../assets/dishCovers/shrimp_three_vegetables.png'),
+    description: '鲜嫩虾仁搭配胡萝卜、豌豆和玉米粒，色彩缤纷，清甜爽口。',
+    descriptionEn: 'Tender shrimp with carrots, peas, and corn. Colorful and naturally sweet with fresh flavors.',
+    ingredients: ['虾仁', '胡萝卜', '豌豆', '玉米', '盐', '料酒', '淀粉'],
+    ingredientsEn: ['Shrimp', 'Carrots', 'Peas', 'Corn', 'Salt', 'Cooking Wine', 'Starch'],
+    nutrition: {
+      calories: 125,
+      protein: '18g',
+      fat: '2g',
+      carbs: '10g'
+    }
+  },
+  {
+    name: '红烧排骨',
+    nameEn: 'Braised Pork Ribs',
+    price: 17.99,
+    stock: 15,
+    orderCount: 0,
+    category: 'Pork',
+    image: require('../assets/dishCovers/braised_pork_ribs.png'),
+    description: '排骨经过慢炖，肉质软烂入味，酱汁浓郁，香甜可口。',
+    descriptionEn: 'Pork ribs slowly braised until tender in rich, savory-sweet sauce. Fall-off-the-bone delicious.',
+    ingredients: ['排骨', '生抽', '老抽', '料酒', '冰糖', '八角', '姜', '葱'],
+    ingredientsEn: ['Pork Ribs', 'Light Soy Sauce', 'Dark Soy Sauce', 'Cooking Wine', 'Rock Sugar', 'Star Anise', 'Ginger', 'Scallions'],
+    nutrition: {
+      calories: 285,
+      protein: '22g',
+      fat: '18g',
+      carbs: '8g'
+    }
   }
-},
-{
-  id: 31,
-  name: '西兰花炒香菇',
-  nameEn: 'Stir-Fried Broccoli with Shiitake Mushrooms',
-  price: 11.99,
-  stock: 18,
-  orderCount: 0,
-  category: 'Vegetables',
-  image: require('../assets/dishCovers/broccoli_shiitake_mushrooms.png'),
-  description: '新鲜西兰花与香菇快炒，口感爽脆，营养丰富，清淡健康。',
-  descriptionEn: 'Fresh broccoli stir-fried with shiitake mushrooms. Crisp texture, nutritious and light.',
-  ingredients: ['西兰花', '香菇', '蒜', '蚝油', '盐'],
-  ingredientsEn: ['Broccoli', 'Shiitake Mushrooms', 'Garlic', 'Oyster Sauce', 'Salt'],
-  nutrition: {
-    calories: 68,
-    protein: '5g',
-    fat: '2g',
-    carbs: '10g'
-  }
-},
-{
-  id: 32,
-  name: '三色炒虾仁',
-  nameEn: 'Stir-Fried Shrimp with Three Vegetables',
-  price: 16.99,
-  stock: 12,
-  orderCount: 0,
-  category: 'Seafood',
-  image: require('../assets/dishCovers/shrimp_three_vegetables.png'),
-  description: '鲜嫩虾仁搭配胡萝卜、豌豆和玉米粒，色彩缤纷，清甜爽口。',
-  descriptionEn: 'Tender shrimp with carrots, peas, and corn. Colorful and naturally sweet with fresh flavors.',
-  ingredients: ['虾仁', '胡萝卜', '豌豆', '玉米', '盐', '料酒', '淀粉'],
-  ingredientsEn: ['Shrimp', 'Carrots', 'Peas', 'Corn', 'Salt', 'Cooking Wine', 'Starch'],
-  nutrition: {
-    calories: 125,
-    protein: '18g',
-    fat: '2g',
-    carbs: '10g'
-  }
-},
-{
-  id: 33,
-  name: '红烧排骨',
-  nameEn: 'Braised Pork Ribs',
-  price: 17.99,
-  stock: 15,
-  orderCount: 0,
-  category: 'Pork',
-  image: require('../assets/dishCovers/braised_pork_ribs.png'),
-  description: '排骨经过慢炖，肉质软烂入味，酱汁浓郁，香甜可口。',
-  descriptionEn: 'Pork ribs slowly braised until tender in rich, savory-sweet sauce. Fall-off-the-bone delicious.',
-  ingredients: ['排骨', '生抽', '老抽', '料酒', '冰糖', '八角', '姜', '葱'],
-  ingredientsEn: ['Pork Ribs', 'Light Soy Sauce', 'Dark Soy Sauce', 'Cooking Wine', 'Rock Sugar', 'Star Anise', 'Ginger', 'Scallions'],
-  nutrition: {
-    calories: 285,
-    protein: '22g',
-    fat: '18g',
-    carbs: '8g'
-  }
-}
 ];
 
 export const CATEGORIES = [

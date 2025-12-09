@@ -111,18 +111,25 @@ function readLocalMenuData() {
 
   const content = fs.readFileSync(menuDataPath, 'utf-8');
   
-  // Extract individual dish objects using regex
-  const dishPattern = /\{\s*id:\s*(\d+),[\s\S]*?\}/g;
+  // Extract only MENU_ITEMS array content, excluding CATEGORIES
+  const menuItemsMatch = content.match(/export const MENU_ITEMS = \[([\s\S]*?)\];/);
+  if (!menuItemsMatch) {
+    throw new Error('MENU_ITEMS array not found in menuData.js');
+  }
+  
+  const menuItemsContent = menuItemsMatch[1];
+  
+  // Extract individual dish objects using regex (no longer looking for id field)
+  const dishPattern = /\{\s*name:\s*['"][^'"]+['"],[\s\S]*?\}/g;
   const dishes = [];
   let match;
   
-  while ((match = dishPattern.exec(content)) !== null) {
+  while ((match = dishPattern.exec(menuItemsContent)) !== null) {
     const dishText = match[0];
     
     try {
-      // Extract fields using regex
+      // Extract fields using regex (no id field)
       const dish = {
-        id: parseInt(extractField(dishText, 'id', 'number')),
         name: extractField(dishText, 'name', 'string'),
         nameEn: extractField(dishText, 'nameEn', 'string'),
         price: parseFloat(extractField(dishText, 'price', 'number')),
@@ -144,7 +151,7 @@ function readLocalMenuData() {
   }
   
   if (dishes.length === 0) {
-    throw new Error('No dishes found in menuData.js');
+    throw new Error('No dishes found in MENU_ITEMS');
   }
   
   return dishes;
@@ -228,9 +235,9 @@ function mapCategory(localCategory) {
 
 /**
  * Convert local dish data to API format
- * Note: dish_id is NOT included here as it should come from the database
+ * Note: dish_id is no longer used - MongoDB will auto-generate _id
  */
-function convertToAPIFormat(localDish, dbDishId = null) {
+function convertToAPIFormat(localDish) {
   // Extract image filename from require path if it exists
   let imageUrl = '';
   if (localDish.image) {
@@ -256,10 +263,7 @@ function convertToAPIFormat(localDish, dbDishId = null) {
     is_active: true,
   };
 
-  // Only include dish_id when creating a new dish (use database's next available ID)
-  if (dbDishId !== null) {
-    apiData.dish_id = dbDishId;
-  }
+  // No dish_id field - MongoDB will use _id
 
   return apiData;
 }
@@ -356,14 +360,10 @@ ${colors.reset}`);
     const dbDishes = await getDishesFromDB();
     console.log(`${colors.green}✓ Found ${dbDishes.length} dishes in database${colors.reset}\n`);
 
-    // Create a map of database dishes by name (Chinese name) and by dish_id
+    // Create a map of database dishes by name (Chinese name only, since local data has no id)
     const dbDishMapByName = new Map();
-    const dbDishMapById = new Map();
     dbDishes.forEach(dish => {
       dbDishMapByName.set(dish.name, dish);
-      if (dish.dish_id) {
-        dbDishMapById.set(dish.dish_id, dish);
-      }
     });
 
     // Statistics
@@ -376,30 +376,16 @@ ${colors.reset}`);
 
     console.log(`${colors.bright}Starting synchronization...${colors.reset}\n`);
 
-    // Find the maximum dish_id in database for new dishes
-    let maxDishId = 0;
-    dbDishes.forEach(dish => {
-      if (dish.dish_id && dish.dish_id > maxDishId) {
-        maxDishId = dish.dish_id;
-      }
-    });
-
     // Process each local dish
     for (const localDish of localDishes) {
-      // First try to match by local dish ID
-      let dbDish = dbDishMapById.get(localDish.id);
-      
-      // If not found by ID, try to match by name
-      if (!dbDish) {
-        dbDish = dbDishMapByName.get(localDish.name);
-      }
+      // Match by name only (since local data has no id)
+      const dbDish = dbDishMapByName.get(localDish.name);
 
       try {
         if (!dbDish) {
-          // Dish doesn't exist in database - create it with new dish_id
-          maxDishId++;
-          const apiDish = convertToAPIFormat(localDish, maxDishId);
-          console.log(`${colors.yellow}➕ Creating dish: ${localDish.name} (dish_id: ${maxDishId})${colors.reset}`);
+          // Dish doesn't exist in database - create it (MongoDB will auto-generate _id)
+          const apiDish = convertToAPIFormat(localDish);
+          console.log(`${colors.yellow}➕ Creating dish: ${localDish.name}${colors.reset}`);
           await createDish(apiDish);
           stats.created++;
           console.log(`${colors.green}   ✓ Created successfully${colors.reset}`);

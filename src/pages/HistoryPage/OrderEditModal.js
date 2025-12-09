@@ -80,7 +80,7 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
       
       // Initialize items from orderDetails
       const initialItems = orderDetails.items.map(item => ({
-        dish_id: item.dish_id,
+        dish_id: item._id,
         dish_name: item.dish_name,
         dish_image: item.dish_image,
         quantity: item.quantity,
@@ -115,8 +115,8 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
   const handleAddDish = (dish) => {
     soundManager.playTap();
     
-    // Check if dish already exists
-    const existingIndex = items.findIndex(item => item.dish_id === dish.dish_id);
+    // Check if dish already exists (using _id instead of dish_id)
+    const existingIndex = items.findIndex(item => item.dish_id === dish._id);
     
     if (existingIndex >= 0) {
       // Increase quantity
@@ -124,9 +124,9 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
       newItems[existingIndex].quantity += 1;
       setItems(newItems);
     } else {
-      // Add new dish
+      // Add new dish (store _id as dish_id)
       setItems([...items, {
-        dish_id: dish.dish_id,
+        dish_id: dish._id,  // Store MongoDB _id
         dish_name: dish.name,
         dish_image: dish.image_url,
         quantity: 1,
@@ -185,6 +185,8 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
         status: status,
         notes: notes
       });
+
+      console.log("====== items", items);
 
       // Update order items
       const itemsData = items.map(item => ({
@@ -452,7 +454,6 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
                       type="date"
                       value={deliveryDate}
                       onChange={(e) => setDeliveryDate(e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300 focus:border-orange-300 bg-white text-sm"
                     />
                   </div>
@@ -547,7 +548,7 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {filteredDishes.map(dish => (
                     <button
-                      key={dish.dish_id}
+                      key={dish._id}
                       onClick={() => handleAddDish(dish)}
                       className="bg-white border-2 border-gray-200 hover:border-orange-300 rounded-xl p-3 text-left transition-all hover:shadow-md"
                     >
