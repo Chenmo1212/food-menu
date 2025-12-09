@@ -602,8 +602,8 @@ def create_order():
         
         # Update dish stock and order count
         for item in data['items']:
-            dish_model.update_stock(item['dish_id'], -item['quantity'])
-            dish_model.increment_order_count(item['dish_id'])
+            # Increment order count by the quantity ordered
+            dish_model.increment_order_count(item['dish_id'], item['quantity'])
         
         # Get created order and items
         order = order_model.find_by_order_number(order_number)
@@ -862,9 +862,11 @@ def update_order_items():
         # Get current items
         current_items = order_model.find_items_by_order_number(order_number)
         
-        # Restore stock for current items
+        # Restore stock and decrement order count for current items
         for item in current_items:
             dish_model.update_stock(item['dish_id'], item['quantity'])
+            # Decrement order count by the quantity (passing negative value)
+            dish_model.increment_order_count(item['dish_id'], -item['quantity'])
         
         # Delete current items
         order_model.items_collection.delete_many({'order_number': order_number})
@@ -877,11 +879,9 @@ def update_order_items():
         for item in new_items:
             dish_id = item['dish_id']
             quantity = item['quantity']
-            print("===== dish_id", dish_id)
             
             # Get dish information using ObjectId
             dish = dish_model.find_by_object_id(dish_id)
-            print("===== dish", dish)
             if not dish:
                 # Rollback: restore old items
                 for old_item in current_items:
@@ -912,11 +912,15 @@ def update_order_items():
                 'custom_notes': item.get('custom_notes', ''),
                 'created_at': datetime.now()
             })
-        
-        print("===== order_items", order_items)
 
         # Insert new items
         order_model.insert_order_items(order['_id'], order_number, order_items)
+        
+        # Update dish stock and increment order count for new items
+        for item in new_items:
+            dish_model.update_stock(item['dish_id'], -item['quantity'])
+            # Increment order count by the quantity ordered
+            dish_model.increment_order_count(item['dish_id'], item['quantity'])
         
         # Update order totals
         order_model.update_order(order_number, {
@@ -1047,10 +1051,11 @@ def cancel_order():
                 'error': 'Order not found or cannot be cancelled'
             }), 400
         
-        # Restore stock
+        # Restore stock and decrement order count
         for item in items:
             dish_model.update_stock(item['dish_id'], item['quantity'])
-            dish_model.increment_order_count(item['dish_id'])  # Decrement by incrementing with -1
+            # Decrement order count by the quantity (passing negative value)
+            dish_model.increment_order_count(item['dish_id'], -item['quantity'])
         
         return jsonify({
             'success': True,

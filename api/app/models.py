@@ -124,17 +124,24 @@ class DishModel:
             {'score': {'$meta': 'textScore'}}
         ).sort([('score', {'$meta': 'textScore'})]))
     
-    def increment_order_count(self, dish_id):
+    def increment_order_count(self, dish_id, count=1):
         """
-        Increment the order count for a dish.
+        Increment or decrement the order count for a dish.
         
         Args:
-            dish_id (int): Dish ID
+            dish_id (int or ObjectId): Dish ID or MongoDB ObjectId
+            count (int): Amount to increment (positive) or decrement (negative). Default is 1.
         """
+        # Handle both dish_id (int) and ObjectId
+        if isinstance(dish_id, str):
+            query = {'_id': ObjectId(dish_id)}
+        else:
+            query = {'_id': dish_id}
+        
         self.collection.update_one(
-            {'dish_id': dish_id},
+            query,
             {
-                '$inc': {'order_count': 1},
+                '$inc': {'order_count': count},
                 '$set': {'updated_at': datetime.now()}
             }
         )

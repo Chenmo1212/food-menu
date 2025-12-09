@@ -41,45 +41,46 @@ function AppContent() {
   const [editingOrder, setEditingOrder] = useState(null);
   const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
 
-  // Fetch dishes from API on component mount
-  useEffect(() => {
-    const fetchDishes = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await getDishes({ limit: 100, sort_by: 'order_count', order: 'desc' });
-        
-        if (response.success && response.data) {
-          const transformedData = response.data.map(dish => ({
-            id: dish._id,
-            name: dish.name,
-            nameEn: dish.name_en,
-            price: dish.price,
-            stock: dish.stock,
-            orderCount: dish.order_count,
-            category: dish.category,
-            image: resolveImageUrl(dish.image_url),
-            description: dish.description || '',
-            descriptionEn: dish.description_en || '',
-            ingredients: dish.ingredients || [],
-            ingredientsEn: dish.ingredients_en || [],
-            nutrition: dish.nutrition || {}
-          }));
-          setMenuItems(transformedData);
-          console.log('✅ Dishes loaded from API:', transformedData.length);
-        }
-      } catch (err) {
-        console.error('❌ Failed to fetch dishes from API:', err);
-        // Don't set error state - silently fall back to local data
-        // setError(err.message);
-        console.log('📦 Using local menu data as fallback (MENU_ITEMS)');
-        // Ensure local data is set (it's already in initial state, but being explicit)
-        setMenuItems(MENU_ITEMS);
-      } finally {
-        setLoading(false);
+  // Fetch dishes from API
+  const fetchDishes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await getDishes({ limit: 100, sort_by: 'order_count', order: 'desc' });
+      
+      if (response.success && response.data) {
+        const transformedData = response.data.map(dish => ({
+          id: dish._id,
+          name: dish.name,
+          nameEn: dish.name_en,
+          price: dish.price,
+          stock: dish.stock,
+          orderCount: dish.order_count,
+          category: dish.category,
+          image: resolveImageUrl(dish.image_url),
+          description: dish.description || '',
+          descriptionEn: dish.description_en || '',
+          ingredients: dish.ingredients || [],
+          ingredientsEn: dish.ingredients_en || [],
+          nutrition: dish.nutrition || {}
+        }));
+        setMenuItems(transformedData);
+        console.log('✅ Dishes loaded from API:', transformedData.length);
       }
-    };
+    } catch (err) {
+      console.error('❌ Failed to fetch dishes from API:', err);
+      // Don't set error state - silently fall back to local data
+      // setError(err.message);
+      console.log('📦 Using local menu data as fallback (MENU_ITEMS)');
+      // Ensure local data is set (it's already in initial state, but being explicit)
+      setMenuItems(MENU_ITEMS);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Fetch dishes on component mount
+  useEffect(() => {
     fetchDishes();
   }, []);
 
@@ -122,7 +123,7 @@ function AppContent() {
   };
 
   // Handle checkout
-  const handleCheckout = async (total, deliveryInfo = '', markdown = '') => {
+  const handleCheckout = async (total, deliveryInfo = '', markdown = '', deliveryDate = '', deliveryTime = '') => {
     console.log('Order Summary (Markdown):\n', markdown);
     
     try {
@@ -130,8 +131,8 @@ function AppContent() {
         customer_name: 'Customer',
         customer_email: '',
         customer_phone: '',
-        delivery_date: new Date().toISOString().split('T')[0],
-        delivery_time: '12:00-13:00',
+        delivery_date: deliveryDate || new Date().toISOString().split('T')[0],
+        delivery_time: deliveryTime || '12:00-13:00',
         delivery_address: '',
         notes: '',
         markdown_content: markdown,
@@ -148,6 +149,10 @@ function AppContent() {
       if (orderResponse && orderResponse.success && orderResponse.data) {
         console.log('✅ Order created:', orderResponse.data);
         const orderNumber = orderResponse.data.order?.order_number || 'N/A';
+        
+        // Refresh dishes to get updated order_count and stock
+        await fetchDishes();
+        
         alert(`Order placed for my love!${deliveryInfo ? '\n' + deliveryInfo : ''}\n\nOrder Number: ${orderNumber}`);
         setCart([]);
         console.log('🛒 Cart cleared after successful order');
