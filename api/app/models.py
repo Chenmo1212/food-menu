@@ -420,6 +420,40 @@ class OrderModel:
         
         return result.matched_count > 0
     
+    def update_order(self, order_number, update_data):
+        """
+        Update order fields.
+        
+        Args:
+            order_number (str): Order number
+            update_data (dict): Fields to update
+            
+        Returns:
+            dict: Updated order document or None
+        """
+        # Prepare update document
+        update_doc = {
+            'updated_at': datetime.now()
+        }
+        
+        # Add all fields from update_data except protected fields
+        skip_fields = ['_id', 'order_number', 'created_at', 'updated_at']
+        
+        for key, value in update_data.items():
+            if key not in skip_fields:
+                update_doc[key] = value
+        
+        # Update order
+        result = self.collection.update_one(
+            {'order_number': order_number},
+            {'$set': update_doc}
+        )
+        
+        if result.matched_count == 0:
+            return None
+        
+        return self.find_by_order_number(order_number)
+    
     def cancel_order(self, order_number):
         """
         Cancel an order and return items for stock restoration.

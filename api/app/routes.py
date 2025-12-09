@@ -754,6 +754,66 @@ def get_order():
         }), 500
 
 
+@api_bp.route('/orders/update', methods=['PUT'])
+def update_order():
+    """
+    Update order fields.
+    
+    Request Body:
+        {
+            "order_number": "ORD20241208123456",
+            "status": "confirmed",
+            "customer_name": "New Name",
+            "notes": "Updated notes",
+            ... any other fields to update
+        }
+    
+    Returns:
+        JSON response with updated order
+    """
+    try:
+        _, order_model, _ = get_models()
+        
+        data = request.get_json()
+        
+        order_number = data.get('order_number')
+        if not order_number:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required field: order_number'
+            }), 400
+        
+        # Remove order_number from update data
+        update_data = {k: v for k, v in data.items() if k != 'order_number'}
+        
+        if not update_data:
+            return jsonify({
+                'success': False,
+                'error': 'No fields to update'
+            }), 400
+        
+        # Update order
+        order = order_model.update_order(order_number, update_data)
+        
+        if not order:
+            return jsonify({
+                'success': False,
+                'error': 'Order not found'
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'data': serialize_doc(order),
+            'message': 'Order updated successfully'
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 @api_bp.route('/orders/status', methods=['PATCH'])
 def update_order_status():
     """
