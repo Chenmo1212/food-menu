@@ -39,6 +39,7 @@ function AppContent() {
   const [cancelingOrder, setCancelingOrder] = useState(false);
   const [restoringOrder, setRestoringOrder] = useState(false);
   const [editingOrder, setEditingOrder] = useState(null);
+  const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
 
   // Fetch dishes from API on component mount
   useEffect(() => {
@@ -209,6 +210,8 @@ function AppContent() {
         alert(t('Order deleted successfully', '订单删除成功'));
         setSelectedOrder(null);
         setSelectedOrderDetails(null);
+        // Trigger history page refresh
+        setHistoryRefreshTrigger(prev => prev + 1);
       } else {
         throw new Error(response.error || 'Failed to delete order');
       }
@@ -240,6 +243,8 @@ function AppContent() {
         alert(t('Order restored successfully', '订单恢复成功'));
         setSelectedOrder(null);
         setSelectedOrderDetails(null);
+        // Trigger history page refresh
+        setHistoryRefreshTrigger(prev => prev + 1);
       } else {
         throw new Error(response.error || 'Failed to restore order');
       }
@@ -277,6 +282,9 @@ function AppContent() {
     // Clear the selected order to force refresh when user clicks on it again
     setSelectedOrder(null);
     setSelectedOrderDetails(null);
+    
+    // Trigger history page refresh
+    setHistoryRefreshTrigger(prev => prev + 1);
     
     alert(t('Order updated successfully', '订单更新成功'));
   };
@@ -326,7 +334,7 @@ function AppContent() {
         );
       
       case 'history':
-        return <HistoryPage onOrderSelect={handleOrderSelect} />;
+        return <HistoryPage onOrderSelect={handleOrderSelect} refreshTrigger={historyRefreshTrigger} />;
       
       case 'order':
         return (

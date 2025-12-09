@@ -6,7 +6,7 @@ import soundManager from '../../utils/soundManager';
 import { resolveMealCover } from '../../utils/imageMapper';
 import OrderEditModal from './OrderEditModal';
 
-export default function HistoryPage({ onOrderSelect }) {
+export default function HistoryPage({ onOrderSelect, refreshTrigger }) {
   const { t, language } = useLanguage();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,10 +15,10 @@ export default function HistoryPage({ onOrderSelect }) {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
-  // Fetch orders on component mount
+  // Fetch orders on component mount and when refreshTrigger changes
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [refreshTrigger]);
 
   // Auto-switch to completed tab if on-process is empty (only on first load)
   useEffect(() => {
