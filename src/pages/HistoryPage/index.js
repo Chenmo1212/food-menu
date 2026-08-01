@@ -4,7 +4,6 @@ import { getOrders } from '../../services/menuApi';
 import { ClockIcon, WarningIcon, PizzaIcon } from '../../utils/iconMapping';
 import soundManager from '../../utils/soundManager';
 import { resolveMealCover } from '../../utils/imageMapper';
-import OrderEditModal from './OrderEditModal';
 
 export default function HistoryPage({ onOrderSelect, refreshTrigger }) {
   const { t, language } = useLanguage();
@@ -37,6 +36,7 @@ export default function HistoryPage({ onOrderSelect, refreshTrigger }) {
     if (selectedOrder && onOrderSelect) {
       onOrderSelect(null);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const fetchOrders = async () => {

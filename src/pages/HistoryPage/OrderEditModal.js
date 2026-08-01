@@ -96,7 +96,7 @@ export default function OrderEditModal({ order, orderDetails, onClose, onSave })
     if (showAddDish && availableDishes.length === 0) {
       loadDishes();
     }
-  }, [showAddDish]);
+  }, [showAddDish, availableDishes.length]);
 
   const loadDishes = async () => {
     try {

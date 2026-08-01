@@ -81,16 +81,6 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
 
   if (!isOpen && !isClosing) return null;
 
-  // Calculate initial position and size from card for opening animation
-  const initialStyle = cardRect ? {
-    position: 'fixed',
-    top: `${cardRect.top}px`,
-    left: `${cardRect.left}px`,
-    width: `${cardRect.width}px`,
-    height: `${cardRect.height}px`,
-    borderRadius: '24px',
-  } : {};
-
   return (
     <>
       {/* Backdrop */}

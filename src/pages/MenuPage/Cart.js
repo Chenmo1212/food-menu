@@ -68,11 +68,6 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
     setIsOpen(false);
   };
   
-  // Calculate totals
-  const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax;
-
   return (
     <>
       {/* Mobile Cart Button - Fixed at bottom */}
