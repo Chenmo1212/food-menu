@@ -93,4 +93,4 @@ export default function Header({ searchQuery, onSearchChange, onMenuClick }) {
   );
 }
 
-// Made with Bob
+

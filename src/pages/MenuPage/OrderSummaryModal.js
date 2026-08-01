@@ -306,4 +306,3 @@ export default function OrderSummaryModal({
   );
 }
 
-// Made with Bob

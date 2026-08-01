@@ -440,4 +440,4 @@ ${colors.reset}`);
 // Run the script
 syncMenu();
 
-// Made with Bob
+

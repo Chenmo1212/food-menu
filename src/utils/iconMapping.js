@@ -95,4 +95,4 @@ export const MinusIcon = (props) => <Icon icon={icons.minus} {...props} />;
 export const CheckIcon = (props) => <Icon icon={icons.check} {...props} />;
 export const CalendarIcon = (props) => <Icon icon={icons.calendar} {...props} />;
 
-// Made with Bob
+

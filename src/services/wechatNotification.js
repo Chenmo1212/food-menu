@@ -52,4 +52,3 @@ export async function sendMarkdownToWeChat(markdown, deliveryInfo = '') {
   return sendOrderToBackend(markdown, deliveryInfo);
 }
 
-// Made with Bob

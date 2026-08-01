@@ -248,4 +248,3 @@ export default function OrderDetailsPanel({
   );
 }
 
-// Made with Bob

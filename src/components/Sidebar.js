@@ -99,4 +99,4 @@ export default function Sidebar({ activeView, onViewChange }) {
   );
 }
 
-// Made with Bob
+

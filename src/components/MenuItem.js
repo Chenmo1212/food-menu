@@ -72,4 +72,4 @@ export default function MenuItem({ item, onAddToCart, onItemClick }) {
   );
 }
 
-// Made with Bob
+

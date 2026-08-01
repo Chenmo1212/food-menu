@@ -247,4 +247,3 @@ export default function MenuItemModal({ item, isOpen, onClose, onAddToCart, card
   );
 }
 
-// Made with Bob

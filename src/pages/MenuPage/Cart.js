@@ -294,4 +294,4 @@ export default function Cart({ cart, onUpdateQty, onCheckout }) {
   );
 }
 
-// Made with Bob
+

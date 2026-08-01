@@ -20,4 +20,4 @@ export const Icon = ({ component: Component, className = "w-6 h-6", ...props }) 
   return <Component className={className} {...props} />;
 };
 
-// Made with Bob
+

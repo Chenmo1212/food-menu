@@ -250,4 +250,3 @@ export async function checkHealth() {
   return apiRequest('/health');
 }
 
-// Made with Bob

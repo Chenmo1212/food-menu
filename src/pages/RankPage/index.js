@@ -171,4 +171,3 @@ export default function RankPage({ onItemClick, menuItems = MENU_ITEMS }) {
   );
 }
 
-// Made with Bob

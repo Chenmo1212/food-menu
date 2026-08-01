@@ -1,269 +1,258 @@
-# Food Menu App - Project Structure
+# Food Menu App
 
-## 📁 File Organization
+A responsive React food ordering app with bilingual (EN/ZH) support, a live backend API, order history, and a dish ranking board.
+
+---
+
+## 📁 Project Structure
 
 ```
 food-menu/
 │
-├── public/                      # Static files
-│   ├── index.html
-│   └── ...
+├── public/                         # Static assets & index.html
 │
 ├── src/
-│   ├── components/              # ✨ NEW: Reusable components
-│   │   ├── Sidebar.js          # Desktop left navigation (hidden on mobile)
-│   │   ├── MobileNav.js        # Mobile bottom navigation (hidden on desktop)
-│   │   ├── Header.js           # Page header with search bar
-│   │   ├── CategoryFilter.js   # Category selection buttons
-│   │   ├── MenuGrid.js         # Grid container for menu items
-│   │   ├── MenuItem.js         # Individual menu item card
-│   │   ├── Cart.js             # Shopping cart (sidebar/overlay)
-│   │   └── CartItem.js         # Individual cart item row
+│   ├── assets/
+│   │   ├── dishCovers/             # Dish cover images (.png)
+│   │   ├── mealCovers/             # Weekly meal plan covers (.png)
+│   │   ├── sounds/                 # UI sound effects (.mp3)
+│   │   ├── svgs/                   # Category SVG icons
+│   │   └── icons.js                # Exports SVG icon components
 │   │
-│   ├── data/                    # ✨ NEW: Data files
-│   │   └── menuData.js         # Menu items & categories
+│   ├── components/                 # Shared / layout components
+│   │   ├── Sidebar.js              # Desktop left navigation
+│   │   ├── MobileNav.js            # Mobile slide-in drawer + bottom bar
+│   │   ├── Header.js               # Top bar with search input
+│   │   ├── MenuItem.js             # Menu item card
+│   │   ├── MenuItemModal.js        # Dish detail modal (animated)
+│   │   ├── CartItem.js             # Single row in the cart
+│   │   └── SidePanel.js            # Generic right-side panel wrapper
 │   │
-│   ├── App.js                   # ✅ REFACTORED: Main app (now clean!)
-│   ├── icons.js                 # Entry point
-│   ├── index.css                # ✅ UPDATED: Global styles + utilities
-│   └── ...
+│   ├── contexts/
+│   │   └── LanguageContext.js      # EN/ZH language toggle (localStorage)
+│   │
+│   ├── data/
+│   │   └── menuData.js             # Local fallback: MENU_ITEMS + CATEGORIES
+│   │
+│   ├── hooks/
+│   │   └── useLocalStorage.js      # useState wrapper with localStorage sync
+│   │
+│   ├── pages/
+│   │   ├── MenuPage/
+│   │   │   ├── index.js            # Category filter + dish grid
+│   │   │   ├── Cart.js             # Cart sidebar / overlay
+│   │   │   ├── CustomDishModal.js  # Add a custom (off-menu) dish
+│   │   │   └── OrderSummaryModal.js# Review order + secret code submit
+│   │   │
+│   │   ├── HistoryPage/
+│   │   │   ├── index.js            # Order list with on-process / completed tabs
+│   │   │   ├── OrderDetailsPanel.js# Right-panel order details view
+│   │   │   └── OrderEditModal.js   # Edit an existing order
+│   │   │
+│   │   └── RankPage/
+│   │       └── index.js            # Top-10 dish leaderboard with podium
+│   │
+│   ├── services/
+│   │   ├── menuApi.js              # REST API calls (dishes, orders, stats)
+│   │   └── wechatNotification.js   # Post order summary to backend message API
+│   │
+│   └── utils/
+│       ├── iconMapping.js          # Centralised icon exports (FontAwesome)
+│       ├── imageMapper.js          # Resolve dish/meal image URLs
+│       └── soundManager.js         # Howler.js tap / add-to-cart sounds
 │
-├── package.json
+├── sync-menu.js                    # CLI: sync menuData.js → backend database
+├── .env.example                    # Environment variable template
 ├── tailwind.config.js
 ├── postcss.config.js
-├── REFACTORING_GUIDE.md         # ✨ NEW: Detailed guide
-└── PROJECT_STRUCTURE.md         # ✨ NEW: This file
+└── package.json
 ```
+
+---
 
 ## 🔄 Component Hierarchy
 
 ```
-App
-├── Sidebar (Desktop only)
-│   └── NavItem (x6)
+App (LanguageProvider)
 │
-├── Main Content
-│   ├── Header
-│   │   └── Search Input
-│   │
-│   ├── CategoryFilter
-│   │   └── Category Buttons (x5)
-│   │
-│   └── MenuGrid
-│       └── MenuItem (x6)
-│           └── Add to Order Button
+├── Sidebar              (desktop only)
+├── MobileNav            (mobile/tablet)
+├── Header               (search bar)
 │
-├── Cart (Responsive)
-│   ├── Cart Header
-│   ├── Dine In/Take Away Toggle
-│   ├── Cart Items List
-│   │   └── CartItem (multiple)
-│   │       └── Quantity Controls
-│   ├── Totals Summary
-│   └── Print Bills Button
+├── MenuPage             (activeView === 'menu')
+│   ├── Category filter buttons
+│   ├── MenuItem cards (grid)
+│   ├── CustomDishModal
+│   └── OrderSummaryModal
 │
-└── MobileNav (Mobile/Tablet only)
-    └── NavButton (x5)
+├── HistoryPage          (activeView === 'history')
+│   ├── Order list (on-process / completed tabs)
+│   └── OrderEditModal
+│
+├── RankPage             (activeView === 'rank')
+│   └── Top-10 podium + leaderboard table
+│
+├── Cart                 (right panel, menu view only)
+├── OrderDetailsPanel    (right panel, history view only)
+└── MenuItemModal        (dish detail overlay)
 ```
 
-## 📱 Responsive Behavior
+---
+
+## 📱 Responsive Layout
 
 ### Desktop (≥ 1024px)
 ```
-┌─────────┬──────────────────────────┬─────────────┐
-│         │                          │             │
-│ Sidebar │    Main Content          │    Cart     │
-│         │    - Header              │  (Sidebar)  │
-│ (Fixed) │    - Categories          │             │
-│         │    - Menu Grid (3 cols)  │  (Fixed)    │
-│         │                          │             │
-└─────────┴──────────────────────────┴─────────────┘
+┌──────────┬────────────────────────────┬─────────────────┐
+│          │                            │                 │
+│ Sidebar  │   Main Content             │  Cart / Details │
+│ (fixed)  │   Header + Page content    │  (fixed panel)  │
+│          │                            │                 │
+└──────────┴────────────────────────────┴─────────────────┘
 ```
 
-### Tablet (768px - 1023px)
+### Mobile / Tablet (< 1024px)
 ```
-┌──────────────────────────────────────┐
-│         Main Content                 │
-│         - Header                     │
-│         - Categories                 │
-│         - Menu Grid (2 cols)         │
-│                                      │
-│                          [Cart Btn]  │ ← Floating
-└──────────────────────────────────────┘
-┌──────────────────────────────────────┐
-│     Bottom Navigation Bar            │
-└──────────────────────────────────────┘
+┌──────────────────────────────────┐
+│  Header (search)                 │
+│  Page content                    │
+│                     [Cart Btn]   │  ← floating
+└──────────────────────────────────┘
+┌──────────────────────────────────┐
+│  Bottom Navigation / Drawer      │
+└──────────────────────────────────┘
 ```
 
-### Mobile (< 768px)
-```
-┌────────────────────────┐
-│    Main Content        │
-│    - Header (stacked)  │
-│    - Categories        │
-│    - Menu Grid (2 col) │
-│                        │
-│            [Cart Btn]  │ ← Floating
-└────────────────────────┘
-┌────────────────────────┐
-│  Bottom Navigation     │
-└────────────────────────┘
+---
 
-When Cart Opens:
-┌────────────────────────┐
-│ [Overlay]   │  Cart    │
-│             │  Panel   │
-│             │  [X]     │
-│             │          │
-│             │  Items   │
-│             │          │
-│             │  Total   │
-└─────────────┴──────────┘
-```
+## 🌐 API Integration
 
-## 🎨 Component Responsibilities
+The app connects to a hosted REST API. All calls are in [`src/services/menuApi.js`](src/services/menuApi.js).
 
-### **Sidebar.js**
-- Desktop navigation
-- Logo/branding
-- Navigation items with icons
-- User profile avatar
-- Hidden on mobile/tablet
+| Function | Method | Endpoint |
+|---|---|---|
+| `getDishes(params)` | GET | `/dishes` |
+| `getDishById(id)` | GET | `/dishes/:id` |
+| `getPopularDishes(limit)` | GET | `/dishes/popular` |
+| `searchDishes(keyword)` | GET | `/dishes/search` |
+| `createDish(data)` | POST | `/dishes` |
+| `updateDish(id, data)` | PUT | `/dishes/:id` |
+| `updateDishStock(id, qty)` | PATCH | `/dishes/:id/stock` |
+| `createOrder(data)` | POST | `/orders` |
+| `getOrders(params)` | GET | `/orders` |
+| `getOrderByNumber(num)` | GET | `/orders/:num` |
+| `updateOrder(num, data)` | PUT | `/orders/:num` |
+| `updateOrderStatus(num, status)` | PATCH | `/orders/:num/status` |
+| `updateOrderItems(num, items)` | PUT | `/orders/:num/items` |
+| `cancelOrder(num)` | DELETE | `/orders/:num` |
+| `getDishesStats()` | GET | `/stats/dishes` |
+| `getOrdersStats()` | GET | `/stats/orders` |
+| `checkHealth()` | GET | `/health` |
 
-### **MobileNav.js**
-- Bottom navigation bar
-- 5 main navigation items
-- Active state highlighting
-- Only visible on mobile/tablet
+On API failure the app silently falls back to the local [`src/data/menuData.js`](src/data/menuData.js) dataset.
 
-### **Header.js**
-- Welcome message
-- Search input
-- Responsive layout (stacked on mobile)
-
-### **CategoryFilter.js**
-- Category selection buttons
-- Horizontal scrollable on mobile
-- Active category highlighting
-- Receives: `activeCategory`, `onCategoryChange`
-
-### **MenuGrid.js**
-- Container for menu items
-- Section title with item count
-- Responsive grid (2-3 columns)
-- Receives: `items`, `activeCategory`, `onAddToCart`
-
-### **MenuItem.js**
-- Individual menu item card
-- Product image (circular)
-- Name, price, stock info
-- "Add to Order" button
-- Receives: `item`, `onAddToCart`
-
-### **Cart.js**
-- Shopping cart display
-- Responsive (sidebar/overlay)
-- Floating button on mobile
-- Order summary and totals
-- Checkout button
-- Receives: `cart`, `onUpdateQty`, `onCheckout`
-
-### **CartItem.js**
-- Individual cart item row
-- Product image and details
-- Quantity controls (+/-)
-- Price calculation
-- Receives: `item`, `onUpdateQty`
+---
 
 ## 📊 Data Flow
 
 ```
-menuData.js
-    ↓
-  App.js (State Management)
-    ├── activeCategory
-    ├── cart
-    ├── addToCart()
-    ├── updateQty()
-    └── handleCheckout()
-    ↓
-Components (Props)
-    ├── CategoryFilter ← activeCategory, onCategoryChange
-    ├── MenuGrid ← items, activeCategory, onAddToCart
-    └── Cart ← cart, onUpdateQty, onCheckout
+menuData.js (local fallback)
+        ↓
+menuApi.js  (live API, fetched on mount)
+        ↓
+App.js  (state: menuItems, cart, activeView, orders…)
+        ↓
+Pages & Components (props)
 ```
 
-## 🔧 State Management
+**Key App.js state:**
 
-All state is managed in `App.js`:
-
-```javascript
-const [cart, setCart] = useState([...])
-const [activeCategory, setActiveCategory] = useState('Pizza')
-```
-
-Functions:
-- `addToCart(item)` - Add item to cart or increment quantity
-- `updateQty(id, delta)` - Update item quantity (+1 or -1)
-- `handleCheckout(total)` - Process checkout
-
-## 🎯 Key Features
-
-### ✅ Responsive Design
-- Mobile-first approach
-- Tailwind breakpoints (sm, md, lg, xl)
-- Adaptive layouts for all screen sizes
-
-### ✅ Component Separation
-- Single Responsibility Principle
-- Reusable components
-- Clean prop interfaces
-
-### ✅ User Experience
-- Smooth transitions
-- Intuitive mobile cart
-- Touch-friendly buttons
-- Horizontal scroll for categories
-
-### ✅ Code Organization
-- Separated data from logic
-- Clear file structure
-- Easy to maintain and extend
-
-## 📈 Lines of Code Comparison
-
-**Before Refactoring:**
-- App.js: ~224 lines (everything in one file)
-
-**After Refactoring:**
-- App.js: ~80 lines (clean and focused)
-- Components: ~8 files (~30-40 lines each)
-- Data: 1 file (~56 lines)
-- **Total: Better organized, more maintainable!**
-
-## 🚀 Getting Started
-
-1. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Start development server:**
-   ```bash
-   npm start
-   ```
-
-3. **Test responsive design:**
-   - Resize browser window
-   - Use browser DevTools device toolbar
-   - Test on actual devices
-
-## 📚 Related Documentation
-
-- [REFACTORING_GUIDE.md](./REFACTORING_GUIDE.md) - Detailed refactoring guide
-- [README.md](./README.md) - Project overview
-- [Tailwind CSS Docs](https://tailwindcss.com/docs) - Styling reference
+| State | Type | Purpose |
+|---|---|---|
+| `cart` | array | Cart items (persisted via `useLocalStorage`) |
+| `menuItems` | array | Dishes from API (or local fallback) |
+| `activeView` | string | `menu` / `history` / `rank` / `home` / `settings` |
+| `searchQuery` | string | Global search string from Header |
+| `selectedOrder` | object | Currently viewed order in HistoryPage |
 
 ---
 
-**Last Updated:** 2025-11-22
+## 🔑 Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in:
+
+```bash
+# Backend API base URL
+REACT_APP_API_BASE_URL=https://api.chenmo1212.cn
+
+# Secret code required to submit an order
+REACT_APP_SECRET_CODE=your_secret_word
+```
+
+> ⚠️ `REACT_APP_SECRET_CODE` **must** be set. Without it, order submission will always fail with an "Incorrect code" error.
+
+---
+
+## 🎯 Key Features
+
+- **Bilingual UI** — English / Chinese toggle, persisted in `localStorage`
+- **Live API + local fallback** — dishes load from backend; falls back to `menuData.js` silently
+- **Cart persistence** — cart survives page refresh via `localStorage`
+- **Custom dish requests** — add any off-menu item via `CustomDishModal`
+- **Order history** — on-process and completed tabs with detail panel and edit/delete/restore
+- **Rank leaderboard** — top-10 dishes by order count with animated podium
+- **Sound effects** — tap and add-to-cart sounds via Howler.js
+- **Secret code gate** — `OrderSummaryModal` requires a passphrase before submitting
+
+---
+
+## 🚀 Getting Started
+
+### 1. Install dependencies
+```bash
+npm install
+```
+
+### 2. Configure environment
+```bash
+cp .env.example .env.local
+# Edit .env.local and set REACT_APP_SECRET_CODE
+```
+
+### 3. Start development server
+```bash
+npm start
+```
+
+### 4. Build for production
+```bash
+npm run build
+```
+
+---
+
+## 🔧 Menu Data Sync
+
+When you update dish data locally in [`src/data/menuData.js`](src/data/menuData.js), sync it to the database:
+
+```bash
+npm run sync-menu
+```
+
+The script compares local dishes against the database by `name` and creates or updates records as needed. It prints a summary of created / updated / skipped / errored dishes.
+
+---
+
+## 📦 Dependencies
+
+| Package | Purpose |
+|---|---|
+| `react` ^19 | UI framework |
+| `react-dom` ^19 | DOM renderer |
+| `howler` ^2.2 | Audio playback (sound effects) |
+| `@fortawesome/react-fontawesome` ^0.2 | Icon library |
+| `tailwindcss` ^3.4 | Utility-first CSS |
+
+---
+
+**Last Updated:** 2025-07-10

@@ -50,4 +50,4 @@ export default function CartItem({ item, onUpdateQty }) {
   );
 }
 
-// Made with Bob
+

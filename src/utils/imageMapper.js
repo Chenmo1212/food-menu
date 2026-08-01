@@ -119,4 +119,3 @@ export function getAllMealCovers() {
   return MEAL_COVER_MAP;
 }
 
-// Made with Bob
