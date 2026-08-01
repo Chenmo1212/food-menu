@@ -73,7 +73,7 @@ export default function OrderSummaryModal({
 
   // Handle submission
   const handleSubmit = async () => {
-    if (secretCode.toLowerCase() !== SECRET_CODE.toLowerCase()) {
+    if (!SECRET_CODE || secretCode.toLowerCase() !== SECRET_CODE.toLowerCase()) {
       soundManager.playTap();
       setCodeError(t('Incorrect code. Please try again.', '密码错误，请重试。'));
       return;
