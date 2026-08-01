@@ -1,7 +1,7 @@
 // Menu API Service
 // Backend API for Food Menu System
 
-const API_BASE_URL = process.env.REACT_APP_MENU_API_BASE_URL || 'https://api.chenmo1212.cn/menu';
+const API_BASE_URL = process.env.REACT_APP_MENU_API_BASE_URL || 'https://api.chenmo1212.cn/food-menu';
 
 /**
  * Generic API request handler
